@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/fragment_hashtag_tagview_detail_title"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/fragment_hashtag_tagview_detail_location"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/fragment_hashtag_tagview_detail_time"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/fragment_hashtag_tagview_detail_fixed"
+        android:layout_gravity="center_horizontal" />
+
+    <ImageView
+        android:layout_width="@dimen/event_picature_height"
+        android:layout_height="@dimen/event_picature_width"
+        android:layout_margin="@dimen/text_size"
+        android:id="@+id/fragment_hashtag_tagview_detail_iv"
+        android:layout_gravity="center_horizontal" />
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/tagview_btn_close"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:id="@+id/textView15" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/tagview_btn_follow"
+            android:id="@+id/textView10" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_hashtag_tagview_detail_ib1"
+            android:src="@mipmap/btn_mail_off"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:background="@drawable/btn_image_circle"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_hashtag_tagview_detail_ib2"
+            android:src="@mipmap/btn_follow"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:background="@drawable/btn_image_circle"/>
+        </LinearLayout>
+</LinearLayout>

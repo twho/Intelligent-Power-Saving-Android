@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/fragment_message_inbox_dialog_title"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/title_size"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/img_heighth"
+        android:layout_gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/img_heighth"
+            android:layout_height="@dimen/img_heighth"
+            android:id="@+id/fragment_message_inbox_dialog_iv" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:paddingTop="5dp"
+                android:text="Large Text"
+                android:id="@+id/fragment_message_inbox_dialog_sender" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/fragment_message_inbox_dialog_tv1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/fragment_message_inbox_dialog_tv2" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mail_height"
+        android:padding="10dp"
+        android:text="New Text"
+        android:textSize="@dimen/text_size"
+        android:id="@+id/fragment_message_inbox_dialog_container"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/message_fragment_dialog_feedback"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:id="@+id/textView14" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/message_fragment_dialog_close"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:id="@+id/textView15" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/message_fragment_dialog_del"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:id="@+id/textView16" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_fragment_dialog_iB1"
+            android:src="@mipmap/btn_mail_feedback"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:background="@drawable/btn_image_circle"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_fragment_dialog_iB2"
+            android:src="@mipmap/btn_mail_off"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:background="@drawable/btn_image_circle"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_fragment_dialog_iB3"
+            android:src="@mipmap/btn_mail_del"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:background="@drawable/btn_image_circle"/>
+    </LinearLayout>
+
+</LinearLayout>
