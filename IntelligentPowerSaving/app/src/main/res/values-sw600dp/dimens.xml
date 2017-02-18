@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_margin">32dp</dimen>
+
+    <!--follow image resolution-->
+    <dimen name="activity_main_img_size">72dp</dimen>
+
+    <!--DrawerListAdapter-->
+    <dimen name="obj_drawer_width">240dp</dimen>
+</resources>

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "164270675967",
+    "firebase_url": "https://intelligent-power-saving.firebaseio.com",
+    "project_id": "intelligent-power-saving",
+    "storage_bucket": "intelligent-power-saving.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164270675967:android:902c02108932d2b1",
+        "android_client_info": {
+          "package_name": "com.tsungweiho.intelligentpowersaving"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164270675967-spa998hqs8pftqqbtejkafnsi9nh001g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKo03dbnbxqIBcKTp7-AMJXKE7Ro_9gDM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

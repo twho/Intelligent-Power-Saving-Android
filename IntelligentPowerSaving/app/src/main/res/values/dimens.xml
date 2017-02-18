@@ -1,0 +1,14 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!--follow image resolution-->
+    <dimen name="activity_main_img_size">72dp</dimen>
+
+    <!--follow material design rules-->
+    <dimen name="activity_main_space">4dp</dimen>
+
+    <!--DrawerListAdapter-->
+    <dimen name="obj_drawer_width">140dp</dimen>
+</resources>
