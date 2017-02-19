@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 .setIcon(R.mipmap.ic_home_unclick).setTabListener(this);
         actionBar.addTab(tabHome);
 
-
         // All icons are padding 25%
         android.support.v7.app.ActionBar.Tab tabEvent = actionBar
                 .newTab().setIcon(R.mipmap.ic_event_unclick).setTabListener(this);
@@ -103,22 +102,18 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             case 0:
                 setFragment(HOME_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_home);
-                tab.setText(getResources().getString(R.string.navi_home));
                 break;
             case 1:
                 setFragment(EVENT_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_event);
-                tab.setText(getResources().getString(R.string.navi_event));
                 break;
             case 2:
                 setFragment(MESSAGE_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_message);
-                tab.setText(getResources().getString(R.string.navi_message));
                 break;
             case 3:
                 setFragment(SETTINGS_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_settings);
-                tab.setText(getResources().getString(R.string.navi_settings));
                 break;
         }
 
@@ -169,19 +164,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         switch (tab.getPosition()) {
             case 0:
                 tab.setIcon(R.mipmap.ic_home_unclick);
-                tab.setText(getResources().getString(R.string.navi_home));
                 break;
             case 1:
                 tab.setIcon(R.mipmap.ic_event_unclick);
-                tab.setText(getResources().getString(R.string.navi_event));
                 break;
             case 2:
                 tab.setIcon(R.mipmap.ic_message_unclick);
-                tab.setText(getResources().getString(R.string.navi_message));
                 break;
             case 3:
                 tab.setIcon(R.mipmap.ic_settings_unclick);
-                tab.setText(getResources().getString(R.string.navi_settings));
                 break;
         }
     }

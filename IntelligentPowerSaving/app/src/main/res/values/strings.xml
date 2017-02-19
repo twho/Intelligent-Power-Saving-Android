@@ -2,10 +2,6 @@
     <string name="app_name">Intelligent Power Saving</string>
 
     <!--MainActivity-->
-    <string name="navi_home">Home</string>
-    <string name="navi_event">Event</string>
-    <string name="navi_message">Message</string>
-    <string name="navi_settings">Settings</string>
     <string name="loading">Loading...</string>
 
     <!--MessageFragment-->
@@ -13,11 +9,13 @@
     <string name="inbox">Inbox</string>
 
     <!--HomeFragment-->
-    <string name="fragment_home_title">Campus Energy Consumption Summary</string>
+    <string name="fragment_home_title">Energy Consumption Dashboard</string>
 
     <!--EventFragment-->
-    <string name="fragment_event_title">Long click to add new event on map</string>
-    <string name="fragment_event_title_add">Please enter an event and take a photo of it</string>
+    <string name="fragment_event_title">Event</string>
+    <string name="fragment_event_title_add">Add an event</string>
+    <string name="fragment_event_bottom">Long click to add new event on map</string>
+    <string name="fragment_event_bottom_add">Please enter an event and take a photo of it</string>
     <string name="fragment_event_btn_full_map">Full map</string>
     <string name="fragment_event_dialog_okay">Okay</string>
     <string name="fragment_event_hint">Event, Building, Floor, etc.</string>

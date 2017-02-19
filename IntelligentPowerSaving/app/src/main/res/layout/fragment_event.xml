@@ -8,7 +8,8 @@
     <RelativeLayout
         android:id="@+id/fragment_event_relative_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark">
 
         <it.sephiroth.android.library.imagezoom.ImageViewTouch
             android:id="@+id/fragment_event_iv_map"
@@ -123,4 +124,19 @@
                 android:textColor="@color/white" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/fragment_event_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/activity_main_space"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center"
+        android:padding="@dimen/activity_main_space"
+        android:paddingBottom="@dimen/activity_main_space"
+        android:text="@string/fragment_event_bottom"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/white" />
 </RelativeLayout>

@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,7 +40,7 @@ public class EventFragment extends Fragment {
     private RelativeLayout rlMap;
     private FrameLayout flTopBarAddEvent;
     private LinearLayout llTopBarAddEvent;
-    private TextView tvTitle;
+    private TextView tvTitle, tvBottom;
     private EditText edEvent;
     private ImageButton ibAdd, ibCancel, ibCamera;
     private Button btnFullMap;
@@ -75,6 +73,7 @@ public class EventFragment extends Fragment {
         ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_btn_cancel);
         ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_btn_camera);
         tvTitle = (TextView) view.findViewById(R.id.fragment_event_title);
+        tvBottom = (TextView) view.findViewById(R.id.fragment_event_bottom);
         edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
         rlMap = (RelativeLayout) view.findViewById(R.id.fragment_event_relative_layout);
         ivMap = (ImageViewTouch) view.findViewById(R.id.fragment_event_iv_map);
@@ -140,6 +139,7 @@ public class EventFragment extends Fragment {
             animUtilities.setflAnimToVisible(flTopBarAddEvent);
             animUtilities.setllAnimToVisible(llTopBarAddEvent);
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
+            tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
             return false;
         }
     }
@@ -148,6 +148,7 @@ public class EventFragment extends Fragment {
         flTopBarAddEvent.setVisibility(View.GONE);
         llTopBarAddEvent.setVisibility(View.GONE);
         tvTitle.setText(context.getString(R.string.fragment_event_title));
+        tvBottom.setText(context.getString(R.string.fragment_event_bottom));
     }
 
     @Override
