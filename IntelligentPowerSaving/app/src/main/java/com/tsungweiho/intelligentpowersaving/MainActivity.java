@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,13 +10,16 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
+import com.tsungweiho.intelligentpowersaving.fragments.BuildingFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
-import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 
-public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
+public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTag, DBConstants {
 
     // functions
     public static Context context;
@@ -25,7 +29,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static int screenWidth;
     public static int screenHeight;
     public static ActionBar actionBar;
-    private AlertDialogManager alertDialogManager;
+    private FragmentManager fragmentManager;
+
+    // Firebase
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +43,16 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     private void init() {
-        alertDialogManager = new AlertDialogManager(context);
+        fragmentManager = getSupportFragmentManager();
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
+
+        // Firebase sign in
+        auth = FirebaseAuth.getInstance();
+        auth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD);
 
         setTab();
     }
@@ -87,38 +99,68 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        Fragment fragment = null;
         switch (tab.getPosition()) {
             case 0:
-                fragment = new HomeFragment();
+                setFragment(HOME_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_home);
                 tab.setText(getResources().getString(R.string.navi_home));
                 break;
             case 1:
-                fragment = new EventFragment();
+                setFragment(EVENT_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_event);
                 tab.setText(getResources().getString(R.string.navi_event));
                 break;
             case 2:
-                fragment = new MessageFragment();
+                setFragment(MESSAGE_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_message);
                 tab.setText(getResources().getString(R.string.navi_message));
                 break;
             case 3:
-                fragment = new SettingsFragment();
+                setFragment(SETTINGS_FRAGMENT);
                 tab.setIcon(R.mipmap.ic_settings);
                 tab.setText(getResources().getString(R.string.navi_settings));
+                break;
+        }
+
+    }
+
+    private void setFragment(String fragmentTag) {
+        Fragment fragment = null;
+
+        switch (fragmentTag) {
+            case HOME_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(HOME_FRAGMENT);
+                if (null == fragment)
+                    fragment = new HomeFragment();
+                break;
+            case EVENT_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(EVENT_FRAGMENT);
+                if (null == fragment)
+                    fragment = new EventFragment();
+                break;
+            case MESSAGE_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(MESSAGE_FRAGMENT);
+                if (null == fragment)
+                    fragment = new MessageFragment();
+                break;
+            case SETTINGS_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(SETTINGS_FRAGMENT);
+                if (null == fragment)
+                    fragment = new SettingsFragment();
+                break;
+            case BUILDING_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(BUILDING_FRAGMENT);
+                if (null == fragment)
+                    fragment = new BuildingFragment();
                 break;
         }
 
         try {
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction();
-            transaction.replace(R.id.activity_main_frameLayout, fragment);
-            transaction.commit();
-
+            transaction.replace(R.id.activity_main_frameLayout, fragment, fragmentTag).addToBackStack(fragmentTag).commit();
         } catch (Exception e) {
-            Log.e("TAG", e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 

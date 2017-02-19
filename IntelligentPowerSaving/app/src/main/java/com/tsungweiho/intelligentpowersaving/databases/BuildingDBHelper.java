@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 
 public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
-    public static final String DBNAME = "buildingdb.sqlite";
+    public static final String DBNAME = "ips.db.sqlite";
     public static final int VERSION = 1;
     public static final String TABLENAME = "building_details";
 
@@ -40,25 +40,19 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
 
     public Boolean checkIfExist(String name) {
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT Name FROM " + TABLENAME +
-                " WHERE name LIKE ?";
+        String sql = "SELECT " + BUILDING_NAME + " FROM " + TABLENAME +
+                " WHERE " + BUILDING_NAME + " LIKE ?";
         String[] args = {"%" + name + "%"};
         Cursor cursor = db.rawQuery(sql, args);
-        ArrayList<String> locations = new ArrayList<String>();
-        int columnCount = cursor.getColumnCount();
-        while (cursor.moveToNext()) {
-            String nameLocation = "";
-            for (int i = 0; i < columnCount; i++)
-                nameLocation += cursor.getString(i) + "\n  ";
-            locations.add(nameLocation);
+        Boolean ifExist;
+        if (cursor.moveToNext()) {
+            ifExist = true;
+        } else {
+            ifExist = false;
         }
         cursor.close();
         db.close();
-        if (locations.size() > 0) {
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
-        }
+        return ifExist;
     }
 
     @Override
@@ -77,5 +71,23 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         long rowId = db.insert(TABLENAME, null, values);
         db.close();
         return rowId;
+    }
+
+    public ArrayList<Building> getAllBuildingList() {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Building> buildingList = new ArrayList<Building>();
+        String sql = "SELECT * FROM " + TABLENAME;
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(1);
+            String detail = cursor.getString(2);
+            String consumption = cursor.getString(3);
+            String imgUrl = cursor.getString(4);
+            Building building = new Building(name, detail, consumption, imgUrl);
+            buildingList.add(building);
+        }
+        cursor.close();
+        db.close();
+        return buildingList;
     }
 }

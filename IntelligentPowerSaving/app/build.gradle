@@ -28,6 +28,9 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:design:25.0.0'
     compile 'com.google.firebase:firebase-core:10.2.0'
+    compile 'com.google.firebase:firebase-database:10.2.0'
+    compile 'com.google.firebase:firebase-auth:10.2.0'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     testCompile 'junit:junit:4.12'
 }
 

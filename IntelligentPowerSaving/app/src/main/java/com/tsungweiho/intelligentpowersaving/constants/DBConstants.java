@@ -6,6 +6,11 @@ package com.tsungweiho.intelligentpowersaving.constants;
 
 public interface DBConstants {
 
+    // Firebase
+    String BUILDING_DB = "buildingList";
+    String SYSTEM_ACCOUNT = "tsungwei50521@hotmail.com";
+    String SYSTEM_PWD = "801020";
+
     // BuildingDBHelper
     String ID = "Id";
     String BUILDING_NAME = "BUILDING_NAME";

@@ -4,7 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!--follow image resolution-->
-    <dimen name="activity_main_img_size">72dp</dimen>
+    <dimen name="activity_main_img_size">120dp</dimen>
+    <dimen name="activity_main_img_size_padding">6dp</dimen>
 
     <!--follow material design rules-->
     <dimen name="activity_main_space">4dp</dimen>

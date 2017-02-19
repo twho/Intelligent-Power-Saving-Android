@@ -2,5 +2,5 @@
     <item android:drawable="@color/colorTint" android:state_focused="true" android:state_pressed="true" />
     <item android:drawable="@color/colorTint" android:state_focused="false" android:state_pressed="true" />
     <item android:drawable="@color/colorTint" android:state_focused="true" android:state_pressed="false" />
-    <item android:drawable="@color/colorPrimary" android:state_focused="false" android:state_pressed="false" />
+    <item android:drawable="@color/colorPrimaryLTDark" android:state_focused="false" android:state_pressed="false" />
 </selector>

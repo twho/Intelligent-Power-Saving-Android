@@ -13,18 +13,18 @@
         android:background="@color/colorPrimaryDark"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/fragment_message_linear_layout"
+        <FrameLayout
+            android:id="@+id/fragment_message_frame_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryLTDark"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/fragment_message_ib_options"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|top"
+                android:layout_gravity="left|center_vertical"
                 android:background="@drawable/background_bar_button"
                 android:src="@mipmap/ic_options" />
 
@@ -42,11 +42,12 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
                 android:background="@drawable/background_bar_button"
                 android:text="@string/unread"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="@color/white" />
-        </LinearLayout>
+        </FrameLayout>
 
         <ListView
             android:id="@+id/fragment_message_lv_message"

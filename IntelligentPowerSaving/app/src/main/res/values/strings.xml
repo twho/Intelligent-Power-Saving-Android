@@ -11,4 +11,18 @@
     <!--MessageFragment-->
     <string name="unread">Unread</string>
     <string name="inbox">Inbox</string>
+
+    <!--HomeFragment-->
+    <string name="fragment_home_title">Campus Energy Consumption Summary</string>
+
+    <!--EventFragment-->
+    <string name="fragment_event_title">Long click to add new event on map</string>
+    <string name="fragment_event_title_add">Please enter an event and take a photo of it</string>
+    <string name="fragment_event_btn_full_map">Full map</string>
+    <string name="fragment_event_dialog_okay">Okay</string>
+    <string name="fragment_event_hint">Event, Building, Floor, etc.</string>
+
+    <!--BuildingIcon-->
+    <string name="decrease_weekly">decrease over 1 week</string>
+    <string name="increase_weekly">increase over 1 week</string>
 </resources>

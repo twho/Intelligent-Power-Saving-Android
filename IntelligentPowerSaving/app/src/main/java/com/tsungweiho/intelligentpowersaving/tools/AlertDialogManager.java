@@ -7,26 +7,40 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.FeatureInfo;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
-public class AlertDialogManager {
+import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
+
+public class AlertDialogManager implements BuildingConstants {
     private Context context;
-
 
     public AlertDialogManager(Context context) {
         this.context = context;
     }
 
     public void showAlertDialog(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK).create();
 
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
 
         // Setting OK Button
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(context.getString(R.string.fragment_event_dialog_okay), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
             }
         });
@@ -37,43 +51,19 @@ public class AlertDialogManager {
 
 
     public void showMessageDialog(String title, String message) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        final AlertDialog alertDialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK).create();
 
         alertDialog.setTitle(title);
 
         alertDialog.setMessage(message);
 
         // Setting OK Button
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(context.getString(R.string.fragment_event_dialog_okay), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 alertDialog.dismiss();
             }
         });
 
-        // Showing Alert Message
-        alertDialog.show();
-    }
-
-    public void showExitDialog() {
-        final AlertDialog alertDialog = new AlertDialog.Builder(context)
-                .create();
-
-        alertDialog.setTitle("Exit");
-        alertDialog.setMessage("You are leaving CourseCloud");
-
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Comfirm",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        ((Activity) context).finish();
-                    }
-                });
-
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                    }
-                });
         // Showing Alert Message
         alertDialog.show();
     }

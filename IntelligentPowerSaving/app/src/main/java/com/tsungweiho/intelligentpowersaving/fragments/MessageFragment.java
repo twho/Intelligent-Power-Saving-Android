@@ -4,14 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.tsungweiho.intelligentpowersaving.MainActivity;
@@ -31,7 +30,7 @@ public class MessageFragment extends Fragment implements DrawerListConstants {
 
     // UI Views
     private DrawerListAdapter drawerListAdapter;
-    private LinearLayout ll;
+    private FrameLayout flTopBar;
     private ImageButton ibOptions;
 
     // Functions
@@ -57,7 +56,7 @@ public class MessageFragment extends Fragment implements DrawerListConstants {
                 drawer.openDrawer(Gravity.LEFT);
             }
         });
-        ll = (LinearLayout) view.findViewById(R.id.fragment_message_linear_layout);
+        flTopBar = (FrameLayout) view.findViewById(R.id.fragment_message_frame_layout);
         navList.setAdapter(drawerListAdapter);
         navList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
