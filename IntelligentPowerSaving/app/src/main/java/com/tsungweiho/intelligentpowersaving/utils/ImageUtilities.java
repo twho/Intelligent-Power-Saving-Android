@@ -25,7 +25,13 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.tsungweiho.intelligentpowersaving.R;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Calendar;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/7.
@@ -175,6 +181,25 @@ public class ImageUtilities {
         byte[] ba = bao.toByteArray();
         String ba1 = Base64.encodeToString(ba, Base64.DEFAULT);
         return ba1;
+    }
+
+    public File getFileFromBitmap(Bitmap bitmap) {
+        File file = new File(context.getCacheDir(), String.valueOf(Calendar.getInstance().getTimeInMillis()));
+        try {
+            file.createNewFile();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return file;
     }
 
     public static Bitmap getOvalCroppedBitmap(Bitmap bitmap, int radius) {

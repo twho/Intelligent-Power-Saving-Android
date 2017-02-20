@@ -82,15 +82,28 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/colorTint"></EditText>
 
-            <ImageButton
-                android:id="@+id/fragment_event_btn_camera"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
-                android:background="@drawable/background_bar_button"
-                android:scaleType="centerInside"
-                android:src="@mipmap/ic_camera"
-                android:textColor="@color/white" />
+                android:layout_gravity="left|center_vertical">
+
+                <ImageButton
+                    android:id="@+id/fragment_event_btn_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_bar_button"
+                    android:scaleType="centerInside"
+                    android:src="@mipmap/ic_camera"
+                    android:textColor="@color/white" />
+
+                <ImageView
+                    android:id="@+id/fragment_event_add_icon"
+                    android:layout_width="@dimen/activity_main_notification_icon_size"
+                    android:layout_height="@dimen/activity_main_notification_icon_size"
+                    android:layout_gravity="right|top"
+                    android:src="@mipmap/ic_check"
+                    android:visibility="gone" />
+            </FrameLayout>
         </FrameLayout>
 
         <LinearLayout

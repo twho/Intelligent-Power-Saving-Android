@@ -6,6 +6,7 @@
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">120dp</dimen>
     <dimen name="activity_main_img_size_padding">6dp</dimen>
+    <dimen name="activity_main_notification_icon_size">20dp</dimen>
 
     <!--follow material design rules-->
     <dimen name="activity_main_space">4dp</dimen>

@@ -6,6 +6,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.tsungweiho.intelligentpowersaving.R;
@@ -46,6 +47,14 @@ public class AnimUtilities {
         Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         am.setDuration(ANIM_DURATION);
         frameLayout.setAnimation(am);
+        am.startNow();
+    }
+
+    public void setIconAnimToVisible(ImageView imageView) {
+        imageView.setVisibility(View.VISIBLE);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_fab_in);
+        am.setDuration(ANIM_DURATION);
+        imageView.setAnimation(am);
         am.startNow();
     }
 }

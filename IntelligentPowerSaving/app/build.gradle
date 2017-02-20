@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
 }
 
 dependencies {
@@ -30,9 +33,10 @@ dependencies {
     compile 'com.google.firebase:firebase-core:10.2.0'
     compile 'com.google.firebase:firebase-database:10.2.0'
     compile 'com.google.firebase:firebase-auth:10.2.0'
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
+    compile 'com.github.AKiniyalocts:imgur-api:-SNAPSHOT'
     testCompile 'junit:junit:4.12'
 }
 

@@ -27,12 +27,20 @@
                 android:textColor="@color/white" />
 
             <ImageButton
-                android:id="@+id/fragment_message_ib_options"
+                android:id="@+id/fragment_home_ib_following"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
                 android:background="@drawable/background_bar_button"
                 android:src="@mipmap/ic_unfollow" />
+
+            <ImageButton
+                android:id="@+id/fragment_home_ib_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:background="@drawable/background_bar_button"
+                android:src="@mipmap/ic_refresh" />
         </FrameLayout>
 
         <ScrollView

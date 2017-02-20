@@ -1,10 +1,16 @@
 package com.tsungweiho.intelligentpowersaving.fragments;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,24 +19,40 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
+import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
+import com.tsungweiho.intelligentpowersaving.objects.Upload;
+import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
+import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment implements FragmentTag {
+
+    private String TAG = "EventFragment";
 
     // Event Fragment View
     private View view;
@@ -42,6 +64,7 @@ public class EventFragment extends Fragment {
     private LinearLayout llTopBarAddEvent;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
+    private ImageView ivAddIcon;
     private ImageButton ibAdd, ibCancel, ibCamera;
     private Button btnFullMap;
 
@@ -50,8 +73,16 @@ public class EventFragment extends Fragment {
     private EventDBHelper eventDBHelper;
     private RelativeLayout.LayoutParams params;
     private String xPos, yPos;
+    private ImageUtilities imageUtilities;
     private AnimUtilities animUtilities;
+    private AlertDialogManager alertDialogManager;
     private EventFragmentListener eventFragmentListener;
+    private Upload upload;
+
+    // Camera
+    public static final int REQUEST_CODE_CAMERA = 1;
+    public static final int REQUEST_CODE_IMAGE = 0;
+    private Bitmap bmpBuffer = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,8 +94,10 @@ public class EventFragment extends Fragment {
     }
 
     private void init() {
+        imageUtilities = new ImageUtilities(context);
         animUtilities = new AnimUtilities(context);
         eventFragmentListener = new EventFragmentListener();
+        alertDialogManager = new AlertDialogManager(context);
 
         // find views
         flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
@@ -78,6 +111,7 @@ public class EventFragment extends Fragment {
         rlMap = (RelativeLayout) view.findViewById(R.id.fragment_event_relative_layout);
         ivMap = (ImageViewTouch) view.findViewById(R.id.fragment_event_iv_map);
         btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
+        ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
 
         // init map view
         ivMap.setDisplayType(ImageViewTouchBase.DisplayType.FIT_IF_BIGGER);
@@ -113,12 +147,19 @@ public class EventFragment extends Fragment {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_event_btn_add:
-                    dismissAddView();
+                    if (edEvent.getText().toString().length() == 0) {
+                        alertDialogManager.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
+                    } else {
+                        createUpload(imageUtilities.getFileFromBitmap(bmpBuffer));
+                        new UploadService(context).Execute(upload, new UiCallback());
+                        dismissAddView();
+                    }
                     break;
                 case R.id.fragment_event_btn_cancel:
                     dismissAddView();
                     break;
                 case R.id.fragment_event_btn_camera:
+                    alertDialogManager.showCameraDialog(EVENT_FRAGMENT);
                     break;
                 case R.id.fragment_event_btn_full_map:
                     Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.img_campus_map);
@@ -149,6 +190,42 @@ public class EventFragment extends Fragment {
         llTopBarAddEvent.setVisibility(View.GONE);
         tvTitle.setText(context.getString(R.string.fragment_event_title));
         tvBottom.setText(context.getString(R.string.fragment_event_bottom));
+        edEvent.setText("");
+        ivAddIcon.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE_IMAGE) {
+                ContentResolver resolver = context.getContentResolver();
+                Uri uri = data.getData();
+
+                try {
+                    bmpBuffer = MediaStore.Images.Media.getBitmap(resolver, uri);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == REQUEST_CODE_CAMERA) {
+                bmpBuffer = (Bitmap) data.getExtras().get("data");
+            }
+
+            if (null != bmpBuffer)
+                animUtilities.setIconAnimToVisible(ivAddIcon);
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void createUpload(File image) {
+        upload = new Upload();
+
+        upload.image = image;
+        upload.title = edEvent.getText().toString();
+        upload.description = edEvent.getText().toString();
     }
 
     @Override
@@ -157,5 +234,22 @@ public class EventFragment extends Fragment {
 
         // clean text
         edEvent.setText("");
+    }
+
+    private class UiCallback implements Callback<ImageResponse> {
+
+        @Override
+        public void success(ImageResponse imageResponse, Response response) {
+            Log.d(TAG, imageResponse.toString());
+            Log.d(TAG, response.toString());
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            //Assume we have no connection, since error is null
+            if (error == null) {
+
+            }
+        }
     }
 }

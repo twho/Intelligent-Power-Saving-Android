@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +49,7 @@ public class HomeFragment extends Fragment implements DBConstants {
     // UI Views;
     private GridLayout gridLayout;
     private LinearLayout llProgress;
+    private ImageButton ibRefresh;
 
     // Functions
     private Context context;
@@ -72,6 +74,17 @@ public class HomeFragment extends Fragment implements DBConstants {
         gridLayout = (GridLayout) view.findViewById(R.id.fragment_home_grid_layout);
         llProgress = (LinearLayout) view.findViewById(R.id.fragment_home_progress_layout);
         animUtilities.setllAnimToVisible(llProgress);
+        ibRefresh = (ImageButton) view.findViewById(R.id.fragment_home_ib_refresh);
+        ibRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadDataFromFirebase();
+            }
+        });
+
+        // Configure for small screen with width under 1080dp
+        if (MainActivity.screenWidth <= 1080)
+            gridLayout.setColumnCount(2);
     }
 
     @Override
@@ -127,7 +140,7 @@ public class HomeFragment extends Fragment implements DBConstants {
 
     private String loadJSONFromAsset() {
         String json = null;
-        InputStream is = null;
+        InputStream is;
         try {
             is = context.getAssets().open(LOCAL_BUILDING_JSON);
             int size = is.available();
@@ -136,7 +149,7 @@ public class HomeFragment extends Fragment implements DBConstants {
             is.close();
             json = new String(buffer, "UTF-8");
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
         return json;
     }

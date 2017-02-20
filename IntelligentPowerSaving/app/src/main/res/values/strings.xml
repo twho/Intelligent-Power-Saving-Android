@@ -17,10 +17,23 @@
     <string name="fragment_event_bottom">Long click to add new event on map</string>
     <string name="fragment_event_bottom_add">Please enter an event and take a photo of it</string>
     <string name="fragment_event_btn_full_map">Full map</string>
-    <string name="fragment_event_dialog_okay">Okay</string>
     <string name="fragment_event_hint">Event, Building, Floor, etc.</string>
+    <string name="fragment_event_err_no_ed">Please enter at least one event name.</string>
+
+    <!--Imgur API-->
+    <string name="notification_fail">Image failed to upload...</string>
+    <string name="notification_share_link">Share link</string>
+    <string name="notifaction_success">Successfully uploaded</string>
+    <string name="notification_progress">Uploading image...</string>
 
     <!--BuildingIcon-->
     <string name="decrease_weekly">decrease over 1 week</string>
     <string name="increase_weekly">increase over 1 week</string>
+
+    <!--AlertDialogManager-->
+    <string name="alert_dialog_manager_camera_title">Get a photo for the event from:</string>
+    <string name="alert_dialog_manager_camera_camera">Camera</string>
+    <string name="alert_dialog_manager_camera_photo">My photo gallery</string>
+    <string name="alert_dialog_manager_ok">Okay</string>
+    <string name="alert_dialog_manager_error">Error</string>
 </resources>
