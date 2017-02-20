@@ -17,13 +17,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -84,10 +92,10 @@ public class HomeFragment extends Fragment implements DBConstants {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot buildingSnapshot : dataSnapshot.getChildren()) {
-                    String name = buildingSnapshot.child("name").getValue().toString();
-                    String detail = buildingSnapshot.child("detail").getValue().toString();
-                    String consumption = buildingSnapshot.child("consumption").getValue().toString();
-                    String imgUrl = buildingSnapshot.child("img_url").getValue().toString();
+                    String name = buildingSnapshot.child(FDB_NAME).getValue().toString();
+                    String detail = buildingSnapshot.child(FDB_DETAIL).getValue().toString();
+                    String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue().toString();
+                    String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue().toString();
                     building = new Building(name, detail, consumption, imgUrl);
                     if (!buildingDBHelper.checkIfExist(name))
                         buildingDBHelper.insertDB(building);
@@ -101,6 +109,11 @@ public class HomeFragment extends Fragment implements DBConstants {
         });
 
         buildingList = buildingDBHelper.getAllBuildingList();
+
+        // Read local file
+        if (buildingList.size() == 0)
+            addBuildingToDatabase();
+
         Building building;
         llProgress.setVisibility(View.GONE);
         gridLayout.removeAllViews();
@@ -110,5 +123,44 @@ public class HomeFragment extends Fragment implements DBConstants {
             gridLayout.addView(buildingIcon.getView());
         }
         animUtilities.setglAnimToVisible(gridLayout);
+    }
+
+    private String loadJSONFromAsset() {
+        String json = null;
+        InputStream is = null;
+        try {
+            is = context.getAssets().open(LOCAL_BUILDING_JSON);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    private void addBuildingToDatabase() {
+        JSONObject obj = null;
+        try {
+            obj = new JSONObject(loadJSONFromAsset());
+            JSONArray jArry = obj.getJSONArray(JSON_ARRAY_NAME);
+
+            Building building = null;
+            for (int i = 0; i < jArry.length(); i++) {
+                JSONObject currentObj = jArry.getJSONObject(i);
+
+                String name = currentObj.getString(FDB_NAME);
+                String detail = currentObj.getString(FDB_DETAIL);
+                String consumption = currentObj.getString(FDB_CONSUMPTION);
+                String imgUrl = currentObj.getString(FDB_IMGURL);
+                building = new Building(name, detail, consumption, imgUrl);
+                if (!buildingDBHelper.checkIfExist(name))
+                    buildingDBHelper.insertDB(building);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

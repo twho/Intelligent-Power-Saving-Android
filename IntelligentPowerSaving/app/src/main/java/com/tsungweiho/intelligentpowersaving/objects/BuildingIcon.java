@@ -46,7 +46,7 @@ public class BuildingIcon extends View {
         tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
         tvBuilding.setText(building.getName());
         tvConsump.setText(building.getConsumption());
-        if ("high".equalsIgnoreCase(building.getDetail().split(",")[0])) {
+        if ("high".equalsIgnoreCase(building.getConsumption().split(",")[0])) {
             tvConsump.setText(context.getString(R.string.increase_weekly));
             setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.light_red));
             ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_increase));
@@ -55,7 +55,7 @@ public class BuildingIcon extends View {
             setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.green));
             ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_decrease));
         }
-        tvConsumpPercent.setText(building.getDetail().split(",")[1] + " %");
+        tvConsumpPercent.setText(building.getConsumption().split(",")[1] + " %");
 
         view.setOnClickListener(new OnClickListener() {
             @Override

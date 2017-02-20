@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
     public static final String DBNAME = "ips.db.sqlite";
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final String TABLENAME = "building_details";
 
     public BuildingDBHelper(Context context) {

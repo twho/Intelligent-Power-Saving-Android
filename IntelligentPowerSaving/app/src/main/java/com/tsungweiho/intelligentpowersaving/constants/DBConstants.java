@@ -10,6 +10,12 @@ public interface DBConstants {
     String BUILDING_DB = "buildingList";
     String SYSTEM_ACCOUNT = "tsungwei50521@hotmail.com";
     String SYSTEM_PWD = "801020";
+    String FDB_NAME = "name";
+    String FDB_CONSUMPTION = "consumption";
+    String FDB_DETAIL = "detail";
+    String FDB_IMGURL = "img_url";
+    String LOCAL_BUILDING_JSON = "intelligent-power-saving-export.json";
+    String JSON_ARRAY_NAME = "buildingList";
 
     // BuildingDBHelper
     String ID = "Id";
