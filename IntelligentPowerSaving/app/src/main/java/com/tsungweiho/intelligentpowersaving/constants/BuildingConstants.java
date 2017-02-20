@@ -1,7 +1,7 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
- * Created by tsung on 2017/2/18.
+ * Created by Tsung Wei Ho on 4/15/2015.
  */
 
 public interface BuildingConstants {

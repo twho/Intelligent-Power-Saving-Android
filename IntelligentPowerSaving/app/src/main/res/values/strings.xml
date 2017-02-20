@@ -36,4 +36,7 @@
     <string name="alert_dialog_manager_camera_photo">My photo gallery</string>
     <string name="alert_dialog_manager_ok">Okay</string>
     <string name="alert_dialog_manager_error">Error</string>
+    <string name="alert_dialog_manager_img_title">Current Image</string>
+    <string name="alert_dialog_manager_img_take_new">Take a new one</string>
+    <string name="alert_dialog_manager_img_use_this">Use this</string>
 </resources>

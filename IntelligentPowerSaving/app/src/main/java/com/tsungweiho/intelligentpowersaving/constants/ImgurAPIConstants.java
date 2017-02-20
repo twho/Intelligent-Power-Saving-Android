@@ -10,15 +10,18 @@ import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
 /**
- * Created by AKiniyalocts on 2/23/15.
- * <p/>
+ * Created by AKiniyalocts on 2/23/2015.
+ * Modified by Tsung Wei Ho on 2/20/2017
  * This is our imgur API. It generates a rest API via Retrofit from Square inc.
- * <p/>
- * more here: http://square.github.io/retrofit/
  */
 public interface ImgurAPIConstants {
     String server = "https://api.imgur.com";
 
+    // Imgur
+    String IMGUR_CLIENT_ID = "07560f65c2774dc";
+    String IMGUR_POST_CLIENT_ID = "Client-ID 07560f65c2774dc";
+    String IMGUR_CLIENT_SECRET = "1893bd07d25e1083d272fe4a5069f2e56a03d07c";
+    boolean LOGGING = false;
 
     /****************************************
      * Upload

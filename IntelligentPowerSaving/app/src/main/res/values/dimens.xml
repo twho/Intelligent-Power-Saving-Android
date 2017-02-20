@@ -13,4 +13,8 @@
 
     <!--DrawerListAdapter-->
     <dimen name="obj_drawer_width">140dp</dimen>
+
+    <!--AlertDialogManager-->
+    <dimen name="alert_dialog_manager_min_width">300dp</dimen>
+    <dimen name="alert_dialog_manager_single_img_size">270dp</dimen>
 </resources>

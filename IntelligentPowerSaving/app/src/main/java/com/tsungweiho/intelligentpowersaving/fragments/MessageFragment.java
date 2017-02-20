@@ -13,17 +13,21 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DrawerListConstants;
+import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
+
+import java.util.Arrays;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class MessageFragment extends Fragment implements DrawerListConstants {
+public class MessageFragment extends Fragment implements DrawerListConstants, PubNubAPIConstants {
 
     // Message Fragment View
     private View view;
@@ -36,6 +40,9 @@ public class MessageFragment extends Fragment implements DrawerListConstants {
     // Functions
     private Context context;
 
+    // PubNub
+    PubNub pubnub = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,6 +53,10 @@ public class MessageFragment extends Fragment implements DrawerListConstants {
     }
 
     private void init() {
+        // subscribe to PubNub channels
+        pubnub = new PubNub(MainActivity.getPNConfiguration());
+        pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
+
         drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
         final DrawerLayout drawer = (DrawerLayout) view.findViewById(R.id.fragment_message_drawer_layout);
         final ListView navList = (ListView) view.findViewById(R.id.fragment_message_drawer);

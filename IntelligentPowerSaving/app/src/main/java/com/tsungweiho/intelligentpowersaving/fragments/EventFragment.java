@@ -24,10 +24,20 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNStatusCategory;
+import com.pubnub.api.models.consumer.PNPublishResult;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
+import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
+import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Upload;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
@@ -38,6 +48,8 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Calendar;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
@@ -50,7 +62,7 @@ import retrofit.client.Response;
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class EventFragment extends Fragment implements FragmentTag {
+public class EventFragment extends Fragment implements FragmentTag, PubNubAPIConstants {
 
     private String TAG = "EventFragment";
 
@@ -84,6 +96,9 @@ public class EventFragment extends Fragment implements FragmentTag {
     public static final int REQUEST_CODE_IMAGE = 0;
     private Bitmap bmpBuffer = null;
 
+    // PubNub
+    PubNub pubnub = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -98,6 +113,11 @@ public class EventFragment extends Fragment implements FragmentTag {
         animUtilities = new AnimUtilities(context);
         eventFragmentListener = new EventFragmentListener();
         alertDialogManager = new AlertDialogManager(context);
+
+        // subscribe to PubNub channels
+        pubnub = new PubNub(MainActivity.getPNConfiguration());
+        pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
+        pubnub.addListener(eventFragmentListener);
 
         // find views
         flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
@@ -141,7 +161,7 @@ public class EventFragment extends Fragment implements FragmentTag {
         return coord;
     }
 
-    private class EventFragmentListener implements View.OnClickListener, View.OnTouchListener, View.OnLongClickListener {
+    private class EventFragmentListener extends SubscribeCallback implements View.OnClickListener, View.OnTouchListener, View.OnLongClickListener {
 
         @Override
         public void onClick(View view) {
@@ -152,6 +172,16 @@ public class EventFragment extends Fragment implements FragmentTag {
                     } else {
                         createUpload(imageUtilities.getFileFromBitmap(bmpBuffer));
                         new UploadService(context).Execute(upload, new UiCallback());
+                        pubnub.publish()
+                                .message(new Event(Calendar.getInstance().getTimeInMillis() + "", "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test"))
+                                .channel(EVENT_CHANNEL)
+                                .async(new PNCallback<PNPublishResult>() {
+                                    @Override
+                                    public void onResponse(PNPublishResult result, PNStatus status) {
+                                        // handle publish result, status always present, result if successful
+                                        // status.isError to see if error happened
+                                    }
+                                });
                         dismissAddView();
                     }
                     break;
@@ -159,7 +189,11 @@ public class EventFragment extends Fragment implements FragmentTag {
                     dismissAddView();
                     break;
                 case R.id.fragment_event_btn_camera:
-                    alertDialogManager.showCameraDialog(EVENT_FRAGMENT);
+                    if (null == bmpBuffer)
+                        alertDialogManager.showCameraDialog(EVENT_FRAGMENT);
+                    else {
+                        alertDialogManager.showImageDialog(EVENT_FRAGMENT, bmpBuffer);
+                    }
                     break;
                 case R.id.fragment_event_btn_full_map:
                     Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.img_campus_map);
@@ -183,6 +217,23 @@ public class EventFragment extends Fragment implements FragmentTag {
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
             return false;
         }
+
+        @Override
+        public void status(PubNub pubnub, PNStatus status) {
+            if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
+                // TODO connectivity
+            }
+        }
+
+        @Override
+        public void message(PubNub pubnub, PNMessageResult message) {
+            Log.d("PubNub Temporary Test", message.toString());
+        }
+
+        @Override
+        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
+        }
     }
 
     private void dismissAddView() {
@@ -192,6 +243,7 @@ public class EventFragment extends Fragment implements FragmentTag {
         tvBottom.setText(context.getString(R.string.fragment_event_bottom));
         edEvent.setText("");
         ivAddIcon.setVisibility(View.GONE);
+        bmpBuffer = null;
     }
 
     @Override
@@ -232,8 +284,7 @@ public class EventFragment extends Fragment implements FragmentTag {
     public void onPause() {
         super.onPause();
 
-        // clean text
-        edEvent.setText("");
+        // TODO Clean memory
     }
 
     private class UiCallback implements Callback<ImageResponse> {

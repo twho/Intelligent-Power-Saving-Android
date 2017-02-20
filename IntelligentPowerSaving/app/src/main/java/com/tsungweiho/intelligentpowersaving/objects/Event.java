@@ -1,94 +1,76 @@
-package com.ibplan.michaelho.com.ibplan.michaelho.objects;
+package com.tsungweiho.intelligentpowersaving.objects;
+
+import java.util.ArrayList;
 
 /**
  * Created by Tsung Wei Ho on 2015/5/23.
  */
 public class Event {
-    private String name;
-    private String department;
-    private String location;
-    private String posX;
-    private String posY;
-    private String event;
-    private byte[] posterImg;
-    private byte[] image;
+    private String uniqueId;
+    private String detail;
+    private String position;
+    private String posterImg;
+    private String image;
     private String time;
     private String ifFixed;
 
-    public Event(String name, String department, String location, String posX, String posY, String event, byte[] image, byte[] posterImg, String time, String ifFixed) {
-        this.name = name;
-        this.department = department;
-        this.location = location;
-        this.posX = posX;
-        this.posY = posY;
-        this.event = event;
+    public Event(String uniqueId, String detail, String position, String image, String posterImg, String time, String ifFixed) {
+        this.uniqueId = uniqueId;
+        this.detail = detail;
+        this.position = position;
         this.image = image;
         this.posterImg = posterImg;
         this.time = time;
         this.ifFixed = ifFixed;
     }
 
-    public String getName() {
-        return name;
+    public Event(ArrayList<String> eventArray) {
+        this.uniqueId = eventArray.get(0);
+        this.detail = eventArray.get(1);
+        this.position = eventArray.get(2);
+        this.image = eventArray.get(3);
+        this.posterImg = eventArray.get(4);
+        this.time = eventArray.get(5);
+        this.ifFixed = eventArray.get(6);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getUniqueId() {
+        return uniqueId;
     }
 
-    public String getDepartment() {
-        return department;
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public String getDetail() {
+        return detail;
     }
 
-    public String getLocation() {
-        return location;
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public String getPosition() {
+        return position;
     }
 
-    public String getPosX() {
-        return posX;
+    public void setPosition(String posX) {
+        this.position = position;
     }
 
-    public void setPosX(String posX) {
-        this.posX = posX;
-    }
-
-    public String getPosY() {
-        return posY;
-    }
-
-    public void setPosY(String posY) {
-        this.posY = posY;
-    }
-
-    public String getEvent() {
-        return event;
-    }
-
-    public void setEvent(String event) {
-        this.event = event;
-    }
-
-    public byte[] getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
-    public byte[] getPosterImg() {
+    public String getPosterImg() {
         return posterImg;
     }
 
-    public void setPosterImg(byte[] posterImg) {
+    public void setPosterImg(String posterImg) {
         this.posterImg = posterImg;
     }
 

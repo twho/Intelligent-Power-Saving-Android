@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Customization of dimensions for screens with more than 1280dp of available width. This
+             would include 10" or higher screen size devices in portrait -->
+    <dimen name="activity_horizontal_margin">64dp</dimen>
+
+    <!--follow image resolution-->
+    <dimen name="activity_main_img_size">200dp</dimen>
+    <dimen name="activity_main_img_size_padding">10dp</dimen>
+
+    <!--AlertDialogManager-->
+    <dimen name="alert_dialog_manager_min_width">800dp</dimen>
+    <dimen name="alert_dialog_manager_single_img_size">720dp</dimen>
+</resources>

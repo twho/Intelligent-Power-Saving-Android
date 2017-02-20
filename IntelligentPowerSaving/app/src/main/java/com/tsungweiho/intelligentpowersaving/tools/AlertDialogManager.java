@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.FeatureInfo;
+import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -106,6 +107,32 @@ public class AlertDialogManager implements BuildingConstants, FragmentTag {
                                 fragment.startActivityForResult(Intent.createChooser(takeIntent, "data source: "), REQUEST_CODE_IMAGE);
                             }
                         }).show();
+    }
+
+    public void showImageDialog(final String fragmentCalledThis, Bitmap bitmap) {
+        final Dialog dialog = new Dialog(context);
+        LayoutInflater li = LayoutInflater.from(context);
+        View dialogView = li.inflate(R.layout.obj_dialog_image, null);
+        Button btnTakeNew = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_retake);
+        btnTakeNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                showCameraDialog(fragmentCalledThis);
+            }
+        });
+        Button btnCancel = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_cancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        ImageView photoImgView = (ImageView) dialogView.findViewById(R.id.obj_dialog_image_iv);
+        photoImgView.setImageBitmap(bitmap);
+
+        dialog.setContentView(dialogView);
+        dialog.show();
     }
 
     public void showProgressDialog(String title, String message,

@@ -14,13 +14,16 @@ import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.Body;
+import retrofit.http.Header;
+import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
 /**
  * Created by AKiniyalocts on 1/12/15.
  * Modified by Tsung Wei Ho on 2/19/17
  */
-public class UploadService implements DBConstants {
+public class UploadService implements ImgurAPIConstants {
     public final static String TAG = UploadService.class.getSimpleName();
 
     private WeakReference<Context> mContext;
@@ -88,5 +91,10 @@ public class UploadService implements DBConstants {
         if (LOGGING)
             imgurAdapter.setLogLevel(RestAdapter.LogLevel.FULL);
         return imgurAdapter;
+    }
+
+    @Override
+    public void postImage(@Header("Authorization") String auth, @Query("title") String title, @Query("description") String description, @Query("album") String albumId, @Query("account_url") String username, @Body TypedFile file, Callback<ImageResponse> cb) {
+        // unused here
     }
 }

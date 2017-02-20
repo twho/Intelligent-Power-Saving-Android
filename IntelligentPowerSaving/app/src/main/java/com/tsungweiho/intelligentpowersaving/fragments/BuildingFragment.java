@@ -11,7 +11,7 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
- * Created by tsung on 2017/2/18.
+ * Created by Tsung Wei Ho on 2017/2/18.
  */
 
 public class BuildingFragment extends Fragment {

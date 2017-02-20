@@ -1,0 +1,13 @@
+<resources>
+    <!-- For high resolution phone screen -->
+
+    <dimen name="activity_horizontal_margin">32dp</dimen>
+
+    <!--follow image resolution-->
+    <dimen name="activity_main_img_size">180dp</dimen>
+    <dimen name="activity_main_img_size_padding">9dp</dimen>
+
+    <!--AlertDialogManager-->
+    <dimen name="alert_dialog_manager_min_width">480dp</dimen>
+    <dimen name="alert_dialog_manager_single_img_size">432dp</dimen>
+</resources>

@@ -11,15 +11,17 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.pubnub.api.PNConfiguration;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
+import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.fragments.BuildingFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
 
-public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTag, DBConstants {
+public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTag, DBConstants, PubNubAPIConstants {
 
     // functions
     public static Context context;
@@ -31,8 +33,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static ActionBar actionBar;
     private FragmentManager fragmentManager;
 
-    // Firebase
+    // Databases
     private FirebaseAuth auth;
+    public static PNConfiguration pnConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,17 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         auth = FirebaseAuth.getInstance();
         auth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD);
 
+        // Pubnub init
+        pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE);
+        pnConfiguration.setPublishKey(PUBNUB_PUBLISH);
+        pnConfiguration.setSecure(false);
+
         setTab();
+    }
+
+    public static PNConfiguration getPNConfiguration() {
+        return pnConfiguration;
     }
 
     private void setTab() {

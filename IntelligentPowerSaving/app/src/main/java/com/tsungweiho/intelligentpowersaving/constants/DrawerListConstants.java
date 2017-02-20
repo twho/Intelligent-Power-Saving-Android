@@ -3,7 +3,7 @@ package com.tsungweiho.intelligentpowersaving.constants;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
- * Created by tsung on 2017/2/18.
+ * Created by Tsung Wei Ho on 2/18/2017.
  */
 
 public interface DrawerListConstants {

@@ -184,6 +184,9 @@ public class ImageUtilities {
     }
 
     public File getFileFromBitmap(Bitmap bitmap) {
+        if (null == bitmap)
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img);
+
         File file = new File(context.getCacheDir(), String.valueOf(Calendar.getInstance().getTimeInMillis()));
         try {
             file.createNewFile();

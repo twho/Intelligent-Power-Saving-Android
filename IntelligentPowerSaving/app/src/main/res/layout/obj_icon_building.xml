@@ -1,65 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="@dimen/activity_main_space"
-    android:background="@drawable/background_building_icon"
-    android:orientation="vertical"
-    android:padding="@dimen/activity_main_img_size_padding">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/obj_building_icon_tv"
+    <data>
+
+        <variable
+            name="building"
+            type="com.tsungweiho.intelligentpowersaving.objects.Building" />
+    </data>
+
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:padding="@dimen/activity_main_space"
-        android:text="@string/loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white" />
+        android:layout_height="match_parent"
+        android:background="@drawable/background_building_icon"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_main_img_size_padding">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        <TextView
+            android:id="@+id/obj_building_icon_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:padding="@dimen/activity_main_space"
+            android:text="@{building.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white" />
 
-        <ImageView
-            android:id="@+id/obj_building_icon_iv"
-            android:layout_width="@dimen/activity_main_img_size"
-            android:layout_height="@dimen/activity_main_img_size"
-            android:layout_gravity="center_horizontal"
-            android:background="@color/transparent"
-            android:clickable="false"
-            android:padding="@dimen/activity_main_img_size_padding"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_preload_img" />
-
-        <ImageView
-            android:id="@+id/obj_building_icon_iv_indicator"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:src="@mipmap/ic_increase" />
-    </FrameLayout>
+            android:layout_gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/obj_building_icon_iv"
+                android:layout_width="@dimen/activity_main_img_size"
+                android:layout_height="@dimen/activity_main_img_size"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/transparent"
+                android:clickable="false"
+                android:padding="@dimen/activity_main_img_size_padding"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_preload_img"
+                app:imageUrl="@{building.imageUrl}" />
+
+            <ImageView
+                android:id="@+id/obj_building_icon_iv_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|bottom"
+                android:src="@mipmap/ic_increase" />
+        </FrameLayout>
 
 
-    <TextView
-        android:id="@+id/obj_building_icon_tv_consumption_percentage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:paddingTop="@dimen/activity_main_space"
-        android:text="@string/loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/white"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/obj_building_icon_tv_consumption_percentage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/activity_main_space"
+            android:text="@string/loading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/obj_building_icon_tv_consumption"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:paddingBottom="@dimen/activity_main_space"
-        android:text="@string/loading"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/white" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/obj_building_icon_tv_consumption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingBottom="@dimen/activity_main_space"
+            android:text="@string/loading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/white" />
+    </LinearLayout>
+</layout>

@@ -1,50 +1,57 @@
 package com.tsungweiho.intelligentpowersaving.objects;
 
 import android.content.Context;
+import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.databinding.ObjIconBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
 /**
- * Created by tsung on 2017/2/18.
+ * Created by Tsung Wei Ho on 2/18/2017.
  */
 
 public class BuildingIcon extends View {
 
-    private Context context;
+    private static Context context;
     private Building building;
 
     // UI
     private View view;
-    private ImageView ivBuilding, ivIndicator;
-    private TextView tvBuilding, tvConsumpPercent, tvConsump;
+    private ImageView ivIndicator;
+    private TextView tvConsumpPercent, tvConsump;
 
     // Functions
-    private ImageUtilities imageUtilities;
+    private static ImageUtilities imageUtilities;
+    private ObjIconBuildingBinding binding;
 
     public BuildingIcon(Context context, Building building) {
         super(context);
         this.context = context;
         this.building = building;
         LayoutInflater li = LayoutInflater.from(context);
-        view = li.inflate(R.layout.obj_icon_building, null);
+        binding = DataBindingUtil.inflate(li, R.layout.obj_icon_building, null, false);
+        binding.setBuilding(building);
+        view = binding.getRoot();
         initViews();
     }
 
-    private void initViews() {
-        imageUtilities = new ImageUtilities(context);
-        ivIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_indicator);
-        ivBuilding = (ImageView) view.findViewById(R.id.obj_building_icon_iv);
-        imageUtilities.setRoundCornerImageViewFromUrl(building.getImageUrl(), ivBuilding);
 
-        tvBuilding = (TextView) view.findViewById(R.id.obj_building_icon_tv);
+    @BindingAdapter({"bind:imageUrl"})
+    public static void loadImage(ImageView imageView, String url) {
+        imageUtilities = new ImageUtilities(context);
+        imageUtilities.setRoundCornerImageViewFromUrl(url, imageView);
+    }
+
+    private void initViews() {
+        ivIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_indicator);
         tvConsump = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption);
         tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
-        tvBuilding.setText(building.getName());
         tvConsump.setText(building.getConsumption());
         if ("high".equalsIgnoreCase(building.getConsumption().split(",")[0])) {
             tvConsump.setText(context.getString(R.string.increase_weekly));

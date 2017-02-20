@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -92,6 +93,15 @@ public class HomeFragment extends Fragment implements DBConstants {
         super.onResume();
 
         loadDataFromFirebase();
+
+        // Auto refresh after 5 seconds.
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshBuildingIcons();
+            }
+        }, 5000);
     }
 
     private void loadDataFromFirebase() {
@@ -123,19 +133,23 @@ public class HomeFragment extends Fragment implements DBConstants {
 
         buildingList = buildingDBHelper.getAllBuildingList();
 
-        // Read local file
+        // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)
             addBuildingToDatabase();
 
-        Building building;
         llProgress.setVisibility(View.GONE);
+        refreshBuildingIcons();
+        animUtilities.setglAnimToVisible(gridLayout);
+    }
+
+    private void refreshBuildingIcons() {
+        Building building;
         gridLayout.removeAllViews();
         for (int index = 0; index < buildingList.size(); index++) {
             building = buildingList.get(index);
             BuildingIcon buildingIcon = new BuildingIcon(context, building);
             gridLayout.addView(buildingIcon.getView());
         }
-        animUtilities.setglAnimToVisible(gridLayout);
     }
 
     private String loadJSONFromAsset() {
