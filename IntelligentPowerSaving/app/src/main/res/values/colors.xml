@@ -6,12 +6,13 @@
     <color name="colorPrimaryDark">#191919</color>
     <color name="colorSemiPrimaryDark">#8b191919</color>
     <color name="colorAccent">#e7e7e7</color>
-    <color name="colorTint">#B3B3B3</color>
+    <color name="colorTint">#919191</color>
 
     <!--Custom Color-->
     <color name="transparent">#10000000</color>
     <color name="white">#ffffff</color>
     <color name="semi_white">#b9ffffff</color>
+    <color name="semi_gray">#96484848</color>
     <color name="green">#00bf8c</color>
     <color name="teal">#7fc9c2</color>
     <color name="light_red">#ff6666</color>

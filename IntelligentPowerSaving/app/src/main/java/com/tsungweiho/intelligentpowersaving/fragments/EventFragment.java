@@ -30,13 +30,13 @@ import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.JsonObject;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -87,13 +87,12 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     // UIs
     private RelativeLayout rlMap;
     private FrameLayout flTopBarAddEvent;
-    private LinearLayout llTopBarAddEvent;
+    private LinearLayout llTopBarAddEvent, llMarkerInfo;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
     private ImageView ivAddIcon;
     private ImageButton ibAdd, ibCancel, ibCamera;
     private Button btnFullMap;
-    private MapView mapView;
 
     // Functions
     private Context context;
@@ -104,6 +103,13 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private AlertDialogManager alertDialogManager;
     private EventFragmentListener eventFragmentListener;
     private Upload upload;
+    private Thread uiThread;
+
+    // Google map
+    private GoogleMap googleMap;
+    private MapView mapView;
+    private LatLngBounds bounds;
+    private LatLng clickedLatLng;
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -141,6 +147,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         // find views
         flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
         llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
+        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_layout_marker_info);
         ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_btn_add);
         ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_btn_cancel);
         ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_btn_camera);
@@ -161,32 +168,48 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        // Limit the map to NTUST campus
+        bounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
+        final LatLngBounds ADELAIDE = bounds;
+        googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
+        googleMap.setMinZoomPreference(18.0f);
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        // Map initial settings
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setMyLocationEnabled(true);
         googleMap.setTrafficEnabled(true);
         googleMap.setIndoorEnabled(true);
         googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // Map listeners
         googleMap.setOnMapLongClickListener(eventFragmentListener);
+        googleMap.setOnMapClickListener(eventFragmentListener);
+        googleMap.setOnMarkerClickListener(eventFragmentListener);
 
-        // latitude and longitude
-        double latitude = 17.385044;
-        double longitude = 78.486671;
+        this.googleMap = googleMap;
+        setAllMarkers();
+    }
 
-        // create marker
-        MarkerOptions marker = new MarkerOptions().position(
-                new LatLng(latitude, longitude)).title("Hello Maps");
+    private void setAllMarkers() {
+        eventList = eventDBHelper.getAllEventList();
 
-        // Changing marker icon
-        marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        for (int index = 0; index < eventList.size(); index++) {
+            Event event = eventList.get(index);
 
-        // adding marker
-        googleMap.addMarker(marker);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(17.385044, 78.486671)).zoom(12).build();
-        googleMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(cameraPosition));
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
+            double latitude = Double.valueOf(event.getPosition().split(",")[0]);
+            double longitude = Double.valueOf(event.getPosition().split(",")[1]);
+
+            // create marker
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude)).title(event.getDetail());
+
+            // Changing marker icon
+            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            this.googleMap.addMarker(marker);
+        }
+
     }
 
     private void setAllListener() {
@@ -196,7 +219,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         btnFullMap.setOnClickListener(eventFragmentListener);
     }
 
-    private class EventFragmentListener extends SubscribeCallback implements View.OnClickListener, GoogleMap.OnMapLongClickListener {
+    private class EventFragmentListener extends SubscribeCallback implements View.OnClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
         @Override
         public void onClick(View view) {
@@ -208,7 +231,8 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
                         createUpload(imageUtilities.getFileFromBitmap(bmpBuffer));
                         new UploadService(context).Execute(upload, new UiCallback());
                         pubnub.publish()
-                                .message(new Event(Calendar.getInstance().getTimeInMillis() + "", "PubNub Test", "0.5,0.5", "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test"))
+                                .message(new Event(Calendar.getInstance().getTimeInMillis() + "", "PubNub Test",
+                                        clickedLatLng.latitude + "," + clickedLatLng.longitude, "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test"))
                                 .channel(EVENT_CHANNEL)
                                 .async(new PNCallback<PNPublishResult>() {
                                     @Override
@@ -231,7 +255,8 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
                     }
                     break;
                 case R.id.fragment_event_btn_full_map:
-                    Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.img_campus_map);
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).zoom(18.0f).build();
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     break;
             }
         }
@@ -242,6 +267,19 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
             animUtilities.setllAnimToVisible(llTopBarAddEvent);
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
+            clickedLatLng = latLng;
+        }
+
+        @Override
+        public void onMapClick(LatLng latLng) {
+            clickedLatLng = latLng;
+        }
+
+
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            animUtilities.setllSlideUp(llMarkerInfo);
+            return false;
         }
 
         @Override
@@ -267,6 +305,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
                 if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
                     eventDBHelper.insertDB(event);
+                    setAllMarkerOnUiThread();
                 }
             } catch (JSONException e) {
                 Log.d(TAG, e.getMessage());
@@ -335,6 +374,21 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
         // TODO Clean memory
         eventDBHelper.closeDB();
+    }
+
+    private void setAllMarkerOnUiThread() {
+        uiThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setAllMarkers();
+                    }
+                });
+            }
+        });
+        uiThread.start();
     }
 
     private class UiCallback implements Callback<ImageResponse> {

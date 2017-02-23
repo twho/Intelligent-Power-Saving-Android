@@ -57,4 +57,20 @@ public class AnimUtilities {
         imageView.setAnimation(am);
         am.startNow();
     }
+
+    public void setllSlideUp(final LinearLayout linearLayout) {
+        linearLayout.setVisibility(View.VISIBLE);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.slide_up);
+        am.setDuration(FAST_ANIM_DURATION);
+        linearLayout.setAnimation(am);
+        am.startNow();
+    }
+
+    public void setllSlideDown(final LinearLayout linearLayout) {
+        linearLayout.setVisibility(View.VISIBLE);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+        am.setDuration(FAST_ANIM_DURATION);
+        linearLayout.setAnimation(am);
+        am.startNow();
+    }
 }

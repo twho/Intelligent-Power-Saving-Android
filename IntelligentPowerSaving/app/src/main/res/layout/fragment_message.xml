@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|center_vertical"
-                android:background="@drawable/background_bar_button"
+                android:background="@drawable/background_theme_button"
                 android:src="@mipmap/ic_options" />
 
             <TextView
@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
-                android:background="@drawable/background_bar_button"
+                android:background="@drawable/background_theme_button"
                 android:text="@string/unread"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="@color/white" />

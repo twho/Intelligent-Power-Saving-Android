@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
-            android:background="@drawable/background_bar_button"
+            android:background="@drawable/background_theme_button"
             android:src="@mipmap/ic_back" />
 
         <TextView

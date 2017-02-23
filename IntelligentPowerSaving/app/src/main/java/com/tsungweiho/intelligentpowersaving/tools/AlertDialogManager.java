@@ -133,7 +133,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTag {
         });
         ImageViewTouch photoImgView = (ImageViewTouch) dialogView.findViewById(R.id.obj_dialog_image_iv);
         photoImgView.setImageBitmap(bitmap);
-        photoImgView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
+        photoImgView.setDisplayType(ImageViewTouchBase.DisplayType.NONE);
 
         dialog.setContentView(dialogView);
         dialog.show();
