@@ -12,16 +12,16 @@ import com.tsungweiho.intelligentpowersaving.objects.Building;
 import java.util.ArrayList;
 
 /**
- * Created by tsung on 2017/2/18.
+ * Created by Tsung Wei Ho on 2015/4/18.
  */
 
 public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
-    public static final String DBNAME = "ips.db.sqlite";
-    public static final int VERSION = 2;
-    public static final String TABLENAME = "building_details";
+
+    public static final String TABLE_NAME = "building_details";
+    public static final String DB_NAME = TABLE_NAME + ".db.sqlite";
 
     public BuildingDBHelper(Context context) {
-        super(context, DBNAME, null, VERSION);
+        super(context, DB_NAME, null, VERSION);
     }
 
     @Override
@@ -30,53 +30,58 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
     }
 
     private void createDatabase(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLENAME + "(" +
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                BUILDING_NAME + " VARCHAR(15)," +
-                BUILDING_DETAIL + " VARCHAR(30)," +
-                BUILDING_CONSUMPTION + " TEXT," +
-                BUILDING_IMG_URL + " TEXT" + ");");
+                DB_BUILDING_NAME + " VARCHAR(15)," +
+                DB_BUILDING_DETAIL + " VARCHAR(30)," +
+                DB_BUILDING_CONSUMPTION + " TEXT," +
+                DB_BUILDING_IMG_URL + " TEXT" + ");");
     }
 
     public Boolean checkIfExist(String name) {
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT " + BUILDING_NAME + " FROM " + TABLENAME +
-                " WHERE " + BUILDING_NAME + " LIKE ?";
-        String[] args = {"%" + name + "%"};
-        Cursor cursor = db.rawQuery(sql, args);
+        String[] columns = {DB_BUILDING_NAME};
+        String whereClause = DB_BUILDING_NAME + " = ?;";
+        String[] whereArgs = {name};
+
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, null);
         Boolean ifExist;
-        if (cursor.moveToNext()) {
+        if (cursor.getCount() != 0) {
             ifExist = true;
         } else {
             ifExist = false;
         }
         cursor.close();
         db.close();
+
         return ifExist;
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLENAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
     public long insertDB(Building building) {
         SQLiteDatabase db = getWritableDatabase();
+
         ContentValues values = new ContentValues();
-        values.put(BUILDING_NAME, building.getName());
-        values.put(BUILDING_DETAIL, building.getDetail());
-        values.put(BUILDING_CONSUMPTION, building.getConsumption());
-        values.put(BUILDING_IMG_URL, building.getImageUrl());
-        long rowId = db.insert(TABLENAME, null, values);
+        values.put(DB_BUILDING_NAME, building.getName());
+        values.put(DB_BUILDING_DETAIL, building.getDetail());
+        values.put(DB_BUILDING_CONSUMPTION, building.getConsumption());
+        values.put(DB_BUILDING_IMG_URL, building.getImageUrl());
+
+        long rowId = db.insert(TABLE_NAME, null, values);
         db.close();
+
         return rowId;
     }
 
     public ArrayList<Building> getAllBuildingList() {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Building> buildingList = new ArrayList<Building>();
-        String sql = "SELECT * FROM " + TABLENAME;
+        String sql = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
             String name = cursor.getString(1);
@@ -88,6 +93,7 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         }
         cursor.close();
         db.close();
+
         return buildingList;
     }
 }

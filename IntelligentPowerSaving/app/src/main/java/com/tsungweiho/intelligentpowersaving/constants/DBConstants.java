@@ -17,10 +17,22 @@ public interface DBConstants {
     String LOCAL_BUILDING_JSON = "intelligent-power-saving-export.json";
     String JSON_ARRAY_NAME = "buildingList";
 
-    // BuildingDBHelper
+    // For all databases
+    int VERSION = 2;
     String ID = "Id";
-    String BUILDING_NAME = "BUILDING_NAME";
-    String BUILDING_DETAIL = "BUILDING_DETAIL";
-    String BUILDING_CONSUMPTION = "BUILDING_CONSUMPTION";
-    String BUILDING_IMG_URL = "BUILDING_IMG_URL";
+
+    // BuildingDBHelper
+    String DB_BUILDING_NAME = "BUILDING_NAME";
+    String DB_BUILDING_DETAIL = "BUILDING_DETAIL";
+    String DB_BUILDING_CONSUMPTION = "BUILDING_CONSUMPTION";
+    String DB_BUILDING_IMG_URL = "BUILDING_IMG_URL";
+
+    // EventDBHelper
+    String DB_EVENT_UNID = "EVENT_UNID";
+    String DB_EVENT_DETAIL = "EVENT_DETAIL";
+    String DB_EVENT_POS = "EVENT_POS";
+    String DB_EVENT_POSTER_IMG = "EVENT_POSTER_IMG";
+    String DB_EVENT_IMG = "EVENT_IMG";
+    String DB_EVENT_TIME = "EVENT_TIME";
+    String DB_EVENT_IF_FIXED = "EVENT_IF_FIXED";
 }

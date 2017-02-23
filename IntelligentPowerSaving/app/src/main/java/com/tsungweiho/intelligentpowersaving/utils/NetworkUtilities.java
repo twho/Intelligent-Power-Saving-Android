@@ -14,8 +14,8 @@ import java.net.UnknownHostException;
  * <p>
  * Basic network utils
  */
-public class NetworkUtils {
-    public static final String TAG = NetworkUtils.class.getSimpleName();
+public class NetworkUtilities {
+    public static final String TAG = NetworkUtilities.class.getSimpleName();
 
     public static boolean isConnected(Context mContext) {
         try {

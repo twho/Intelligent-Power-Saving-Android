@@ -2,11 +2,10 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
 
-import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.ImgurAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Upload;
-import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
+import com.tsungweiho.intelligentpowersaving.utils.NetworkUtilities;
 
 import java.lang.ref.WeakReference;
 
@@ -35,7 +34,7 @@ public class UploadService implements ImgurAPIConstants {
     public void Execute(Upload upload, Callback<ImageResponse> callback) {
         final Callback<ImageResponse> cb = callback;
 
-        if (!NetworkUtils.isConnected(mContext.get())) {
+        if (!NetworkUtilities.isConnected(mContext.get())) {
             //Callback will be called, so we prevent a unnecessary notification
             cb.failure(null);
             return;

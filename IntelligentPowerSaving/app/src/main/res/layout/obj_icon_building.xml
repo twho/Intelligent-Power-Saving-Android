@@ -50,7 +50,6 @@
                 android:src="@mipmap/ic_increase" />
         </FrameLayout>
 
-
         <TextView
             android:id="@+id/obj_building_icon_tv_consumption_percentage"
             android:layout_width="match_parent"

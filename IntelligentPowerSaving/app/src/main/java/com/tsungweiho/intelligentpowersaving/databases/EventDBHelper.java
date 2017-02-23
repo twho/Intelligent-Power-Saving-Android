@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
-import com.tsungweiho.intelligentpowersaving.objects.Building;
+import com.tsungweiho.intelligentpowersaving.objects.Event;
 
 import java.util.ArrayList;
 
@@ -18,12 +18,11 @@ import java.util.ArrayList;
 
 public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
 
-    public static final String DBNAME = "ips.db.sqlite";
-    public static final int VERSION = 1;
-    public static final String TABLENAME = "event_details";
+    public static final String TABLE_NAME = "event_details";
+    public static final String DB_NAME = TABLE_NAME + ".db.sqlite";
 
     public EventDBHelper(Context context) {
-        super(context, DBNAME, null, VERSION);
+        super(context, DB_NAME, null, VERSION);
     }
 
     @Override
@@ -32,64 +31,99 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
     }
 
     private void createDatabase(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLENAME + "(" +
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                BUILDING_NAME + " VARCHAR(15)," +
-                BUILDING_DETAIL + " VARCHAR(30)," +
-                BUILDING_CONSUMPTION + " TEXT," +
-                BUILDING_IMG_URL + " TEXT" + ");");
+                DB_EVENT_UNID + " VARCHAR(30)," +
+                DB_EVENT_DETAIL + " VARCHAR(30)," +
+                DB_EVENT_POS + " VARCHAR(30)," +
+                DB_EVENT_IMG + " TEXT," +
+                DB_EVENT_POSTER_IMG + " TEXT," +
+                DB_EVENT_TIME + " VARCHAR(30)," +
+                DB_EVENT_IF_FIXED + " VARCHAR(10)" + ");");
     }
 
-    public Boolean checkIfExist(String name) {
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    public Boolean checkIfExist(String uniqueId) {
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT " + BUILDING_NAME + " FROM " + TABLENAME +
-                " WHERE " + BUILDING_NAME + " LIKE ?";
-        String[] args = {"%" + name + "%"};
-        Cursor cursor = db.rawQuery(sql, args);
+        String[] columns = {DB_EVENT_UNID};
+        String whereClause = DB_EVENT_UNID + " = ?;";
+        String[] whereArgs = {uniqueId};
+
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, null);
         Boolean ifExist;
-        if (cursor.moveToNext()) {
+        if (cursor.getCount() != 0) {
             ifExist = true;
         } else {
             ifExist = false;
         }
         cursor.close();
-        db.close();
+
         return ifExist;
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLENAME);
-        onCreate(db);
-    }
-
-    public long insertDB(Building building) {
+    public long insertDB(Event event) {
         SQLiteDatabase db = getWritableDatabase();
+
         ContentValues values = new ContentValues();
-        values.put(BUILDING_NAME, building.getName());
-        values.put(BUILDING_DETAIL, building.getDetail());
-        values.put(BUILDING_CONSUMPTION, building.getConsumption());
-        values.put(BUILDING_IMG_URL, building.getImageUrl());
-        long rowId = db.insert(TABLENAME, null, values);
-        db.close();
+        values.put(DB_EVENT_UNID, event.getUniqueId());
+        values.put(DB_EVENT_DETAIL, event.getDetail());
+        values.put(DB_EVENT_POS, event.getPosition());
+        values.put(DB_EVENT_IMG, event.getImage());
+        values.put(DB_EVENT_POSTER_IMG, event.getPosterImg());
+        values.put(DB_EVENT_TIME, event.getTime());
+        values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
+
+        long rowId = db.insert(TABLE_NAME, null, values);
+
         return rowId;
     }
 
-    public ArrayList<Building> getAllBuildingList() {
+    public int updateDB(Event event) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DB_EVENT_UNID, event.getUniqueId());
+        values.put(DB_EVENT_DETAIL, event.getDetail());
+        values.put(DB_EVENT_POS, event.getPosition());
+        values.put(DB_EVENT_IMG, event.getImage());
+        values.put(DB_EVENT_POSTER_IMG, event.getPosterImg());
+        values.put(DB_EVENT_TIME, event.getTime());
+        values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
+        String whereClause = DB_EVENT_UNID + "='" + event.getUniqueId() + "'";
+
+        int count = db.update(TABLE_NAME, values, whereClause, null);
+
+        return count;
+    }
+
+    public ArrayList<Event> getAllEventList() {
         SQLiteDatabase db = getReadableDatabase();
-        ArrayList<Building> buildingList = new ArrayList<Building>();
-        String sql = "SELECT * FROM " + TABLENAME;
+        ArrayList<Event> eventList = new ArrayList<Event>();
+        String sql = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            String name = cursor.getString(1);
+            String uniqueId = cursor.getString(1);
             String detail = cursor.getString(2);
-            String consumption = cursor.getString(3);
+            String position = cursor.getString(3);
             String imgUrl = cursor.getString(4);
-            Building building = new Building(name, detail, consumption, imgUrl);
-            buildingList.add(building);
+            String posterImgUrl = cursor.getString(5);
+            String time = cursor.getString(6);
+            String ifFixed = cursor.getString(7);
+            Event event = new Event(uniqueId, detail, position, imgUrl, posterImgUrl, time, ifFixed);
+            eventList.add(event);
         }
         cursor.close();
+
+        return eventList;
+    }
+
+    public void closeDB() {
+        SQLiteDatabase db = getWritableDatabase();
         db.close();
-        return buildingList;
     }
 }

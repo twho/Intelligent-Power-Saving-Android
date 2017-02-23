@@ -18,7 +18,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/white" />
 
-    <ImageView
+    <it.sephiroth.android.library.imagezoom.ImageViewTouch
         android:id="@+id/obj_dialog_image_iv"
         android:layout_width="@dimen/alert_dialog_manager_single_img_size"
         android:layout_height="@dimen/alert_dialog_manager_single_img_size"

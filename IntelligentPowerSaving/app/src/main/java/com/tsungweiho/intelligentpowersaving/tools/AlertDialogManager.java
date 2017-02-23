@@ -34,6 +34,9 @@ import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
+
 public class AlertDialogManager implements BuildingConstants, FragmentTag {
     private Context context;
 
@@ -128,8 +131,9 @@ public class AlertDialogManager implements BuildingConstants, FragmentTag {
                 dialog.dismiss();
             }
         });
-        ImageView photoImgView = (ImageView) dialogView.findViewById(R.id.obj_dialog_image_iv);
+        ImageViewTouch photoImgView = (ImageViewTouch) dialogView.findViewById(R.id.obj_dialog_image_iv);
         photoImgView.setImageBitmap(bitmap);
+        photoImgView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
 
         dialog.setContentView(dialogView);
         dialog.show();

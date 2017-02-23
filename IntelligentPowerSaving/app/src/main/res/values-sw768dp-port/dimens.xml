@@ -9,6 +9,6 @@
     <dimen name="activity_main_img_size_padding">10dp</dimen>
 
     <!--AlertDialogManager-->
-    <dimen name="alert_dialog_manager_min_width">800dp</dimen>
-    <dimen name="alert_dialog_manager_single_img_size">720dp</dimen>
+    <dimen name="alert_dialog_manager_min_width">640dp</dimen>
+    <dimen name="alert_dialog_manager_single_img_size">576dp</dimen>
 </resources>

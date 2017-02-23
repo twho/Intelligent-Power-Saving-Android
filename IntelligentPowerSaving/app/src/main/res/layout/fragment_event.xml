@@ -5,17 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/fragment_event_relative_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark">
-
-        <it.sephiroth.android.library.imagezoom.ImageViewTouch
-            android:id="@+id/fragment_event_iv_map"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-    </RelativeLayout>
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/fragment_event_map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/fragment_event_top_bar"
@@ -136,20 +129,18 @@
                 android:src="@mipmap/ic_cancel"
                 android:textColor="@color/white" />
         </LinearLayout>
-    </LinearLayout>
 
-    <TextView
-        android:id="@+id/fragment_event_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/activity_main_space"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="center"
-        android:padding="@dimen/activity_main_space"
-        android:paddingBottom="@dimen/activity_main_space"
-        android:text="@string/fragment_event_bottom"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white" />
+        <TextView
+            android:id="@+id/fragment_event_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:background="@color/colorSemiPrimaryDark"
+            android:gravity="center"
+            android:padding="@dimen/activity_main_space"
+            android:text="@string/fragment_event_bottom"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white" />
+    </LinearLayout>
 </RelativeLayout>
