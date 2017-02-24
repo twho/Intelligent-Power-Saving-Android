@@ -37,7 +37,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
                 DB_EVENT_DETAIL + " VARCHAR(30)," +
                 DB_EVENT_POS + " VARCHAR(30)," +
                 DB_EVENT_IMG + " TEXT," +
-                DB_EVENT_POSTER_IMG + " TEXT," +
+                DB_EVENT_POSTER + " TEXT," +
                 DB_EVENT_TIME + " VARCHAR(30)," +
                 DB_EVENT_IF_FIXED + " VARCHAR(10)" + ");");
     }
@@ -74,7 +74,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_EVENT_DETAIL, event.getDetail());
         values.put(DB_EVENT_POS, event.getPosition());
         values.put(DB_EVENT_IMG, event.getImage());
-        values.put(DB_EVENT_POSTER_IMG, event.getPosterImg());
+        values.put(DB_EVENT_POSTER, event.getPoster());
         values.put(DB_EVENT_TIME, event.getTime());
         values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
 
@@ -91,7 +91,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_EVENT_DETAIL, event.getDetail());
         values.put(DB_EVENT_POS, event.getPosition());
         values.put(DB_EVENT_IMG, event.getImage());
-        values.put(DB_EVENT_POSTER_IMG, event.getPosterImg());
+        values.put(DB_EVENT_POSTER, event.getPoster());
         values.put(DB_EVENT_TIME, event.getTime());
         values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
         String whereClause = DB_EVENT_UNID + "='" + event.getUniqueId() + "'";
@@ -111,15 +111,27 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
             String detail = cursor.getString(2);
             String position = cursor.getString(3);
             String imgUrl = cursor.getString(4);
-            String posterImgUrl = cursor.getString(5);
+            String poster = cursor.getString(5);
             String time = cursor.getString(6);
             String ifFixed = cursor.getString(7);
-            Event event = new Event(uniqueId, detail, position, imgUrl, posterImgUrl, time, ifFixed);
+            Event event = new Event(uniqueId, detail, position, imgUrl, poster, time, ifFixed);
             eventList.add(event);
         }
         cursor.close();
 
         return eventList;
+    }
+
+    public void deleteByUniqueId(String uniqueId) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereClause = DB_EVENT_UNID + " = ?;";
+        String[] whereArgs = {uniqueId};
+        db.delete(TABLE_NAME, whereClause, whereArgs);
+    }
+
+    public void deleteAllDB() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_NAME);
     }
 
     public void closeDB() {

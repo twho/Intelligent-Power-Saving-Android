@@ -4,18 +4,16 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.tool.writer.LayoutBinderWriter;
+import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,7 +22,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,6 +40,7 @@ import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
@@ -50,6 +48,7 @@ import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
+import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Upload;
@@ -57,7 +56,9 @@ import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,8 +67,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.HashMap;
 
+import id.zelory.compressor.Compressor;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -85,12 +87,11 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private View view;
 
     // UIs
-    private RelativeLayout rlMap;
     private FrameLayout flTopBarAddEvent;
     private LinearLayout llTopBarAddEvent, llMarkerInfo;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
-    private ImageView ivAddIcon;
+    private ImageView ivAddIcon, ivMarker;
     private ImageButton ibAdd, ibCancel, ibCamera;
     private Button btnFullMap;
 
@@ -98,18 +99,23 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private Context context;
     private EventDBHelper eventDBHelper;
     private ArrayList<Event> eventList;
-    private ImageUtilities imageUtilities;
+    private static ImageUtilities imageUtilities;
     private AnimUtilities animUtilities;
+    private TimeUtilities timeUtilities;
     private AlertDialogManager alertDialogManager;
     private EventFragmentListener eventFragmentListener;
+    private FragmentEventBinding binding;
     private Upload upload;
+    private File tempImgFile;
     private Thread uiThread;
+    private static Handler handler;
 
     // Google map
     private GoogleMap googleMap;
     private MapView mapView;
     private LatLngBounds bounds;
     private LatLng clickedLatLng;
+    private HashMap<Marker, Event> mapMarkers;
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -122,9 +128,10 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_event, container, false);
-        context = MainActivity.getContext();
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
+        view = binding.getRoot();
 
+        context = MainActivity.getContext();
         init(savedInstanceState);
 
         return view;
@@ -133,6 +140,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private void init(Bundle savedInstanceState) {
         imageUtilities = new ImageUtilities(context);
         animUtilities = new AnimUtilities(context);
+        timeUtilities = new TimeUtilities(context);
         eventFragmentListener = new EventFragmentListener();
         alertDialogManager = new AlertDialogManager(context);
         eventDBHelper = new EventDBHelper(context);
@@ -156,8 +164,8 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
         btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
         ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
-
-        setAllListener();
+        ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
+        setAllListeners();
     }
 
     private void initMap(Bundle savedInstanceState) {
@@ -187,14 +195,16 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         // Map listeners
         googleMap.setOnMapLongClickListener(eventFragmentListener);
         googleMap.setOnMapClickListener(eventFragmentListener);
-        googleMap.setOnMarkerClickListener(eventFragmentListener);
 
         this.googleMap = googleMap;
-        setAllMarkers();
+        getChannelHistory();
     }
 
     private void setAllMarkers() {
         eventList = eventDBHelper.getAllEventList();
+        mapMarkers = new HashMap<>();
+
+        googleMap.clear();
 
         for (int index = 0; index < eventList.size(); index++) {
             Event event = eventList.get(index);
@@ -203,16 +213,93 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
             double longitude = Double.valueOf(event.getPosition().split(",")[1]);
 
             // create marker
-            MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude)).title(event.getDetail());
+            MarkerOptions markerOpt = new MarkerOptions().position(new LatLng(latitude, longitude)).title(event.getDetail());
 
             // Changing marker icon
-            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-            this.googleMap.addMarker(marker);
+            markerOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            Marker marker = this.googleMap.addMarker(markerOpt);
+            mapMarkers.put(marker, event);
         }
-
+        // Set all markers listener
+        googleMap.setOnMarkerClickListener(eventFragmentListener);
     }
 
-    private void setAllListener() {
+    private void getChannelHistory() {
+        pubnub.history()
+                .channel(EVENT_CHANNEL)
+                .count(100)
+                .async(new PNCallback<PNHistoryResult>() {
+                    @Override
+                    public void onResponse(PNHistoryResult result, PNStatus status) {
+                        if (null == result)
+                            return;
+
+                        eventDBHelper.deleteAllDB();
+                        try {
+                            for (int index = 0; index < result.getMessages().size(); index++) {
+                                JSONObject jObject = new JSONObject(String.valueOf(result.getMessages().get(index).getEntry()));
+                                insertDataToDB(jObject);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        pubnub.history()
+                .channel(EVENT_CHANNEL_DELETED) // where to fetch history from
+                .count(100) // how many items to fetch
+                .async(new PNCallback<PNHistoryResult>() {
+                    @Override
+                    public void onResponse(PNHistoryResult result, PNStatus status) {
+                        if (null == result)
+                            return;
+                        try {
+                            JSONArray jsonArray = new JSONArray(result.getMessages().toString());
+                            for (int index = 0; index < jsonArray.length(); index++) {
+                                JSONObject jObject = new JSONObject(String.valueOf(jsonArray.getJSONObject(index)));
+                                deleteDataInDB(jObject);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+        setAllMarkers();
+    }
+
+    private void insertDataToDB(JSONObject jObject) {
+        Event event = getEventByJSONObj(jObject);
+        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
+            eventDBHelper.insertDB(event);
+        }
+    }
+
+    private void deleteDataInDB(JSONObject jObject) {
+        Event event = getEventByJSONObj(jObject);
+        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
+            eventDBHelper.deleteByUniqueId(event.getUniqueId());
+        }
+    }
+
+    private Event getEventByJSONObj(JSONObject jsonObject) {
+        Event event = null;
+        try {
+            String uniqueId = jsonObject.getString(EVENT_UNID);
+            String detail = jsonObject.getString(EVENT_DETAIL);
+            String position = jsonObject.getString(EVENT_POS);
+            String image = jsonObject.getString(EVENT_IMG);
+            String poster = jsonObject.getString(EVENT_POSTER);
+            String time = jsonObject.getString(EVENT_TIME);
+            String ifFixed = jsonObject.getString(EVENT_IF_FIXED);
+            event = new Event(uniqueId, detail, position, image, poster, time, ifFixed);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return event;
+    }
+
+    private void setAllListeners() {
         ibAdd.setOnClickListener(eventFragmentListener);
         ibCancel.setOnClickListener(eventFragmentListener);
         ibCamera.setOnClickListener(eventFragmentListener);
@@ -228,20 +315,9 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
                     if (edEvent.getText().toString().length() == 0) {
                         alertDialogManager.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
                     } else {
-                        createUpload(imageUtilities.getFileFromBitmap(bmpBuffer));
+                        tempImgFile = imageUtilities.getFileFromBitmap(bmpBuffer);
+                        createUpload(tempImgFile);
                         new UploadService(context).Execute(upload, new UiCallback());
-                        pubnub.publish()
-                                .message(new Event(Calendar.getInstance().getTimeInMillis() + "", "PubNub Test",
-                                        clickedLatLng.latitude + "," + clickedLatLng.longitude, "PubNub Test", "PubNub Test", "PubNub Test", "PubNub Test"))
-                                .channel(EVENT_CHANNEL)
-                                .async(new PNCallback<PNPublishResult>() {
-                                    @Override
-                                    public void onResponse(PNPublishResult result, PNStatus status) {
-                                        // handle publish result, status always present, result if successful
-                                        // status.isError to see if error happened
-                                    }
-                                });
-                        dismissAddView();
                     }
                     break;
                 case R.id.fragment_event_btn_cancel:
@@ -278,6 +354,9 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
         @Override
         public boolean onMarkerClick(Marker marker) {
+            Event event = mapMarkers.get(marker);
+            binding.setEvent(event);
+            ivMarker.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img));
             animUtilities.setllSlideUp(llMarkerInfo);
             return false;
         }
@@ -291,24 +370,12 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
         @Override
         public void message(PubNub pubnub, PNMessageResult message) {
-            Log.d("PubNub Temporary Test", message.toString());
             try {
                 JSONObject jObject = new JSONObject(message.getMessage().toString());
-                String uniqueId = jObject.getString(EVENT_UNID);
-                String detail = jObject.getString(EVENT_DETAIL);
-                String position = jObject.getString(EVENT_POS);
-                String image = jObject.getString(EVENT_IMG);
-                String posterImg = jObject.getString(EVENT_POSTER_IMG);
-                String time = jObject.getString(EVENT_TIME);
-                String ifFixed = jObject.getString(EVENT_IF_FIXED);
-                Event event = new Event(uniqueId, detail, position, image, posterImg, time, ifFixed);
-
-                if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
-                    eventDBHelper.insertDB(event);
-                    setAllMarkerOnUiThread();
-                }
+                insertDataToDB(jObject);
+                setAllMarkerOnUiThread();
             } catch (JSONException e) {
-                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -316,6 +383,20 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         public void presence(PubNub pubnub, PNPresenceEventResult presence) {
 
         }
+    }
+
+    @BindingAdapter({"bind:image"})
+    public static void loadImage(final ImageView imageView, final String url) {
+        imageUtilities = new ImageUtilities(MainActivity.getContext());
+        imageUtilities.setImageViewFromUrl(url, imageView);
+
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imageUtilities.setImageViewFromUrl(url, imageView);
+            }
+        }, 5000);
     }
 
     private void dismissAddView() {
@@ -357,7 +438,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private void createUpload(File image) {
         upload = new Upload();
 
-        upload.image = image;
+        upload.image = Compressor.getDefault(context).compressToFile(image);
         upload.title = edEvent.getText().toString();
         upload.description = edEvent.getText().toString();
     }
@@ -395,8 +476,18 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
         @Override
         public void success(ImageResponse imageResponse, Response response) {
-            Log.d(TAG, imageResponse.toString());
-            Log.d(TAG, response.toString());
+            tempImgFile.delete();
+            pubnub.publish().message(new Event(timeUtilities.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
+                    clickedLatLng.longitude, imageResponse.data.link, "PubNub Test", timeUtilities.getDate() + " " + timeUtilities.getTimeHHmm(), "0"))
+                    .channel(EVENT_CHANNEL)
+                    .async(new PNCallback<PNPublishResult>() {
+                        @Override
+                        public void onResponse(PNPublishResult result, PNStatus status) {
+                            // handle publish result, status always present, result if successful
+                            // status.isError to see if error happened
+                        }
+                    });
+            dismissAddView();
         }
 
         @Override
@@ -406,6 +497,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
             }
         }
+
     }
 
     @Override
@@ -416,7 +508,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
     @Override
     public void onLowMemory() {
-        super.onLowMemory();
         mapView.onLowMemory();
+        super.onLowMemory();
     }
 }

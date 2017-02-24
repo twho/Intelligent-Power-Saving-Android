@@ -1,195 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/hashtag_relative_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <FrameLayout
+    <data>
+
+        <variable
+            name="event"
+            type="com.tsungweiho.intelligentpowersaving.objects.Event" />
+    </data>
+
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/hashtag_relative_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/fragment_event_map_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/fragment_event_layout_marker_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="@dimen/activity_main_img_size"
-                android:layout_height="@dimen/activity_main_img_size"
-                android:layout_margin="@dimen/activity_main_space"
-                android:background="@color/semi_gray"
-                android:padding="@dimen/activity_main_space"
-                android:src="@mipmap/ic_preload_img" />
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/fragment_event_map_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <LinearLayout
+                android:id="@+id/fragment_event_layout_marker_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/fragment_event_iv_marker_img"
+                    android:layout_width="@dimen/activity_main_img_size"
+                    android:layout_height="@dimen/activity_main_img_size"
+                    android:layout_margin="@dimen/activity_main_space"
+                    android:background="@color/semi_gray"
+                    android:padding="@dimen/activity_main_space"
+                    android:scaleType="centerInside"
+                    android:src="@mipmap/ic_preload_img"
+                    app:image="@{event.image}" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryLTDark"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/fragment_event_tv_marker_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:paddingBottom="@dimen/activity_main_space"
+                            android:paddingLeft="@dimen/activity_half_horizontal_margin"
+                            android:paddingRight="@dimen/activity_half_horizontal_margin"
+                            android:paddingTop="@dimen/activity_main_space"
+                            android:text="@{event.detail}"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:id="@+id/fragment_event_tv_marker_poster"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:maxLines="1"
+                            android:paddingBottom="@dimen/activity_main_space"
+                            android:paddingLeft="@dimen/activity_half_horizontal_margin"
+                            android:paddingRight="@dimen/activity_half_horizontal_margin"
+                            android:paddingTop="@dimen/activity_main_space"
+                            android:text="@{event.poster}"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                            android:textColor="@color/white" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="7"
+                        android:background="@drawable/background_theme_button"
+                        android:scaleType="fitCenter"
+                        android:src="@mipmap/ic_unfollow" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/fragment_event_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
                 android:background="@color/colorPrimaryLTDark"
                 android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/fragment_event_btn_full_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:background="@drawable/background_theme_button"
+                    android:text="@string/fragment_event_btn_full_map"
+                    android:textColor="@color/white" />
+
                 <TextView
+                    android:id="@+id/fragment_event_title"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:paddingBottom="@dimen/activity_main_space"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_main_space"
-                    android:text="@string/loading"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="@dimen/activity_main_space"
+                    android:text="@string/fragment_event_title"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="@color/white" />
 
                 <ImageButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="7"
-                    android:background="@drawable/background_theme_button"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_unfollow" />
-            </LinearLayout>
-        </LinearLayout>
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/fragment_event_top_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="@color/colorPrimaryLTDark"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/fragment_event_btn_full_map"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
-                android:background="@drawable/background_theme_button"
-                android:text="@string/fragment_event_btn_full_map"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:id="@+id/fragment_event_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:padding="@dimen/activity_main_space"
-                android:text="@string/fragment_event_title"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/white" />
-
-            <ImageButton
-                android:id="@+id/fragment_event_btn_refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:background="@drawable/background_theme_button"
-                android:src="@mipmap/ic_refresh"
-                android:textColor="@color/white" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/fragment_event_top_bar_add_event1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryLTDark"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <EditText
-                android:id="@+id/fragment_event_ed_event"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_main_space"
-                android:gravity="center"
-                android:hint="@string/fragment_event_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/white"
-                android:textColorHint="@color/colorTint"></EditText>
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical">
-
-                <ImageButton
-                    android:id="@+id/fragment_event_btn_camera"
+                    android:id="@+id/fragment_event_btn_refresh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
                     android:background="@drawable/background_theme_button"
+                    android:src="@mipmap/ic_refresh"
+                    android:textColor="@color/white" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_event_top_bar_add_event1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimaryLTDark"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/fragment_event_ed_event"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_main_space"
+                    android:gravity="center"
+                    android:hint="@string/fragment_event_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/colorTint"></EditText>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical">
+
+                    <ImageButton
+                        android:id="@+id/fragment_event_btn_camera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_theme_button"
+                        android:scaleType="centerInside"
+                        android:src="@mipmap/ic_camera"
+                        android:textColor="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/fragment_event_add_icon"
+                        android:layout_width="@dimen/activity_main_notification_icon_size"
+                        android:layout_height="@dimen/activity_main_notification_icon_size"
+                        android:layout_gravity="right|top"
+                        android:src="@mipmap/ic_check"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/fragment_event_top_bar_add_event2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/fragment_event_btn_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_theme_button"
+                    android:paddingRight="@dimen/activity_main_space"
                     android:scaleType="centerInside"
-                    android:src="@mipmap/ic_camera"
+                    android:src="@mipmap/ic_confirm"
                     android:textColor="@color/white" />
 
-                <ImageView
-                    android:id="@+id/fragment_event_add_icon"
-                    android:layout_width="@dimen/activity_main_notification_icon_size"
-                    android:layout_height="@dimen/activity_main_notification_icon_size"
-                    android:layout_gravity="right|top"
-                    android:src="@mipmap/ic_check"
-                    android:visibility="gone" />
-            </FrameLayout>
-        </FrameLayout>
+                <ImageButton
+                    android:id="@+id/fragment_event_btn_cancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_theme_button"
+                    android:paddingLeft="@dimen/activity_main_space"
+                    android:src="@mipmap/ic_cancel"
+                    android:textColor="@color/white" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/fragment_event_top_bar_add_event2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <ImageButton
-                android:id="@+id/fragment_event_btn_add"
+            <TextView
+                android:id="@+id/fragment_event_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/background_theme_button"
-                android:paddingRight="@dimen/activity_main_space"
-                android:scaleType="centerInside"
-                android:src="@mipmap/ic_confirm"
-                android:textColor="@color/white" />
-
-            <ImageButton
-                android:id="@+id/fragment_event_btn_cancel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_weight="1"
-                android:background="@drawable/background_theme_button"
-                android:paddingLeft="@dimen/activity_main_space"
-                android:src="@mipmap/ic_cancel"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center"
+                android:background="@color/colorSemiPrimaryDark"
+                android:gravity="center"
+                android:padding="@dimen/activity_main_space"
+                android:text="@string/fragment_event_bottom"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/white" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/fragment_event_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center"
-            android:background="@color/colorSemiPrimaryDark"
-            android:gravity="center"
-            android:padding="@dimen/activity_main_space"
-            android:text="@string/fragment_event_bottom"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@color/white" />
-    </LinearLayout>
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

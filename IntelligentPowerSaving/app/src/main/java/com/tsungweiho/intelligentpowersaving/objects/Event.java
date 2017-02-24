@@ -9,17 +9,17 @@ public class Event {
     private String uniqueId;
     private String detail;
     private String position;
-    private String posterImg;
+    private String poster;
     private String image;
     private String time;
     private String ifFixed;
 
-    public Event(String uniqueId, String detail, String position, String image, String posterImg, String time, String ifFixed) {
+    public Event(String uniqueId, String detail, String position, String image, String poster, String time, String ifFixed) {
         this.uniqueId = uniqueId;
         this.detail = detail;
         this.position = position;
         this.image = image;
-        this.posterImg = posterImg;
+        this.poster = poster;
         this.time = time;
         this.ifFixed = ifFixed;
     }
@@ -29,7 +29,7 @@ public class Event {
         this.detail = eventArray.get(1);
         this.position = eventArray.get(2);
         this.image = eventArray.get(3);
-        this.posterImg = eventArray.get(4);
+        this.poster = eventArray.get(4);
         this.time = eventArray.get(5);
         this.ifFixed = eventArray.get(6);
     }
@@ -66,12 +66,12 @@ public class Event {
         this.image = image;
     }
 
-    public String getPosterImg() {
-        return posterImg;
+    public String getPoster() {
+        return poster;
     }
 
-    public void setPosterImg(String posterImg) {
-        this.posterImg = posterImg;
+    public void setPoster(String poster) {
+        this.poster = poster;
     }
 
     public String getTime() {
