@@ -92,7 +92,7 @@ public class AnimUtilities {
 
     public void rotateToIcon(ImageButton imageButton, int icon) {
         imageButton.setImageResource(icon);
-        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_snackbar_in);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.rotate);
         am.setDuration(FAST_ANIM_DURATION);
         imageButton.setAnimation(am);
         am.startNow();

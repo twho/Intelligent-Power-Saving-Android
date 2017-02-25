@@ -69,6 +69,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
     private MessageListAdapter messageListAdapter;
+    private ArrayList<Message> messageList;
 
     // PubNub
     private PubNub pubnub = null;
@@ -108,7 +109,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     }
 
     private void refreshInbox() {
-        ArrayList<Message> messageList = messageDBHelper.getAllMessageList();
+        messageList = messageDBHelper.getAllMessageList();
         messageListAdapter = new MessageListAdapter(context, messageList);
         lvMessages.setAdapter(messageListAdapter);
     }
@@ -116,11 +117,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private void setAllListeners() {
         ibOptions.setOnClickListener(inboxFragmentListener);
         navList.setOnItemClickListener(inboxFragmentListener);
-        lvMessages.setOnItemClickListener(inboxFragmentListener);
-        lvMessages.setOnItemLongClickListener(inboxFragmentListener);
     }
 
-    private class InboxFragmentListener extends SubscribeCallback implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+    private class InboxFragmentListener extends SubscribeCallback implements View.OnClickListener, AdapterView.OnItemClickListener {
 
         @Override
         public void onClick(View view) {
@@ -133,32 +132,23 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int pos, long id) {
-            if (view.getId() == R.id.fragment_inbox_drawer_lv) {
-                drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
-                    @Override
-                    public void onDrawerClosed(View drawerView) {
-                        switch (pos) {
-                            case 0:
-                                break;
-                            case 1:
-                                break;
-                            case 2:
-                                break;
-                            case 3:
-                                break;
-                        }
-                        super.onDrawerClosed(drawerView);
+            drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+                @Override
+                public void onDrawerClosed(View drawerView) {
+                    switch (pos) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
                     }
-                });
-                drawer.closeDrawer(llDrawer);
-            } else if (view.getId() == R.id.fragment_inbox_lv_message) {
-
-            }
-        }
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-            return false;
+                    super.onDrawerClosed(drawerView);
+                }
+            });
+            drawer.closeDrawer(llDrawer);
         }
 
         @Override

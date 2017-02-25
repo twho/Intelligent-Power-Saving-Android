@@ -5,16 +5,19 @@ package com.tsungweiho.intelligentpowersaving.tools;
  * Updated by MichaelHo on 2017/2/17.
  */
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -86,10 +89,14 @@ public class AlertDialogManager implements BuildingConstants, FragmentTag {
                         new DialogInterface.OnClickListener() {
 
                             @Override
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                fragment.startActivityForResult(takeIntent, REQUEST_CODE_CAMERA);
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                    Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    fragment.startActivityForResult(takeIntent, REQUEST_CODE_CAMERA);
+                                } else {
+                                    PermissionManager permissionManager = new PermissionManager(context);
+                                    permissionManager.requestCameraPermission();
+                                }
                             }
                         })
                 .setNegativeButton(R.string.alert_dialog_manager_camera_photo,

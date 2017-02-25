@@ -21,6 +21,7 @@ import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
+import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 
 import java.util.Arrays;
 
@@ -29,10 +30,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     // functions
     public static Context context;
     private String TAG = "MainActivity";
+    private PermissionManager permissionManager;
 
     //screen info
-    public static int screenWidth;
-    public static int screenHeight;
+    public static float screenWidth;
+    public static float screenHeight;
     public static ActionBar actionBar;
     private FragmentManager fragmentManager;
 
@@ -53,11 +55,16 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     private void init() {
         fragmentManager = getSupportFragmentManager();
+        permissionManager = new PermissionManager(context);
+        permissionManager.requestLocationPermission();
+        permissionManager.requestStoragePermission();
+        permissionManager.requestNetworkPermission();
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        screenWidth = metrics.widthPixels;
-        screenHeight = metrics.heightPixels;
+        float density = getResources().getDisplayMetrics().density;
+        screenWidth = metrics.widthPixels / density;
+        screenHeight = metrics.heightPixels / density;
 
         // Firebase sign in
         auth = FirebaseAuth.getInstance();
@@ -74,16 +81,37 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         setTab();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PermissionManager.PERMISSION_ACCESS_COARSE_LOCATION:
+                break;
+            case PermissionManager.PERMISSION_ACCESS_FINE_LOCATION:
+                break;
+            case PermissionManager.PERMISSION_READ_EXTERNAL_STORAGE:
+                break;
+            case PermissionManager.PERMISSION_WRITE_EXTERNAL_STORAGE:
+                break;
+            case PermissionManager.PERMISSION_ACCESS_NETWORK_STATE:
+                break;
+            case PermissionManager.PERMISSION_ACCESS_WIFI_STATE:
+                break;
+        }
+    }
+
     public static PubNub getPubNub() {
         return pubnub;
     }
 
     private void setTab() {
         actionBar = getSupportActionBar();
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setLogo(R.mipmap.ic_launcher);
         actionBar.setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayUseLogoEnabled(true);
+        if (screenHeight >= 800)
+            actionBar.setDisplayShowTitleEnabled(true);
+
         android.support.v7.app.ActionBar.Tab tabHome = actionBar.newTab()
                 .setIcon(R.mipmap.ic_home_unclick).setTabListener(this);
         actionBar.addTab(tabHome);

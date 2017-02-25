@@ -84,7 +84,7 @@ public class HomeFragment extends Fragment implements DBConstants {
         });
 
         // Configure for small screen with width under 1080dp
-        if (MainActivity.screenWidth <= 1080)
+        if (MainActivity.screenWidth < 600)
             gridLayout.setColumnCount(2);
     }
 
