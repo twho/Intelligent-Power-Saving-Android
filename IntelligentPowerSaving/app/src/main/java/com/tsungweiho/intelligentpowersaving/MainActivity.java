@@ -12,14 +12,17 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.fragments.BuildingFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
-import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
+import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
+
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTag, DBConstants, PubNubAPIConstants {
 
@@ -35,7 +38,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     // Databases
     private FirebaseAuth auth;
+
+    // PubNub Configuration
     public static PNConfiguration pnConfiguration;
+    public static PubNub pubnub = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE);
         pnConfiguration.setPublishKey(PUBNUB_PUBLISH);
         pnConfiguration.setSecure(false);
+        pubnub = new PubNub(pnConfiguration);
+        pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED, MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
 
         setTab();
     }
 
-    public static PNConfiguration getPNConfiguration() {
-        return pnConfiguration;
+    public static PubNub getPubNub() {
+        return pubnub;
     }
 
     private void setTab() {
@@ -87,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         actionBar.selectTab(tabEvent);
 
         android.support.v7.app.ActionBar.Tab tabMessage = actionBar
-                .newTab().setIcon(R.mipmap.ic_message_unclick).setTabListener(this);
+                .newTab().setIcon(R.mipmap.ic_mail_unclick).setTabListener(this);
         actionBar.addTab(tabMessage);
         actionBar.selectTab(tabMessage);
 
@@ -121,8 +129,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 tab.setIcon(R.mipmap.ic_event);
                 break;
             case 2:
-                setFragment(MESSAGE_FRAGMENT);
-                tab.setIcon(R.mipmap.ic_message);
+                setFragment(INBOX_FRAGMENT);
+                tab.setIcon(R.mipmap.ic_mail);
                 break;
             case 3:
                 setFragment(SETTINGS_FRAGMENT);
@@ -146,10 +154,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 if (null == fragment)
                     fragment = new EventFragment();
                 break;
-            case MESSAGE_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(MESSAGE_FRAGMENT);
+            case INBOX_FRAGMENT:
+                fragment = fragmentManager.findFragmentByTag(INBOX_FRAGMENT);
                 if (null == fragment)
-                    fragment = new MessageFragment();
+                    fragment = new InboxFragment();
                 break;
             case SETTINGS_FRAGMENT:
                 fragment = fragmentManager.findFragmentByTag(SETTINGS_FRAGMENT);
@@ -182,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 tab.setIcon(R.mipmap.ic_event_unclick);
                 break;
             case 2:
-                tab.setIcon(R.mipmap.ic_message_unclick);
+                tab.setIcon(R.mipmap.ic_mail_unclick);
                 break;
             case 3:
                 tab.setIcon(R.mipmap.ic_settings_unclick);

@@ -8,6 +8,10 @@
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">200dp</dimen>
     <dimen name="activity_main_img_size_padding">10dp</dimen>
+    <dimen name="activity_main_small_icon_size">48dp</dimen>
+
+    <!--DrawerListAdapter-->
+    <dimen name="obj_drawer_width">384dp</dimen>
 
     <!--AlertDialogManager-->
     <dimen name="alert_dialog_manager_min_width">640dp</dimen>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_content_button"
+    android:padding="@dimen/activity_main_space">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/obj_message_list_item_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="@dimen/activity_main_space"
+            android:background="@drawable/background_circle_lightgray"
+            android:padding="@dimen/activity_main_img_frame"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_preload_img" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_main_space"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/obj_message_list_item_tv_sender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:padding="@dimen/activity_main_space"
+                android:text="@string/loading"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/obj_message_list_item_tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:paddingLeft="@dimen/activity_main_space"
+                android:text="@string/loading"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/obj_message_list_item_tv_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:paddingLeft="@dimen/activity_main_space"
+                android:text="@string/loading"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/obj_message_list_item_tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_main_space"
+            android:text="@string/loading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/obj_message_list_item_ib"
+            android:layout_width="@dimen/activity_main_small_icon_size"
+            android:layout_height="@dimen/activity_main_small_icon_size"
+            android:layout_gravity="right|center_vertical"
+            android:layout_margin="@dimen/activity_main_space"
+            android:background="@drawable/background_content_button"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_unfollow" />
+    </LinearLayout>
+</FrameLayout>

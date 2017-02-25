@@ -10,9 +10,10 @@ public interface FragmentTag {
     // Main Fragments
     String HOME_FRAGMENT = packageName + "HomeFragment";
     String EVENT_FRAGMENT = packageName + "EventFragment";
-    String MESSAGE_FRAGMENT = packageName + "MessageFragment";
+    String INBOX_FRAGMENT = packageName + "InboxFragment";
     String SETTINGS_FRAGMENT = packageName + "SettingsFragment";
 
     // Extended Fragment
     String BUILDING_FRAGMENT = packageName + "BuildingFragment";
+    String MESSAGE_FRAGMENT = packageName + "MessageFragment";
 }

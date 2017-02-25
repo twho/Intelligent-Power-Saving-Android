@@ -18,7 +18,7 @@ public interface DBConstants {
     String JSON_ARRAY_NAME = "buildingList";
 
     // For all databases
-    int VERSION = 2;
+    int VERSION = 5;
     String ID = "Id";
 
     // BuildingDBHelper
@@ -35,4 +35,12 @@ public interface DBConstants {
     String DB_EVENT_IMG = "EVENT_IMG";
     String DB_EVENT_TIME = "EVENT_TIME";
     String DB_EVENT_IF_FIXED = "EVENT_IF_FIXED";
+
+    // MessageDBHelper
+    String DB_MESSAGE_UNID = "MESSAGE_UNID";
+    String DB_MESSAGE_SENDER = "MESSAGE_SENDER";
+    String DB_MESSAGE_TITLE = "MESSAGE_TITLE";
+    String DB_MESSAGE_CONTENT = "MESSAGE_CONTENT";
+    String DB_MESSAGE_TIME = "MESSAGE_TIME";
+    String DB_MESSAGE_INBOX_LABEL = "MESSAGE_INBOX_LABEL";
 }

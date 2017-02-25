@@ -11,9 +11,11 @@
 
     <!--follow material design rules-->
     <dimen name="activity_main_space">4dp</dimen>
+    <dimen name="activity_main_img_frame">2dp</dimen>
+    <dimen name="activity_main_small_icon_size">24dp</dimen>
 
     <!--DrawerListAdapter-->
-    <dimen name="obj_drawer_width">140dp</dimen>
+    <dimen name="obj_drawer_width">200dp</dimen>
 
     <!--AlertDialogManager-->
     <dimen name="alert_dialog_manager_min_width">300dp</dimen>

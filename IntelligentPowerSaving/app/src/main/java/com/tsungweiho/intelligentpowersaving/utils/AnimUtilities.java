@@ -6,6 +6,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -60,17 +61,40 @@ public class AnimUtilities {
 
     public void setllSlideUp(final LinearLayout linearLayout) {
         linearLayout.setVisibility(View.VISIBLE);
-        Animation am = AnimationUtils.loadAnimation(context, R.anim.slide_up);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_bottom_sheet_slide_in);
         am.setDuration(FAST_ANIM_DURATION);
         linearLayout.setAnimation(am);
         am.startNow();
     }
 
     public void setllSlideDown(final LinearLayout linearLayout) {
-        linearLayout.setVisibility(View.VISIBLE);
-        Animation am = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_bottom_sheet_slide_out);
         am.setDuration(FAST_ANIM_DURATION);
+        am.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                linearLayout.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
         linearLayout.setAnimation(am);
+        am.startNow();
+    }
+
+    public void rotateToIcon(ImageButton imageButton, int icon) {
+        imageButton.setImageResource(icon);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_snackbar_in);
+        am.setDuration(FAST_ANIM_DURATION);
+        imageButton.setAnimation(am);
         am.startNow();
     }
 }

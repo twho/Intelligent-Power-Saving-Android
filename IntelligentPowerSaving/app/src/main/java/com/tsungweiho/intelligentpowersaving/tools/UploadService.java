@@ -1,6 +1,7 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.constants.ImgurAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;

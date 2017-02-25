@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Intelligent Power Saving</string>
+    <string name="app_name">iPower Saving</string>
 
     <!--MainActivity-->
     <string name="loading">Loading...</string>
@@ -7,6 +7,14 @@
     <!--MessageFragment-->
     <string name="unread">Unread</string>
     <string name="inbox">Inbox</string>
+    <string name="starred">Starred event</string>
+    <string name="trash">Trash</string>
+    <string name="label_default">unread,inbox,</string>
+    <string name="event_reported_around">Reported around</string>
+
+    <!--SettingsFragment-->
+    <string name="fragment_settings_title">Settings</string>
+    <string name="logout">Log out</string>
 
     <!--HomeFragment-->
     <string name="fragment_home_title">Energy Consumption Dashboard</string>

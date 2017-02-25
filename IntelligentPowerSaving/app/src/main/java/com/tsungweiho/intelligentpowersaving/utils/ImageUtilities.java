@@ -54,6 +54,16 @@ public class ImageUtilities {
         this.context = context;
     }
 
+    public File getCompressedImgFile(File imgFile) {
+        File compressedImgFile = imgFile;
+
+        // Compress
+        if (compressedImgFile.length() > MAX_SIZE)
+            compressedImgFile = Compressor.getDefault(context).compressToFile(imgFile);
+
+        return compressedImgFile;
+    }
+
     public File getFileFromBitmap(Bitmap bitmap) {
         if (null == bitmap)
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img);

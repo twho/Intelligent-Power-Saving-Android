@@ -19,10 +19,10 @@ import com.tsungweiho.intelligentpowersaving.R;
 public class DrawerListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private String[] functions;
+    private int[] functions;
     private int[] drawables;
 
-    public DrawerListAdapter(Context context, String[] functions, int[] drawables) {
+    public DrawerListAdapter(Context context, int[] functions, int[] drawables) {
         this.context = context;
         this.functions = functions;
         this.drawables = drawables;
@@ -59,7 +59,7 @@ public class DrawerListAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.tvFunction.setText(functions[position]);
+        viewHolder.tvFunction.setText(context.getResources().getString(functions[position]));
         Drawable d = context.getResources().getDrawable(drawables[position]);
         viewHolder.imageView.setImageDrawable(d);
         return convertView;

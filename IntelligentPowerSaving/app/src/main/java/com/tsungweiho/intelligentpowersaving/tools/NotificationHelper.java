@@ -84,8 +84,7 @@ public class NotificationHelper {
 
         mBuilder.setAutoCancel(true);
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) mContext.get().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) mContext.get().getSystemService(Context.NOTIFICATION_SERVICE);
 
         mNotificationManager.notify(mContext.get().getString(R.string.app_name).hashCode(), mBuilder.build());
     }

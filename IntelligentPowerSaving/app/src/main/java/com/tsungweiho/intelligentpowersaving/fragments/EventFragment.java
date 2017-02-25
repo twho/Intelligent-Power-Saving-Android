@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +110,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private File tempImgFile;
     private Thread uiThread;
     private static Handler handler;
+    private static Runnable runnable;
 
     // Google map
     private GoogleMap googleMap;
@@ -123,7 +125,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
     private Bitmap bmpBuffer = null;
 
     // PubNub
-    PubNub pubnub = null;
+    private PubNub pubnub = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -145,9 +147,8 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         alertDialogManager = new AlertDialogManager(context);
         eventDBHelper = new EventDBHelper(context);
 
-        // subscribe to PubNub channels
-        pubnub = new PubNub(MainActivity.getPNConfiguration());
-        pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
+        // Add PubNub Listeners
+        pubnub = MainActivity.getPubNub();
         pubnub.addListener(eventFragmentListener);
 
         initMap(savedInstanceState);
@@ -349,6 +350,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         @Override
         public void onMapClick(LatLng latLng) {
             clickedLatLng = latLng;
+            animUtilities.setllSlideDown(llMarkerInfo);
         }
 
 
@@ -370,6 +372,9 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
         @Override
         public void message(PubNub pubnub, PNMessageResult message) {
+            if (!message.getChannel().equalsIgnoreCase(EVENT_CHANNEL) && !message.getChannel().equalsIgnoreCase(EVENT_CHANNEL_DELETED))
+                return;
+
             try {
                 JSONObject jObject = new JSONObject(message.getMessage().toString());
                 insertDataToDB(jObject);
@@ -390,13 +395,18 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         imageUtilities = new ImageUtilities(MainActivity.getContext());
         imageUtilities.setImageViewFromUrl(url, imageView);
 
+        if (null != handler)
+            handler.removeCallbacks(runnable);
+
         handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        runnable = new Runnable() {
             @Override
             public void run() {
                 imageUtilities.setImageViewFromUrl(url, imageView);
             }
-        }, 5000);
+        };
+
+        handler.postDelayed(runnable, 5000);
     }
 
     private void dismissAddView() {
@@ -437,8 +447,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
 
     private void createUpload(File image) {
         upload = new Upload();
-
-        upload.image = Compressor.getDefault(context).compressToFile(image);
+        upload.image = imageUtilities.getCompressedImgFile(image);
         upload.title = edEvent.getText().toString();
         upload.description = edEvent.getText().toString();
     }
@@ -478,7 +487,7 @@ public class EventFragment extends Fragment implements FragmentTag, PubNubAPICon
         public void success(ImageResponse imageResponse, Response response) {
             tempImgFile.delete();
             pubnub.publish().message(new Event(timeUtilities.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, "PubNub Test", timeUtilities.getDate() + " " + timeUtilities.getTimeHHmm(), "0"))
+                    clickedLatLng.longitude, imageResponse.data.link, "PubNub Test", timeUtilities.getDate() + "," + timeUtilities.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override

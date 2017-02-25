@@ -1,22 +1,34 @@
-package com.ibplan.michaelho.com.ibplan.michaelho.objects;
+package com.tsungweiho.intelligentpowersaving.objects;
 
 /**
  * Created by MichaelHo on 2015/6/1.
  */
+
 public class Message {
 
+    private String uniqueId;
     private String title;
-    private String detail;
-    private String ifRead;
+    private String content;
     private String sender;
+    private String inboxLabel;
     private String time;
 
-    public Message(String title, String detail, String sender, String time, String ifRead) {
+    // inbox label stores information (un/read,inbox,eventId)
+    public Message(String uniqueId, String title, String content, String sender, String time, String inboxLabel) {
+        this.uniqueId = uniqueId;
         this.title = title;
-        this.detail = detail;
-        this.ifRead = ifRead;
+        this.content = content;
         this.sender = sender;
         this.time = time;
+        this.inboxLabel = inboxLabel;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
     public String getTitle() {
@@ -27,16 +39,20 @@ public class Message {
         this.title = title;
     }
 
-    public String getDetail() {
-        return detail;
+    public String getContent() {
+        return content;
     }
 
-    public void setDetail(String detail) {
-        this.detail = detail;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getSender() {
         return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public void setTime(String time) {
@@ -47,15 +63,11 @@ public class Message {
         return time;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public String getInboxLabel() {
+        return inboxLabel;
     }
 
-    public String getIfRead() {
-        return ifRead;
-    }
-
-    public void setIfRead(String ifRead) {
-        this.ifRead = ifRead;
+    public void setInboxLabel(String ifRead) {
+        this.inboxLabel = inboxLabel;
     }
 }
