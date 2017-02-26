@@ -67,7 +67,7 @@ public class Message {
         return inboxLabel;
     }
 
-    public void setInboxLabel(String ifRead) {
+    public void setInboxLabel(String inboxLabel) {
         this.inboxLabel = inboxLabel;
     }
 }

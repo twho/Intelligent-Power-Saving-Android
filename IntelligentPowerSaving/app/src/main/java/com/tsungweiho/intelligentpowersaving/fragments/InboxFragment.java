@@ -33,6 +33,7 @@ import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,10 +67,12 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private Context context;
     private AnimUtilities animUtilities;
     private ImageUtilities imageUtilities;
+    private TimeUtilities timeUtilities;
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
     private MessageListAdapter messageListAdapter;
     private ArrayList<Message> messageList;
+    private Thread uiThread;
 
     // PubNub
     private PubNub pubnub = null;
@@ -88,6 +91,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageDBHelper = new MessageDBHelper(context);
         animUtilities = new AnimUtilities(context);
         imageUtilities = new ImageUtilities(context);
+        timeUtilities = new TimeUtilities(context);
 
         // Add PubNub Listeners
         pubnub = MainActivity.getPubNub();
@@ -167,7 +171,20 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     e.printStackTrace();
                 }
             } else if (message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL) || message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL_DELETED)) {
-
+                if (message.getMessage().toString().contains(FROM_WEB_MESSAGE_SEPARATOR)) {
+                    String strMessage = message.getMessage().toString();
+                    String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
+                    if (!messageDBHelper.checkIfExist(uniqueId)) {
+                        String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
+                        String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
+                        String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
+                        String time = timeUtilities.getTimeByMillies(strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID]);
+                        String inboxLabel = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_INBOX_LABEL];
+                        Message newMessage = new Message(uniqueId, title, content, sender, time, inboxLabel);
+                        messageDBHelper.insertDB(newMessage);
+                        refreshMessageOnUiThread();
+                    }
+                }
             }
         }
 
@@ -207,6 +224,24 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
             e.printStackTrace();
         }
         return address;
+    }
+
+    private void refreshMessageOnUiThread() {
+        if (null != uiThread)
+            uiThread.interrupt();
+
+        uiThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshInbox();
+                    }
+                });
+            }
+        });
+        uiThread.start();
     }
 
     @Override

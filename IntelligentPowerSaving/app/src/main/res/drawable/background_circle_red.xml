@@ -4,8 +4,8 @@
     <solid android:color="@color/colorPrimaryLTDark" />
     <corners android:radius="500dp" />
     <stroke
-        android:width="2px"
-        android:color="@color/colorPrimaryLTDark" />
+        android:width="@dimen/activity_main_img_frame"
+        android:color="@color/red" />
 
     <padding
         android:bottom="5dp"

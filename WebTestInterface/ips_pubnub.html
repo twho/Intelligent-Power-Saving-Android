@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.4.4.js"></script>
+		<script type="text/javascript">
+
+ 			function handleClick(button){
+ 				var timeMillies = new Date().getTime();
+ 				var defaultLabel = "unread,inbox,";
+ 				var type = document.getElementById('sel').value;
+ 				var inboxLabel = defaultLabel + type;
+ 				var name = document.getElementById('messageSender').value;
+ 				var title = document.getElementById('messageTitle').value;
+ 				var content = document.getElementById('messageContent').value;
+
+ 				// if (true) {
+
+ 				// } else {
+
+ 				// }
+ 				publish(timeMillies, inboxLabel, title, name, content);
+	 		}
+
+	 		function publish(timeMillies, inboxLabel, title, name, content) {
+	 			var separtor = "IPSFROMWEB"
+    			pubnub = new PubNub({
+        			publishKey : 'pub-c-dca997e6-cdc6-44eb-929d-d6cc56a56a1f',
+        			subscribeKey : 'sub-c-1061b83c-f6e2-11e6-ac91-02ee2ddab7fe'
+    			})
+    			
+    			var publishConfig = {
+            		channel : "message_channel_11",
+            		message : separtor + timeMillies + separtor + title + separtor + content + separtor + name + separtor + inboxLabel + separtor
+        		}
+        		pubnub.publish(publishConfig, function(status, response) {
+        			document.getElementById('demo').innerHTML = response;
+            		console.log(status, response);
+        		})
+    		}
+ 		</script>
+		<form method="POST">
+			Your name:<br><input id="messageSender" type="text" name="sender" value="iPower Saving Test Account">
+			<br>
+  			Title:<br>
+  			<input id="messageTitle" type="text" name="title" value="System Demo Test">
+  			<br>
+  			Message Content:<br>
+  			<textarea id="messageContent" name="content" rows="10" cols="30">The cat was playing in the garden.
+			</textarea>
+  			<br>
+  			<br>
+  			Message Type:<br>
+  			<select id="sel" name="messageType">
+    			<option value="announcement">Announcement</option>
+    			<option value="warning">Warning</option>
+    			<option value="emergency">Emergency</option>
+  			</select>
+  			<br><br>
+  			<input type="button" onclick="handleClick(this)" value="Submit">
+		</form>
+	</body>
+</html>

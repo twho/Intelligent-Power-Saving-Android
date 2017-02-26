@@ -18,7 +18,7 @@ public interface DBConstants {
     String JSON_ARRAY_NAME = "buildingList";
 
     // For all databases
-    int VERSION = 5;
+    int VERSION = 3;
     String ID = "Id";
 
     // BuildingDBHelper

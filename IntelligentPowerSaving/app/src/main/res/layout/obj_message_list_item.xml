@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/obj_message_list_item_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/background_content_button"
@@ -8,15 +9,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="@dimen/activity_main_space">
 
         <ImageView
             android:id="@+id/obj_message_list_item_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
-            android:layout_margin="@dimen/activity_main_space"
-            android:background="@drawable/background_circle_lightgray"
+            android:background="@drawable/background_circle_lightred"
             android:padding="@dimen/activity_main_img_frame"
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_preload_img" />
@@ -84,7 +85,7 @@
             android:layout_height="@dimen/activity_main_small_icon_size"
             android:layout_gravity="right|center_vertical"
             android:layout_margin="@dimen/activity_main_space"
-            android:background="@drawable/background_content_button"
+            android:background="@drawable/background_content_transparent_button"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_unfollow" />
     </LinearLayout>
