@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
-import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.fragments.BuildingFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
@@ -25,7 +25,7 @@ import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTag, DBConstants, PubNubAPIConstants {
+public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
 
     // functions
     public static Context context;
@@ -229,5 +229,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
 
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // lock back button
     }
 }

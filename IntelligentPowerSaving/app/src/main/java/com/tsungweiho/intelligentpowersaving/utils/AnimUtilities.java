@@ -21,7 +21,7 @@ public class AnimUtilities {
 
     // Animation duration
     private int ANIM_DURATION = 1000;
-    private int FAST_ANIM_DURATION = 500;
+    private int FAST_ANIM_DURATION = 250;
 
     public AnimUtilities(Context context) {
         this.context = context;

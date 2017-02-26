@@ -2,8 +2,10 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -12,28 +14,58 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
+import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Updated by Tsung Wei Ho on 2017/2/26.
  */
 
-public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstants {
+public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstants, DBConstants, FragmentTags {
     private Context context;
     private LayoutInflater layoutInflater;
     private ArrayList<Message> messageList;
-    private TimeUtilities timeUtilities;
+    private ArrayList<Boolean> messageSelectedList;
+    private int mode;
 
-    public MessageListAdapter(Context context, ArrayList<Message> messageList) {
+    // functions
+    private TimeUtilities timeUtilities;
+    private FragmentManager fm;
+    private int MODE_VIEWING = 0;
+    private int MODE_EDITING = 1;
+
+    public MessageListAdapter(Context context, ArrayList<Message> messageList, ArrayList<Boolean> messageSelectedList, int mode) {
         this.context = context;
         this.messageList = messageList;
+        this.messageSelectedList = messageSelectedList;
+        this.mode = mode;
         timeUtilities = new TimeUtilities(context);
+    }
+
+    public void setMessageList(ArrayList<Message> messageList) {
+        this.messageList = messageList;
+    }
+
+    public void setSelectedList(ArrayList<Boolean> messageSelectedList) {
+        this.messageSelectedList = messageSelectedList;
+    }
+
+    public int getMode() {
+        return mode;
+    }
+
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
     @Override
@@ -52,10 +84,10 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
         layoutInflater = LayoutInflater.from(context);
-        int newOrderPosition = getCount() - position - 1;
+        final int newOrderPosition = getCount() - position - 1;
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.obj_message_list_item, null);
@@ -72,32 +104,89 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
         Message message = messageList.get(newOrderPosition);
         viewHolder.tvSender.setText(message.getSender());
         viewHolder.tvTitle.setText(message.getTitle());
         viewHolder.tvContent.setText(message.getContent());
 
         // Check if in the same day to determine how to show the time
-        if (message.getTime().split(",")[0].equalsIgnoreCase(timeUtilities.getDate()))
-            viewHolder.tvTime.setText(message.getTime().split(",")[1]);
+        if (message.getTime().split(MESSAGE_LABEL_SEPARATOR)[0].equalsIgnoreCase(timeUtilities.getDate()))
+            viewHolder.tvTime.setText(message.getTime().split(MESSAGE_LABEL_SEPARATOR)[1]);
         else {
-            viewHolder.tvTime.setText(message.getTime().split(",")[0]);
+            viewHolder.tvTime.setText(message.getTime().split(MESSAGE_LABEL_SEPARATOR)[0]);
         }
 
-        Log.d("asdasd", message.getInboxLabel());
-        setImageViewByLable(message.getInboxLabel().split(",")[2], viewHolder.imageView);
+        // set read message as gray
+        if (message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[0].equalsIgnoreCase(LABEL_MESSAGE_READ)) {
+            viewHolder.tvSender.setTextColor(context.getResources().getColor(R.color.colorTint));
+            viewHolder.tvTitle.setTextColor(context.getResources().getColor(R.color.colorTint));
+            viewHolder.tvContent.setTextColor(context.getResources().getColor(R.color.colorTint));
+        }
+
+        // Viewing Mode
+        if (mode == MODE_VIEWING) {
+            viewHolder.frameLayout.setOnClickListener(null);
+
+            viewHolder.frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                private long timeDown = 0;
+
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            timeDown = System.currentTimeMillis();
+                            viewHolder.frameLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryLTDark));
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            viewHolder.frameLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                            if ((System.currentTimeMillis() - timeDown) > 1000) {
+                                if (null == fm)
+                                    fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+                                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                                inboxFragment.initEditingInbox(newOrderPosition, messageList);
+                            } else {
+
+                            }
+                            break;
+                    }
+                    return true;
+                }
+            });
+            setImageViewByLabel(message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[2], viewHolder.imageView);
+        } else if (mode == MODE_EDITING) {
+            viewHolder.frameLayout.setOnTouchListener(null);
+            viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (null == fm)
+                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                    if (messageSelectedList.get(newOrderPosition)) {
+                        inboxFragment.setIndexSelected(newOrderPosition, Boolean.FALSE);
+                    } else {
+                        inboxFragment.setIndexSelected(newOrderPosition, Boolean.TRUE);
+                    }
+                }
+            });
+            setImageViewOnEditing(messageSelectedList.get(newOrderPosition), viewHolder.imageView);
+        }
 
         return convertView;
     }
 
-    private void setImageViewByLable(String label, ImageView imageView) {
+    private class ViewHolder {
+        FrameLayout frameLayout;
+        ImageView imageView;
+        TextView tvSender;
+        TextView tvTitle;
+        TextView tvContent;
+        TextView tvTime;
+        ImageButton ibStar;
+    }
+
+    private void setImageViewByLabel(String label, ImageView imageView) {
         Drawable drawable;
         switch (label) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
@@ -120,13 +209,11 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         imageView.setImageDrawable(drawable);
     }
 
-    private class ViewHolder {
-        FrameLayout frameLayout;
-        ImageView imageView;
-        TextView tvSender;
-        TextView tvTitle;
-        TextView tvContent;
-        TextView tvTime;
-        ImageButton ibStar;
+    private void setImageViewOnEditing(Boolean select, ImageView imageView) {
+        imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_check));
+        imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_colorprimary));
+        if (select) {
+            imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_colortint));
+        }
     }
 }

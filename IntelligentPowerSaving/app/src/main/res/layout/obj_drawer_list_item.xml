@@ -20,7 +20,7 @@
 
         <TextView
             android:id="@+id/obj_drawer_list_item_tv"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_margin="@dimen/activity_main_space"
@@ -28,5 +28,4 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white" />
     </LinearLayout>
-
 </LinearLayout>

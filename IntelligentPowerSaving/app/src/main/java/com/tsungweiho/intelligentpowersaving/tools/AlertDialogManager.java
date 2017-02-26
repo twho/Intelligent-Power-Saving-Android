@@ -18,7 +18,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,13 +27,12 @@ import android.widget.ImageView;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
-import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
-import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
-public class AlertDialogManager implements BuildingConstants, FragmentTag {
+public class AlertDialogManager implements BuildingConstants, FragmentTags {
     private Context context;
 
     public AlertDialogManager(Context context) {

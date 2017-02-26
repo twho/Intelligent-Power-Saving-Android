@@ -4,7 +4,7 @@ package com.tsungweiho.intelligentpowersaving.constants;
  * Created by Tsung Wei Ho on 2/18/2017.
  */
 
-public interface FragmentTag {
+public interface FragmentTags {
     String packageName = "com.tsungweiho.intelligentpowersaving";
 
     // Main Fragments

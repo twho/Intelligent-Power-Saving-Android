@@ -129,14 +129,12 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="@color/white" />
 
-                <ImageButton
-                    android:id="@+id/fragment_event_btn_refresh"
+                <ProgressBar
+                    android:id="@+id/fragment_event_pb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right|center_vertical"
-                    android:background="@drawable/background_theme_button"
-                    android:src="@mipmap/ic_refresh"
-                    android:textColor="@color/white" />
+                    android:visibility="gone" />
             </FrameLayout>
 
             <FrameLayout

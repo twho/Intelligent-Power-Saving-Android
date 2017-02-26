@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 
 import java.util.ArrayList;
@@ -15,10 +17,11 @@ import java.util.ArrayList;
  * Created by tsung on 2017/2/24.
  */
 
-public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants {
+public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, PubNubAPIConstants {
 
     public static final String TABLE_NAME = "message_details";
     public static final String DB_NAME = TABLE_NAME + ".db.sqlite";
+    public static final String SEPARATOR = TABLE_NAME + ".db.sqlite";
 
     public MessageDBHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
@@ -97,24 +100,68 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants {
         return count;
     }
 
-    public ArrayList<Message> getAllMessageList() {
+    public ArrayList<Message> getInboxMessageList() {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Message> messageList = new ArrayList<Message>();
         String sql = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            String uniqueId = cursor.getString(1);
-            String title = cursor.getString(2);
-            String content = cursor.getString(3);
-            String sender = cursor.getString(4);
-            String time = cursor.getString(5);
-            String inboxLabel = cursor.getString(6);
-            Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
-            messageList.add(message);
+            if (cursor.getString(6).split(MESSAGE_LABEL_SEPARATOR)[1].equalsIgnoreCase(LABEL_MESSAGE_INBOX)) {
+                String uniqueId = cursor.getString(1);
+                String title = cursor.getString(2);
+                String content = cursor.getString(3);
+                String sender = cursor.getString(4);
+                String time = cursor.getString(5);
+                String inboxLabel = cursor.getString(6);
+                Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
+                messageList.add(message);
+            }
         }
         cursor.close();
 
         return messageList;
+    }
+
+    public ArrayList<Message> getTrashMessageList() {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Message> messageList = new ArrayList<Message>();
+        String sql = "SELECT * FROM " + TABLE_NAME;
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            if (cursor.getString(6).split(MESSAGE_LABEL_SEPARATOR)[1].equalsIgnoreCase(LABEL_MESSAGE_TRASH)) {
+                String uniqueId = cursor.getString(1);
+                String title = cursor.getString(2);
+                String content = cursor.getString(3);
+                String sender = cursor.getString(4);
+                String time = cursor.getString(5);
+                String inboxLabel = cursor.getString(6);
+                Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
+                messageList.add(message);
+            }
+        }
+        cursor.close();
+
+        return messageList;
+    }
+
+    public int moveToTrash(Message message) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String newInboxLabel = message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[0] + MESSAGE_LABEL_SEPARATOR
+                + LABEL_MESSAGE_TRASH + MESSAGE_LABEL_SEPARATOR + message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[2];
+
+        ContentValues values = new ContentValues();
+        values.put(DB_MESSAGE_UNID, message.getUniqueId());
+        values.put(DB_MESSAGE_TITLE, message.getTitle());
+        values.put(DB_MESSAGE_CONTENT, message.getContent());
+        values.put(DB_MESSAGE_SENDER, message.getSender());
+        values.put(DB_MESSAGE_TIME, message.getTime());
+        values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
+        String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
+
+        int count = db.update(TABLE_NAME, values, whereClause, null);
+
+        return count;
     }
 
     public void deleteByUniqueId(String uniqueId) {

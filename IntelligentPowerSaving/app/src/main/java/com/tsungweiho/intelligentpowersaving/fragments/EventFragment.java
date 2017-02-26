@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +46,8 @@ import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
-import com.tsungweiho.intelligentpowersaving.Manifest;
 import com.tsungweiho.intelligentpowersaving.R;
-import com.tsungweiho.intelligentpowersaving.constants.FragmentTag;
+import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
@@ -70,10 +68,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
-import id.zelory.compressor.Compressor;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -83,7 +79,7 @@ import retrofit.client.Response;
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class EventFragment extends Fragment implements FragmentTag, PubNubAPIConstants, OnMapReadyCallback {
+public class EventFragment extends Fragment implements FragmentTags, PubNubAPIConstants, OnMapReadyCallback {
 
     private String TAG = "EventFragment";
 
