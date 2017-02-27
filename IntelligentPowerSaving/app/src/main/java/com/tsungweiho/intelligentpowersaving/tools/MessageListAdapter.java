@@ -113,7 +113,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             add(viewHolder.tvTime);
         }};
 
-        Message message = messageList.get(newOrderPosition);
+        final Message message = messageList.get(newOrderPosition);
         viewHolder.tvSender.setText(message.getSender());
         viewHolder.tvTitle.setText(message.getTitle());
         viewHolder.tvContent.setText(message.getContent());
@@ -159,7 +159,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    ((MainActivity) MainActivity.getContext()).setMessageFragment(message);
                 }
             });
 

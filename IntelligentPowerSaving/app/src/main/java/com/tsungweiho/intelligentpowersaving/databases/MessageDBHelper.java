@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
@@ -162,6 +161,28 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         int count = db.update(TABLE_NAME, values, whereClause, null);
 
         return count;
+    }
+
+    public Message getMessageByUnId(String unId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {DB_MESSAGE_UNID, DB_MESSAGE_TITLE, DB_MESSAGE_CONTENT, DB_MESSAGE_SENDER, DB_MESSAGE_TIME, DB_MESSAGE_INBOX_LABEL};
+        String whereClause = DB_MESSAGE_UNID + " = ?;";
+        String[] whereArgs = {unId};
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,
+                null, null, null);
+        Message message = null;
+        while (cursor.moveToNext()) {
+            String uniqueId = cursor.getString(0);
+            String title = cursor.getString(1);
+            String content = cursor.getString(2);
+            String sender = cursor.getString(3);
+            String time = cursor.getString(4);
+            String inboxLabel = cursor.getString(5);
+            message = new Message(uniqueId, title, content, sender, time, inboxLabel);
+        }
+        cursor.close();
+        db.close();
+        return message;
     }
 
     public void deleteByUniqueId(String uniqueId) {

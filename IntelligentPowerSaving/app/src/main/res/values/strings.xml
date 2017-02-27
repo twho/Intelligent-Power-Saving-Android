@@ -3,6 +3,8 @@
 
     <!--MainActivity-->
     <string name="loading">Loading...</string>
+    <string name="testing_account">testing@ipowersaving.com</string>
+    <string name="testing_name">iPower Saving Test Account</string>
 
     <!--MessageFragment-->
     <string name="unread">Unread</string>

@@ -129,6 +129,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
         initInbox(messageList);
         lvMessages.setAdapter(messageListAdapter);
+        animUtilities.setlvAnimToVisible(lvMessages);
 
         setAllListeners();
     }
@@ -289,6 +290,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     }
                     switchBoxFunctions(currentBox);
                     refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
+                    animUtilities.setlvAnimToVisible(lvMessages);
                     super.onDrawerClosed(drawerView);
                 }
             });

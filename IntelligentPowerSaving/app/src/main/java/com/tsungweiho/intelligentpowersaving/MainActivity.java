@@ -23,8 +23,10 @@ import com.tsungweiho.intelligentpowersaving.fragments.BuildingFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
+import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
+import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 
 import java.util.Arrays;
@@ -212,6 +214,14 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         BuildingFragment buildingFragment = new BuildingFragment();
         buildingFragment.setArguments(bundle);
         startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
+    }
+
+    public void setMessageFragment(Message message) {
+        Bundle bundle = new Bundle();
+        bundle.putString(MESSAGE_FRAGMENT_KEY, message.getUniqueId());
+        MessageFragment messageFragment = new MessageFragment();
+        messageFragment.setArguments(bundle);
+        startReplaceFragment(messageFragment, MESSAGE_FRAGMENT);
     }
 
     private void startReplaceFragment(Fragment fragment, String fragmentTag) {

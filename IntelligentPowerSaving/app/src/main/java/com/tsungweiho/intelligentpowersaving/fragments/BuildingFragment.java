@@ -21,7 +21,6 @@ import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentBuildingBinding;
-import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.utils.AChartUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;

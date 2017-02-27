@@ -512,7 +512,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         public void success(ImageResponse imageResponse, Response response) {
             tempImgFile.delete();
             pubnub.publish().message(new Event(timeUtilities.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, "PubNub Test", timeUtilities.getDate() + "," + timeUtilities.getTimehhmm(), "0"))
+                    clickedLatLng.longitude, imageResponse.data.link, getString(R.string.testing_name), timeUtilities.getDate() + "," + timeUtilities.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override

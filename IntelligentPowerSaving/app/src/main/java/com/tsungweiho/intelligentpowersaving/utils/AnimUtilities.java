@@ -9,6 +9,7 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.tsungweiho.intelligentpowersaving.R;
 
@@ -21,6 +22,7 @@ public class AnimUtilities {
 
     // Animation duration
     private int ANIM_DURATION = 1000;
+    private int MID_ANIM_DURATION = 500;
     private int FAST_ANIM_DURATION = 250;
 
     public AnimUtilities(Context context) {
@@ -48,6 +50,14 @@ public class AnimUtilities {
         Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         am.setDuration(ANIM_DURATION);
         frameLayout.setAnimation(am);
+        am.startNow();
+    }
+
+    public void setlvAnimToVisible(final ListView listView) {
+        listView.setVisibility(View.VISIBLE);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+        am.setDuration(MID_ANIM_DURATION);
+        listView.setAnimation(am);
         am.startNow();
     }
 
