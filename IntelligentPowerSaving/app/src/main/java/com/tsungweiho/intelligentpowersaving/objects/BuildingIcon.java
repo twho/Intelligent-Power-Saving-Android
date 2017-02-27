@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.ObjIconBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
@@ -16,7 +17,7 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
  * Created by Tsung Wei Ho on 2/18/2017.
  */
 
-public class BuildingIcon extends View {
+public class BuildingIcon extends View implements BuildingConstants {
 
     private static Context context;
     private Building building;
@@ -53,7 +54,7 @@ public class BuildingIcon extends View {
         tvConsump = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption);
         tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
         tvConsump.setText(building.getConsumption());
-        if ("high".equalsIgnoreCase(building.getConsumption().split(",")[0])) {
+        if (ENERGY_HIGH.equalsIgnoreCase(building.getConsumption().split(",")[0])) {
             tvConsump.setText(context.getString(R.string.increase_weekly));
             setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.light_red));
             ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_increase));

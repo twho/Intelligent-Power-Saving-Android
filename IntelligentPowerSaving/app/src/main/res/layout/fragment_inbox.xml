@@ -55,7 +55,7 @@
                     android:src="@mipmap/ic_delete" />
 
                 <ImageButton
-                    android:id="@+id/fragment_inbox_ib_read"
+                    android:id="@+id/fragment_inbox_ib_inbox_function"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/background_theme_button"

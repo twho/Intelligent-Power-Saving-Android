@@ -100,13 +100,13 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         return count;
     }
 
-    public ArrayList<Message> getInboxMessageList() {
+    public ArrayList<Message> getMessageListByLabel(String label) {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Message> messageList = new ArrayList<Message>();
         String sql = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            if (cursor.getString(6).split(MESSAGE_LABEL_SEPARATOR)[1].equalsIgnoreCase(LABEL_MESSAGE_INBOX)) {
+            if (cursor.getString(6).split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(label)) {
                 String uniqueId = cursor.getString(1);
                 String title = cursor.getString(2);
                 String content = cursor.getString(3);
@@ -122,33 +122,33 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         return messageList;
     }
 
-    public ArrayList<Message> getTrashMessageList() {
-        SQLiteDatabase db = getReadableDatabase();
-        ArrayList<Message> messageList = new ArrayList<Message>();
-        String sql = "SELECT * FROM " + TABLE_NAME;
-        Cursor cursor = db.rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            if (cursor.getString(6).split(MESSAGE_LABEL_SEPARATOR)[1].equalsIgnoreCase(LABEL_MESSAGE_TRASH)) {
-                String uniqueId = cursor.getString(1);
-                String title = cursor.getString(2);
-                String content = cursor.getString(3);
-                String sender = cursor.getString(4);
-                String time = cursor.getString(5);
-                String inboxLabel = cursor.getString(6);
-                Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
-                messageList.add(message);
-            }
-        }
-        cursor.close();
-
-        return messageList;
-    }
-
-    public int moveToTrash(Message message) {
+    // Handle un/read of mails
+    public int markMailByLabel(Message message, String ifRead) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String newInboxLabel = message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[0] + MESSAGE_LABEL_SEPARATOR
-                + LABEL_MESSAGE_TRASH + MESSAGE_LABEL_SEPARATOR + message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[2];
+        String newInboxLabel = ifRead + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1] +
+                SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
+
+        ContentValues values = new ContentValues();
+        values.put(DB_MESSAGE_UNID, message.getUniqueId());
+        values.put(DB_MESSAGE_TITLE, message.getTitle());
+        values.put(DB_MESSAGE_CONTENT, message.getContent());
+        values.put(DB_MESSAGE_SENDER, message.getSender());
+        values.put(DB_MESSAGE_TIME, message.getTime());
+        values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
+        String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
+
+        int count = db.update(TABLE_NAME, values, whereClause, null);
+
+        return count;
+    }
+
+    // Handle mails moving between boxes
+    public int moveToBoxByLabel(Message message, String label) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String newInboxLabel = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0] + SEPARATOR_MSG_LABEL
+                + label + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
 
         ContentValues values = new ContentValues();
         values.put(DB_MESSAGE_UNID, message.getUniqueId());

@@ -31,16 +31,30 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <ImageView
-                    android:id="@+id/fragment_event_iv_marker_img"
+                <FrameLayout
                     android:layout_width="@dimen/activity_main_img_size"
                     android:layout_height="@dimen/activity_main_img_size"
-                    android:layout_margin="@dimen/activity_main_space"
-                    android:background="@color/semi_gray"
-                    android:padding="@dimen/activity_main_space"
-                    android:scaleType="centerInside"
-                    android:src="@mipmap/ic_preload_img"
-                    app:image="@{event.image}" />
+                    android:layout_gravity="left"
+                    android:layout_margin="@dimen/activity_main_space">
+
+                    <ImageView
+                        android:id="@+id/fragment_event_iv_marker_img"
+                        android:layout_width="@dimen/activity_main_img_size"
+                        android:layout_height="@dimen/activity_main_img_size"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:background="@color/semi_gray"
+                        android:padding="@dimen/activity_main_space"
+                        android:scaleType="fitCenter"
+                        app:image="@{event.image}" />
+
+                    <ProgressBar
+                        android:id="@+id/fragment_event_pb_marker_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -134,6 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right|center_vertical"
+                    android:padding="@dimen/activity_main_space"
                     android:visibility="gone" />
             </FrameLayout>
 

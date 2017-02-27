@@ -148,6 +148,13 @@ public class HomeFragment extends Fragment implements DBConstants {
         for (int index = 0; index < buildingList.size(); index++) {
             building = buildingList.get(index);
             BuildingIcon buildingIcon = new BuildingIcon(context, building);
+            final Building finalBuilding = building;
+            buildingIcon.getView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((MainActivity) MainActivity.getContext()).setBuildingFragment(finalBuilding);
+                }
+            });
             gridLayout.addView(buildingIcon.getView());
         }
     }

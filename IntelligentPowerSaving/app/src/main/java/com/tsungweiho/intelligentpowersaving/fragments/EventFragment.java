@@ -8,22 +8,24 @@ import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,6 +47,8 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
@@ -93,6 +97,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private EditText edEvent;
     private ImageView ivAddIcon, ivMarker;
     private ImageButton ibAdd, ibCancel, ibCamera;
+    private static ProgressBar pbMarker, pbTopBar;
     private Button btnFullMap;
 
     // Functions
@@ -117,6 +122,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private LatLngBounds bounds;
     private LatLng clickedLatLng;
     private HashMap<Marker, Event> mapMarkers;
+    private boolean ifMarkerViewUp = false;
+    private boolean lockLocation = false;
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -165,6 +172,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
         ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
         ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
+        pbMarker = (ProgressBar) view.findViewById(R.id.fragment_event_pb_marker_img);
+        pbTopBar = (ProgressBar) view.findViewById(R.id.fragment_event_pb);
         setAllListeners();
     }
 
@@ -316,6 +325,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_event_btn_add:
+                    pbTopBar.animate();
+                    pbTopBar.setVisibility(View.VISIBLE);
                     if (edEvent.getText().toString().length() == 0) {
                         alertDialogManager.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
                     } else {
@@ -348,21 +359,30 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
             clickedLatLng = latLng;
+            lockLocation = true;
         }
 
         @Override
         public void onMapClick(LatLng latLng) {
-            clickedLatLng = latLng;
-            animUtilities.setllSlideDown(llMarkerInfo);
-        }
+            if (!lockLocation)
+                clickedLatLng = latLng;
 
+            if (ifMarkerViewUp) {
+                animUtilities.setllSlideDown(llMarkerInfo);
+                ifMarkerViewUp = false;
+            }
+        }
 
         @Override
         public boolean onMarkerClick(Marker marker) {
+            ivMarker.setImageDrawable(null);
+            pbMarker.setVisibility(View.VISIBLE);
+            pbMarker.animate();
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
-            ivMarker.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img));
+            binding.executePendingBindings();
             animUtilities.setllSlideUp(llMarkerInfo);
+            ifMarkerViewUp = true;
             return false;
         }
 
@@ -396,7 +416,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     @BindingAdapter({"bind:image"})
     public static void loadImage(final ImageView imageView, final String url) {
         imageUtilities = new ImageUtilities(MainActivity.getContext());
-        imageUtilities.setImageViewFromUrl(url, imageView);
+        imageUtilities.setImageViewFromUrl(url, imageView, pbMarker);
 
         if (null != handler)
             handler.removeCallbacks(runnable);
@@ -405,7 +425,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         runnable = new Runnable() {
             @Override
             public void run() {
-                imageUtilities.setImageViewFromUrl(url, imageView);
+                imageUtilities.setImageViewFromUrl(url, imageView, pbMarker);
             }
         };
 
@@ -420,6 +440,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         edEvent.setText("");
         ivAddIcon.setVisibility(View.GONE);
         bmpBuffer = null;
+        closeKeyboard(context, edEvent.getWindowToken());
+        lockLocation = false;
     }
 
     @Override
@@ -473,7 +495,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         uiThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                getActivity().runOnUiThread(new Runnable() {
+                ((MainActivity) MainActivity.getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         setAllMarkers();
@@ -499,6 +521,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                             // status.isError to see if error happened
                         }
                     });
+            pbTopBar.clearAnimation();
+            pbTopBar.setVisibility(View.GONE);
             dismissAddView();
         }
 
@@ -522,5 +546,10 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     public void onLowMemory() {
         mapView.onLowMemory();
         super.onLowMemory();
+    }
+
+    public static void closeKeyboard(Context c, IBinder windowToken) {
+        InputMethodManager mgr = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 }

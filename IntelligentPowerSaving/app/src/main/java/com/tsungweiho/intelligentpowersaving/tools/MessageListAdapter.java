@@ -1,6 +1,7 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -25,6 +26,7 @@ import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -104,58 +106,68 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        ArrayList<TextView> tvSet = new ArrayList<TextView>() {{
+            add(viewHolder.tvTitle);
+            add(viewHolder.tvContent);
+            add(viewHolder.tvSender);
+            add(viewHolder.tvTime);
+        }};
+
         Message message = messageList.get(newOrderPosition);
         viewHolder.tvSender.setText(message.getSender());
         viewHolder.tvTitle.setText(message.getTitle());
         viewHolder.tvContent.setText(message.getContent());
 
         // Check if in the same day to determine how to show the time
-        if (message.getTime().split(MESSAGE_LABEL_SEPARATOR)[0].equalsIgnoreCase(timeUtilities.getDate()))
-            viewHolder.tvTime.setText(message.getTime().split(MESSAGE_LABEL_SEPARATOR)[1]);
+        if (message.getTime().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtilities.getDate()))
+            viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[1]);
         else {
-            viewHolder.tvTime.setText(message.getTime().split(MESSAGE_LABEL_SEPARATOR)[0]);
+            viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[0]);
         }
 
-        // set read message as gray
-        if (message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[0].equalsIgnoreCase(LABEL_MESSAGE_READ)) {
-            viewHolder.tvSender.setTextColor(context.getResources().getColor(R.color.colorTint));
-            viewHolder.tvTitle.setTextColor(context.getResources().getColor(R.color.colorTint));
-            viewHolder.tvContent.setTextColor(context.getResources().getColor(R.color.colorTint));
+        // set read message as gray, unread message as white bold
+        if (message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ)) {
+            for (int i = 0; i < tvSet.size(); i++) {
+                tvSet.get(i).setTextColor(context.getResources().getColor(R.color.colorTint));
+                tvSet.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+            }
+        } else {
+            for (int i = 0; i < tvSet.size(); i++) {
+                tvSet.get(i).setTextColor(context.getResources().getColor(R.color.white));
+                tvSet.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            }
         }
 
         // Viewing Mode
         if (mode == MODE_VIEWING) {
             viewHolder.frameLayout.setOnClickListener(null);
 
-            viewHolder.frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                private long timeDown = 0;
-
+            // On long click: perform editing mode
+            viewHolder.frameLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    switch (motionEvent.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            timeDown = System.currentTimeMillis();
-                            viewHolder.frameLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryLTDark));
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            viewHolder.frameLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
-                            if ((System.currentTimeMillis() - timeDown) > 1000) {
-                                if (null == fm)
-                                    fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+                public boolean onLongClick(View view) {
+                    if (null == fm)
+                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
-                                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
-                                inboxFragment.initEditingInbox(newOrderPosition, messageList);
-                            } else {
-
-                            }
-                            break;
-                    }
-                    return true;
+                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                    inboxFragment.initEditingInbox(newOrderPosition, messageList);
+                    return false;
                 }
             });
-            setImageViewByLabel(message.getInboxLabel().split(MESSAGE_LABEL_SEPARATOR)[2], viewHolder.imageView);
+
+            // On click: view mail details
+            viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+            setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2], viewHolder.imageView);
         } else if (mode == MODE_EDITING) {
             viewHolder.frameLayout.setOnTouchListener(null);
+
+            // On click in editing mode: select mail
             viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

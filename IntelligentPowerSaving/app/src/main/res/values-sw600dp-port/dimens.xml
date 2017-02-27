@@ -3,6 +3,7 @@
 
     <dimen name="activity_horizontal_margin">32dp</dimen>
     <dimen name="activity_half_horizontal_margin">16dp</dimen>
+    <dimen name="activity_main_single_row_btn_width">300dp</dimen>
 
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">180dp</dimen>

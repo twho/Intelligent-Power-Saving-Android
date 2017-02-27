@@ -13,31 +13,21 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.util.Base64;
-import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.tsungweiho.intelligentpowersaving.R;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Calendar;
 
 import id.zelory.compressor.Compressor;
-import it.sephiroth.android.library.imagezoom.ImageViewTouch;
-import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/7.
@@ -48,7 +38,7 @@ public class ImageUtilities {
     private static Context context;
 
     // unit KB
-    private static final int MAX_SIZE = (100) * 1024;
+    private static final int MAX_SIZE = (200) * 1024;
 
     public ImageUtilities(Context context) {
         this.context = context;
@@ -75,9 +65,11 @@ public class ImageUtilities {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             if (bitmap.getAllocationByteCount() > MAX_SIZE) {
                 int rate = MAX_SIZE / (bitmap.getAllocationByteCount());
+                if (rate <= 25)
+                    rate = 25;
                 bitmap.compress(Bitmap.CompressFormat.JPEG, rate, bos);
             } else {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 0, bos);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             }
 
             byte[] bitmapdata = bos.toByteArray();
@@ -191,7 +183,7 @@ public class ImageUtilities {
         }
     }
 
-    public static void setImageViewFromUrl(String url, final ImageView imageView) {
+    public static void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar pbMarker) {
 
         if (!"".equalsIgnoreCase(url)) {
             Picasso.with(context).load(url).into(new Target() {
@@ -199,11 +191,13 @@ public class ImageUtilities {
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     imageView.invalidate();
                     imageView.setImageBitmap(bitmap);
+                    pbMarker.clearAnimation();
+                    pbMarker.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onBitmapFailed(Drawable errorDrawable) {
-
+                    setImageViewFromUrl(url, imageView, pbMarker);
                 }
 
                 @Override
@@ -213,6 +207,8 @@ public class ImageUtilities {
             });
         } else {
             imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img));
+            pbMarker.clearAnimation();
+            pbMarker.setVisibility(View.GONE);
         }
     }
 }

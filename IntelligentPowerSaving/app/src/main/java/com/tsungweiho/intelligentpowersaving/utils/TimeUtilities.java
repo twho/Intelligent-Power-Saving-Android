@@ -26,6 +26,11 @@ public class TimeUtilities {
         return df1.format(Calendar.getInstance().getTime());
     }
 
+    public String getTimeHH() {
+        DateFormat df = new SimpleDateFormat("HH");
+        return df.format(Calendar.getInstance().getTime());
+    }
+
     public String getTimehhmm() {
         DateFormat df = new SimpleDateFormat("hh:mm aaa");
         return df.format(Calendar.getInstance().getTime());

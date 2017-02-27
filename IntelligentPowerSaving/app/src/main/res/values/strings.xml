@@ -6,18 +6,37 @@
 
     <!--MessageFragment-->
     <string name="unread">Unread</string>
+    <string name="read">Read</string>
     <string name="inbox">Inbox</string>
-    <string name="starred">Starred event</string>
+    <string name="starred">Starred</string>
     <string name="trash">Trash</string>
     <string name="label_default">unread,inbox,</string>
     <string name="event_reported_around">Reported around</string>
+    <string name="delete_caption1">You have deleted</string>
+    <string name="delete_caption2">mail(s).</string>
 
     <!--SettingsFragment-->
     <string name="fragment_settings_title">Settings</string>
     <string name="logout">Log out</string>
+    <string name="diaplay_name">Display name</string>
+    <string name="email">Email</string>
+    <string name="subscribed_channels">Subscribed channels</string>
+    <string name="event_channels">Event channel</string>
+    <string name="public_channels">Public channel</string>
 
     <!--HomeFragment-->
     <string name="fragment_home_title">Energy Consumption Dashboard</string>
+
+    <!--BuildingFragment-->
+    <string name="follow_this">Follow this</string>
+    <string name="unfollow_this">Unfollow this</string>
+    <string name="chart_title">Daily Energy Consumption</string>
+    <string name="chart_x_title">Hour</string>
+    <string name="chart_y_title">Energy Consumption (kWh)</string>
+    <string name="use_dept">Department using: </string>
+    <string name="consump_this_hour">Current consumption:</string>
+    <string name="consump_last_hour">Last hour consumption:</string>
+    <string name="info_title">Real-time Information</string>
 
     <!--EventFragment-->
     <string name="fragment_event_title">Event</string>

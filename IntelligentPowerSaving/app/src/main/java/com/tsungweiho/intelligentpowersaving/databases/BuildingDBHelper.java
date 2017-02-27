@@ -96,4 +96,24 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
 
         return buildingList;
     }
+
+    public Building getBuildingByName(String buildingName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL};
+        String whereClause = DB_BUILDING_NAME + " = ?;";
+        String[] whereArgs = {buildingName};
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,
+                null, null, null);
+        Building building = null;
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(0);
+            String detail = cursor.getString(1);
+            String consumption = cursor.getString(2);
+            String imgUrl = cursor.getString(3);
+            building = new Building(name, detail, consumption, imgUrl);
+        }
+        cursor.close();
+        db.close();
+        return building;
+    }
 }

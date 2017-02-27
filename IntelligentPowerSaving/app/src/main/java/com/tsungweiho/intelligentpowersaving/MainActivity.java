@@ -1,5 +1,6 @@
 package com.tsungweiho.intelligentpowersaving;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
@@ -21,6 +24,7 @@ import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
+import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 
 import java.util.Arrays;
@@ -168,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     }
 
-    private void setFragment(String fragmentTag) {
+    public void setFragment(String fragmentTag) {
         Fragment fragment = null;
 
         switch (fragmentTag) {
@@ -199,6 +203,18 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 break;
         }
 
+        startReplaceFragment(fragment, fragmentTag);
+    }
+
+    public void setBuildingFragment(Building building) {
+        Bundle bundle = new Bundle();
+        bundle.putString(BUILDING_FRAGMENT_KEY, building.getName());
+        BuildingFragment buildingFragment = new BuildingFragment();
+        buildingFragment.setArguments(bundle);
+        startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
+    }
+
+    private void startReplaceFragment(Fragment fragment, String fragmentTag) {
         try {
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction();
@@ -232,8 +248,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         // lock back button
     }
 }
