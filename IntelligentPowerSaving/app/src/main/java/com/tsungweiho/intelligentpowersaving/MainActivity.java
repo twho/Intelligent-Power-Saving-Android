@@ -29,6 +29,7 @@ import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
@@ -216,9 +217,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
     }
 
-    public void setMessageFragment(Message message) {
+    public void setMessageFragment(Message message, int position) {
         Bundle bundle = new Bundle();
-        bundle.putString(MESSAGE_FRAGMENT_KEY, message.getUniqueId());
+        ArrayList<String> messageInfo = new ArrayList<>(2);
+        messageInfo.add(message.getUniqueId());
+        messageInfo.add(position + "");
+        bundle.putStringArrayList(MESSAGE_FRAGMENT_KEY, messageInfo);
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
         startReplaceFragment(messageFragment, MESSAGE_FRAGMENT);

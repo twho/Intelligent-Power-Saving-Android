@@ -9,11 +9,14 @@ public class MyAccountInfo {
     private String email;
     private String name;
     private String imageUrl;
+    private String subscription;
 
-    public MyAccountInfo(String email, String name, String imageUrl) {
+    // Subscription format = 1,1 means subscribe to event and public channels
+    public MyAccountInfo(String email, String name, String imageUrl, String subscription) {
         this.email = email;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.subscription = subscription;
     }
 
     public String getEmail() {
@@ -38,5 +41,13 @@ public class MyAccountInfo {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getSubscription() {
+        return this.subscription;
+    }
+
+    public void setSubscription(String imageUrl) {
+        this.subscription = subscription;
     }
 }

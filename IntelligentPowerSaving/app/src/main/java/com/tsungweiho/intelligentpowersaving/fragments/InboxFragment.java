@@ -1,11 +1,13 @@
 package com.tsungweiho.intelligentpowersaving.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,6 +77,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private TimeUtilities timeUtilities;
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
+    private SharedPreferences sharedPreferences;
     private Thread uiThread;
 
     // Mailbox functions, topbar buttons are padding 15%
@@ -83,8 +86,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private ArrayList<Boolean> messageSelectedList;
     private int MODE_VIEWING = 0;
     private int MODE_EDITING = 1;
-    private String currentBox = LABEL_MSG_INBOX;
+    private String currentBox;
     private Boolean ifSelectedRead;
+    private String CURRENT_INBOX;
 
     // PubNub
     private PubNub pubnub = null;
@@ -124,14 +128,32 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
 
+        setAllListeners();
+    }
+
+    private void setAllListeners() {
+        ibOptions.setOnClickListener(inboxFragmentListener);
+        navList.setOnItemClickListener(inboxFragmentListener);
+        ibDelete.setOnClickListener(inboxFragmentListener);
+        ibInboxFunction.setOnClickListener(inboxFragmentListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // use the data already saved
+        sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        currentBox = sharedPreferences.getString(CURRENT_INBOX, LABEL_MSG_INBOX);
+        messageList = messageDBHelper.getMessageListByLabel(currentBox);
+
         // init inbox
-        messageList = messageDBHelper.getMessageListByLabel(LABEL_MSG_INBOX);
+        messageList = messageDBHelper.getMessageListByLabel(currentBox);
         messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
         initInbox(messageList);
         lvMessages.setAdapter(messageListAdapter);
         animUtilities.setlvAnimToVisible(lvMessages);
-
-        setAllListeners();
+        tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
     }
 
     private void initInbox(ArrayList<Message> messageList) {
@@ -204,11 +226,15 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         }
     }
 
-    private void setAllListeners() {
-        ibOptions.setOnClickListener(inboxFragmentListener);
-        navList.setOnItemClickListener(inboxFragmentListener);
-        ibDelete.setOnClickListener(inboxFragmentListener);
-        ibInboxFunction.setOnClickListener(inboxFragmentListener);
+    @Override
+    public void onPause() {
+        super.onPause();
+        messageDBHelper.closeDB();
+
+        // save which box the user is using
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        prefsEditor.putString(CURRENT_INBOX, currentBox);
+        prefsEditor.apply();
     }
 
     private class InboxFragmentListener extends SubscribeCallback implements View.OnClickListener, AdapterView.OnItemClickListener {
@@ -389,11 +415,5 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
     private void makeDeleteToast(int count) {
         Toast.makeText(context, getString(R.string.delete_caption1) + " " + count + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        messageDBHelper.closeDB();
     }
 }

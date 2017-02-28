@@ -35,6 +35,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCxydPJ7b9K403XpaagtHlZMIqQkhz14GQ" />
+
         <!--android:screenOrientation="portrait"-->
         <activity
             android:name=".MainActivity"

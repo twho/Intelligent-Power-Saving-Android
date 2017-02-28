@@ -73,7 +73,7 @@ public class AChartUtilities implements BuildingConstants {
         // set y axis
         Renderer.setYLabelsAlign(Paint.Align.CENTER);
         Renderer.setYAxisMin(0);
-        Renderer.setYAxisMax(400);
+        Renderer.setYAxisMax(350);
         Renderer.setYLabelsPadding(context.getResources().getDimension(R.dimen.activity_main_space));
 
         // set series color

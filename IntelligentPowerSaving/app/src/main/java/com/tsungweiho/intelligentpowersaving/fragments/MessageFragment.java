@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import com.tsungweiho.intelligentpowersaving.databinding.FragmentMessageBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+
+import java.util.ArrayList;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -42,8 +45,10 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     // Functions
     private FragmentMessageBinding binding;
     private Context context;
-    private String messageUnId;
+    private ArrayList<String> messageInfo;
+    private int position;
     private Message currentMessage;
+    private String currentBox;
     private static ImageUtilities imageUtilities;
     private static TimeUtilities timeUtilities;
     private MessageDBHelper messageDBHelper;
@@ -56,7 +61,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         view = binding.getRoot();
 
         context = MainActivity.getContext();
-        this.messageUnId = this.getArguments().getString(MESSAGE_FRAGMENT_KEY);
+        this.messageInfo = this.getArguments().getStringArrayList(MESSAGE_FRAGMENT_KEY);
         init();
         return view;
     }
@@ -67,8 +72,14 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         timeUtilities = new TimeUtilities(context);
         messageFragmentListener = new MessageFragmentListener();
 
-        currentMessage = messageDBHelper.getMessageByUnId(messageUnId);
+        // Mark message as read when getting in the message screen
+        currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
+        messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_READ);
+        this.position = Integer.parseInt(messageInfo.get(1));
+        this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1];
         binding.setMessage(currentMessage);
+        Log.d("asdasdas", currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL) + "");
+        Log.d("asdasdas", currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1]);
 
         ibBack = (ImageButton) view.findViewById(R.id.fragment_message_ib_back);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_message_ib_delete);
@@ -131,8 +142,18 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
                     break;
                 case R.id.fragment_message_ib_delete:
+                    messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
+                    if (position + 1 < messageDBHelper.getMessageListByLabel(currentBox).size()) {
+                        currentMessage = messageDBHelper.getMessageListByLabel(currentBox).get(position + 1);
+                        binding.setMessage(currentMessage);
+                        position = position + 1;
+                    } else {
+                        ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
+                    }
                     break;
                 case R.id.fragment_message_ib_read:
+                    messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
+                    ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
                     break;
             }
         }
