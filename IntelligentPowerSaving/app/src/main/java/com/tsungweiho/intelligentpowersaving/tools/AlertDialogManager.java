@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.isseiaoki.simplecropview.CropImageView;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -48,25 +49,6 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         // Setting OK Button
         alertDialog.setButton(context.getString(R.string.alert_dialog_manager_ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-
-        // Showing Alert Message
-        alertDialog.show();
-    }
-
-
-    public void showMessageDialog(String title, String message) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK).create();
-
-        alertDialog.setTitle(title);
-
-        alertDialog.setMessage(message);
-
-        // Setting OK Button
-        alertDialog.setButton(context.getString(R.string.alert_dialog_manager_ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialog.dismiss();
             }
         });
 
@@ -115,6 +97,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         final Dialog dialog = new Dialog(context);
         LayoutInflater li = LayoutInflater.from(context);
         View dialogView = li.inflate(R.layout.obj_dialog_image, null);
+
         Button btnTakeNew = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_retake);
         btnTakeNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +106,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
                 showCameraDialog(fragmentCalledThis);
             }
         });
+
         Button btnCancel = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_cancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,11 +131,45 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         dialog.show();
     }
 
-    public void showProgressDialog(String title, String message,
-                                   ProgressDialog dialog) {
-        dialog.setTitle(title);
-        dialog.setMessage(message);
-        dialog.setCancelable(true);
+    boolean ifCropped = false;
+
+    public void showCropImageDialog(final ImageView imageView, final Bitmap bitmap) {
+        final Dialog dialog = new Dialog(context);
+        LayoutInflater li = LayoutInflater.from(context);
+        View dialogView = li.inflate(R.layout.obj_dialog_crop_image, null);
+        final CropImageView cropImageView = (CropImageView) dialogView.findViewById(R.id.obj_dialog_crop_image_civ);
+        cropImageView.setImageBitmap(bitmap);
+        cropImageView.setEnabled(true);
+
+        final Button btnCrop = (Button) dialogView.findViewById(R.id.obj_dialog_crop_image_btn_crop);
+        btnCrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!ifCropped) {
+                    cropImageView.setCropEnabled(false);
+                    cropImageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
+                    btnCrop.setText(context.getString(R.string.alert_dialog_manager_crop_img_revert));
+                    ifCropped = true;
+                } else {
+                    cropImageView.setImageBitmap(bitmap);
+                    cropImageView.setCropEnabled(true);
+                    btnCrop.setText(context.getString(R.string.alert_dialog_manager_crop_img_crop));
+                    ifCropped = false;
+                }
+            }
+        });
+
+        Button btnCancel = (Button) dialogView.findViewById(R.id.obj_dialog_crop_image_btn_cancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getImageBitmap()));
+                imageView.buildDrawingCache();
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setContentView(dialogView);
         dialog.show();
     }
 }

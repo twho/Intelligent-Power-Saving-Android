@@ -50,11 +50,22 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/fragment_settings_iv"
                 android:layout_width="@dimen/activity_main_img_size"
                 android:layout_height="@dimen/activity_main_img_size"
                 android:layout_margin="@dimen/activity_half_horizontal_margin"
                 android:src="@mipmap/ic_preload_profile"
-                app:imageUrl="@{myAccountInfo.imageUrl}" />
+                app:userImage="@{myAccountInfo.imageUrl}" />
+
+            <TextView
+                android:layout_width="@dimen/activity_main_single_row_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_main_space"
+                android:gravity="center"
+                android:padding="@dimen/activity_main_space"
+                android:text="@string/pic_instruc"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorTint" />
 
             <TextView
                 android:layout_width="@dimen/activity_main_single_row_btn_width"

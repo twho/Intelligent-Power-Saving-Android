@@ -11,7 +11,7 @@ public interface PubNubAPIConstants {
     String PUBNUB_SUBSCRIBE = "sub-c-1061b83c-f6e2-11e6-ac91-02ee2ddab7fe";
 
     // PubNub channels
-    String CHANNEL_VERSION = "13";
+    String CHANNEL_VERSION = "10";
     String EVENT_CHANNEL = "event_channel_" + CHANNEL_VERSION;
     String EVENT_CHANNEL_DELETED = "event_channel_" + CHANNEL_VERSION + "_deleted";
     String MESSAGE_CHANNEL = "message_channel_" + CHANNEL_VERSION;

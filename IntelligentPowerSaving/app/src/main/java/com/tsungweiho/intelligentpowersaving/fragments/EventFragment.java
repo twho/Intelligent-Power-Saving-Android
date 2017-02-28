@@ -146,7 +146,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     }
 
     private void init(Bundle savedInstanceState) {
-        imageUtilities = new ImageUtilities(context);
+        imageUtilities = MainActivity.getImageUtilities();
         animUtilities = new AnimUtilities(context);
         timeUtilities = new TimeUtilities(context);
         eventFragmentListener = new EventFragmentListener();
@@ -163,9 +163,9 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
         llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
         llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_layout_marker_info);
-        ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_btn_add);
-        ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_btn_cancel);
-        ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_btn_camera);
+        ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_ib_add);
+        ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_ib_cancel);
+        ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_ib_camera);
         tvTitle = (TextView) view.findViewById(R.id.fragment_event_title);
         tvBottom = (TextView) view.findViewById(R.id.fragment_event_bottom);
         edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
@@ -324,7 +324,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
-                case R.id.fragment_event_btn_add:
+                case R.id.fragment_event_ib_add:
                     pbTopBar.animate();
                     pbTopBar.setVisibility(View.VISIBLE);
                     if (edEvent.getText().toString().length() == 0) {
@@ -335,10 +335,11 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                         new UploadService(context).Execute(upload, new UiCallback());
                     }
                     break;
-                case R.id.fragment_event_btn_cancel:
+                case R.id.fragment_event_ib_cancel:
                     dismissAddView();
                     break;
-                case R.id.fragment_event_btn_camera:
+                case R.id.fragment_event_ib_camera:
+                    closeKeyboard(context, edEvent.getWindowToken());
                     if (null == bmpBuffer)
                         alertDialogManager.showCameraDialog(EVENT_FRAGMENT);
                     else {
@@ -464,8 +465,6 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
             if (null != bmpBuffer)
                 animUtilities.setIconAnimToVisible(ivAddIcon);
-        } else if (resultCode == Activity.RESULT_CANCELED) {
-
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -487,7 +486,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     public void onPause() {
         super.onPause();
 
-        // TODO Clean memory
+        // Clean memory
         eventDBHelper.closeDB();
     }
 
@@ -548,8 +547,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         super.onLowMemory();
     }
 
-    public static void closeKeyboard(Context c, IBinder windowToken) {
-        InputMethodManager mgr = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public static void closeKeyboard(Context context, IBinder windowToken) {
+        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 }

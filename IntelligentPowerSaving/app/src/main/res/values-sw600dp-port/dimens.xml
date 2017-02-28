@@ -8,6 +8,7 @@
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">180dp</dimen>
     <dimen name="activity_main_img_size_padding">9dp</dimen>
+    <dimen name="activity_main_min_img_size">45dp</dimen>
 
     <!--DrawerListAdapter-->
     <dimen name="obj_drawer_width">300dp</dimen>

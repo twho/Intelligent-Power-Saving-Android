@@ -32,6 +32,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile 'com.isseiaoki:simplecropview:1.1.4'
     compile 'com.android.support:multidex:1.0.0'
     compile group: 'com.pubnub', name: 'pubnub-gson', version: '4.5.0'
     compile 'com.android.support:appcompat-v7:25.1.1'

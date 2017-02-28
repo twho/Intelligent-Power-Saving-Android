@@ -13,6 +13,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -42,6 +43,19 @@ public class ImageUtilities {
 
     public ImageUtilities(Context context) {
         this.context = context;
+    }
+
+    public static Bitmap decodeBase64ToBitmap(String input) {
+        byte[] decodedByte = Base64.decode(input, 0);
+        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+    }
+
+    public String encodeBase64ToString(Bitmap bitmapOrg) {
+        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+        bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 100, bao);
+        byte[] ba = bao.toByteArray();
+
+        return Base64.encodeToString(ba, Base64.DEFAULT);
     }
 
     public File getCompressedImgFile(File imgFile) {
@@ -87,11 +101,12 @@ public class ImageUtilities {
 
     public static Bitmap getOvalCroppedBitmap(Bitmap bitmap, int radius) {
         Bitmap finalBitmap;
-        if (bitmap.getWidth() != radius || bitmap.getHeight() != radius)
-            finalBitmap = Bitmap.createScaledBitmap(bitmap, radius, radius,
-                    false);
-        else
+        if (bitmap.getWidth() != radius || bitmap.getHeight() != radius) {
+            finalBitmap = Bitmap.createScaledBitmap(bitmap, radius, radius, false);
+        } else {
             finalBitmap = bitmap;
+        }
+
         Bitmap output = Bitmap.createBitmap(finalBitmap.getWidth(),
                 finalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
@@ -114,25 +129,26 @@ public class ImageUtilities {
     }
 
     public static Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
-        Bitmap finalBitmap = bitmap;
-        Bitmap output = Bitmap.createBitmap(finalBitmap.getWidth(),
-                finalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        if (null == bitmap)
+            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_profile);
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
         final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, finalBitmap.getWidth(),
-                finalBitmap.getHeight());
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(),
+                bitmap.getHeight());
 
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         paint.setDither(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle(finalBitmap.getWidth() / 2 + 0.7f,
-                finalBitmap.getHeight() / 2 + 0.7f,
-                finalBitmap.getWidth() / 2 + 0.1f, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2 + 0.7f,
+                bitmap.getHeight() / 2 + 0.7f,
+                bitmap.getWidth() / 2 + 0.1f, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(finalBitmap, rect, rect, paint);
+        canvas.drawBitmap(bitmap, rect, rect, paint);
 
         return output;
     }

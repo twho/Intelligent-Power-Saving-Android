@@ -1,6 +1,5 @@
 package com.tsungweiho.intelligentpowersaving;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
@@ -27,7 +24,10 @@ import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
+import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
+import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static Context context;
     private String TAG = "MainActivity";
     private PermissionManager permissionManager;
+    private SharedPreferencesManager sharedPreferencesManager;
+    private MyAccountInfo myAccountInfo;
+    private static ImageUtilities imageUtilities;
+    private String PREF_SEPARTOR = ",";
 
     //screen info
     public static float screenWidth;
@@ -67,6 +71,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         permissionManager.requestStoragePermission();
         permissionManager.requestNetworkPermission();
 
+        // For the app-wide use
+        imageUtilities = new ImageUtilities(context);
+        sharedPreferencesManager = new SharedPreferencesManager(context);
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         float density = getResources().getDisplayMetrics().density;
@@ -83,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         pnConfiguration.setPublishKey(PUBNUB_PUBLISH);
         pnConfiguration.setSecure(false);
         pubnub = new PubNub(pnConfiguration);
-        pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED, MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
 
         setTab();
     }
@@ -108,6 +115,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     public static PubNub getPubNub() {
         return pubnub;
+    }
+
+    public static ImageUtilities getImageUtilities() {
+        return imageUtilities;
     }
 
     private void setTab() {
@@ -145,6 +156,13 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     public void onResume() {
         super.onResume();
+
+        // Read users preference
+        myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
+        if (myAccountInfo.getSubscription().split(PREF_SEPARTOR)[0].equalsIgnoreCase("1"))
+            pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
+        if (myAccountInfo.getSubscription().split(PREF_SEPARTOR)[1].equalsIgnoreCase("1"))
+            pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
     }
 
 
@@ -264,5 +282,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     public void onBackPressed() {
         // lock back button
+    }
+
+    @Override
+    protected void onDestroy() {
+        pubnub.destroy();
     }
 }

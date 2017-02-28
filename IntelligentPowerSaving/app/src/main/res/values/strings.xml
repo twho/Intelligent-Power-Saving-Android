@@ -4,7 +4,7 @@
     <!--MainActivity-->
     <string name="loading">Loading...</string>
     <string name="testing_account">testing@ipowersaving.com</string>
-    <string name="testing_name">iPower Saving Test Account</string>
+    <string name="testing_name">iPower Saving Testing Account</string>
 
     <!--MessageFragment-->
     <string name="unread">Unread</string>
@@ -21,6 +21,7 @@
     <string name="fragment_settings_title">Settings</string>
     <string name="logout">Log out</string>
     <string name="diaplay_name">Display name</string>
+    <string name="pic_instruc">Click to change profile picture</string>
     <string name="email">Email</string>
     <string name="subscribed_channels">Subscribed channels</string>
     <string name="event_channels">Event channel</string>
@@ -68,4 +69,6 @@
     <string name="alert_dialog_manager_img_title">Current Image</string>
     <string name="alert_dialog_manager_img_take_new">Take a new one</string>
     <string name="alert_dialog_manager_img_use_this">Use this</string>
+    <string name="alert_dialog_manager_crop_img_crop">Crop</string>
+    <string name="alert_dialog_manager_crop_img_revert">Revert</string>
 </resources>

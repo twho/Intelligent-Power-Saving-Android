@@ -47,7 +47,7 @@ public class MyAccountInfo {
         return this.subscription;
     }
 
-    public void setSubscription(String imageUrl) {
+    public void setSubscription(String subscription) {
         this.subscription = subscription;
     }
 }

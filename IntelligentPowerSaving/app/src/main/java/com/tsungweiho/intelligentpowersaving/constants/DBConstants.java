@@ -6,10 +6,6 @@ package com.tsungweiho.intelligentpowersaving.constants;
 
 public interface DBConstants {
 
-    // MyAccountInfo
-    String PREF_USER_ACCOUNT = "PREF_EMAIL";
-    String PREF_SEPARTOR = ",";
-
     // Firebase
     String BUILDING_DB = "buildingList";
     String SYSTEM_ACCOUNT = "tsungwei50521@hotmail.com";
@@ -22,7 +18,7 @@ public interface DBConstants {
     String JSON_ARRAY_NAME = "buildingList";
 
     // For all databases
-    int VERSION = 6;
+    int VERSION = 1;
     String ID = "Id";
 
     // BuildingDBHelper

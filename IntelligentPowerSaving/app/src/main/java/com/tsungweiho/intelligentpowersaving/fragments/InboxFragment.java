@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,8 +34,10 @@ import com.tsungweiho.intelligentpowersaving.constants.DrawerListConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
+import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
+import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
@@ -65,19 +68,20 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private FrameLayout flTopBar;
     private DrawerLayout drawer;
     private LinearLayout llDrawer, llEditing;
-    private TextView tvTitle;
+    private TextView tvTitle, tvMail;
     private ListView navList, lvMessages;
     private ImageButton ibOptions, ibDelete, ibInboxFunction;
     private Button btnUnread;
+    private ImageView ivDrawerPic;
 
     // Functions
     private Context context;
-    private AnimUtilities animUtilities;
     private ImageUtilities imageUtilities;
+    private AnimUtilities animUtilities;
     private TimeUtilities timeUtilities;
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
-    private SharedPreferences sharedPreferences;
+    private SharedPreferencesManager sharedPreferencesManager;
     private Thread uiThread;
 
     // Mailbox functions, topbar buttons are padding 15%
@@ -88,7 +92,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private int MODE_EDITING = 1;
     private String currentBox;
     private Boolean ifSelectedRead;
-    private String CURRENT_INBOX;
 
     // PubNub
     private PubNub pubnub = null;
@@ -106,8 +109,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         inboxFragmentListener = new InboxFragmentListener();
         messageDBHelper = new MessageDBHelper(context);
         animUtilities = new AnimUtilities(context);
-        imageUtilities = new ImageUtilities(context);
         timeUtilities = new TimeUtilities(context);
+        imageUtilities = MainActivity.getImageUtilities();
+        sharedPreferencesManager = new SharedPreferencesManager(context);
 
         // Add PubNub Listeners
         pubnub = MainActivity.getPubNub();
@@ -118,6 +122,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         navList = (ListView) view.findViewById(R.id.fragment_inbox_drawer_lv);
         navList.setAdapter(drawerListAdapter);
         lvMessages = (ListView) view.findViewById(R.id.fragment_inbox_lv_message);
+        tvMail = (TextView) view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
         tvTitle = (TextView) view.findViewById(R.id.fragment_inbox_tv_title);
         tvTitle.setText(context.getString(R.string.inbox));
         ibOptions = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_options);
@@ -127,6 +132,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         flTopBar = (FrameLayout) view.findViewById(R.id.fragment_inbox_frame_layout);
         llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
+        ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
 
         setAllListeners();
     }
@@ -143,9 +149,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         super.onResume();
 
         // use the data already saved
-        sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-        currentBox = sharedPreferences.getString(CURRENT_INBOX, LABEL_MSG_INBOX);
+        currentBox = sharedPreferencesManager.getCurrentMessagebox();
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
+        MyAccountInfo myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
+        ivDrawerPic.setImageBitmap(imageUtilities.getRoundedCroppedBitmap(imageUtilities.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
+        tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
@@ -232,9 +240,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageDBHelper.closeDB();
 
         // save which box the user is using
-        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-        prefsEditor.putString(CURRENT_INBOX, currentBox);
-        prefsEditor.apply();
+        sharedPreferencesManager.saveCurrentMessageBox(currentBox);
     }
 
     private class InboxFragmentListener extends SubscribeCallback implements View.OnClickListener, AdapterView.OnItemClickListener {

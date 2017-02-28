@@ -71,7 +71,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     private void init() {
         buildingDBHelper = new BuildingDBHelper(context);
-        imageUtilities = new ImageUtilities(context);
+        imageUtilities = MainActivity.getImageUtilities();
         timeUtilities = new TimeUtilities(context);
         aChartUtilities = new AChartUtilities(context);
 
