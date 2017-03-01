@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     // UI Views
     private Switch swEvent, swPublic;
     private ImageView ivProfile;
+    private EditText edName, edEmail;
 
     // Functions
     private Context context;
@@ -86,6 +88,9 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         alertDialogManager = new AlertDialogManager(context);
         sharedPreferencesManager = new SharedPreferencesManager(context);
         imageUtilities = MainActivity.getImageUtilities();
+
+        edName = (EditText) view.findViewById(R.id.fragment_settings_ed_name);
+        edEmail = (EditText) view.findViewById(R.id.fragment_settings_ed_email);
 
         ivProfile = (ImageView) view.findViewById(R.id.fragment_settings_iv);
         ivProfile.setOnClickListener(new View.OnClickListener() {
@@ -174,6 +179,8 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             myAccountInfo.setImageUrl(imageUtilities.encodeBase64ToString(ivProfile.getDrawingCache()));
         }
 
+        myAccountInfo.setName(edName.getText().toString());
+        myAccountInfo.setEmail(edEmail.getText().toString());
         sharedPreferencesManager.saveMyAccountInfo(myAccountInfo);
     }
 }

@@ -163,7 +163,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                imageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getImageBitmap()));
+                imageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
                 imageView.buildDrawingCache();
                 dialog.dismiss();
             }
