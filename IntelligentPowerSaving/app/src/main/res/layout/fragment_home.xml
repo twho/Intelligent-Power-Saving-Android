@@ -32,6 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
                 android:background="@drawable/background_theme_button"
+                android:scaleX="@dimen/activity_main_top_bar_widget_scale"
+                android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                 android:src="@mipmap/ic_unfollow" />
 
             <ImageButton
@@ -40,6 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|center_vertical"
                 android:background="@drawable/background_theme_button"
+                android:scaleX="@dimen/activity_main_top_bar_widget_scale"
+                android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                 android:src="@mipmap/ic_refresh" />
         </FrameLayout>
 

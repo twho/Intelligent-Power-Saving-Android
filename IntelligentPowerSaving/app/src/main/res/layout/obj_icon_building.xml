@@ -47,6 +47,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|bottom"
+                android:scaleType="centerInside"
+                android:scaleX="@dimen/activity_main_top_bar_widget_scale"
+                android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                 android:src="@mipmap/ic_increase" />
         </FrameLayout>
 

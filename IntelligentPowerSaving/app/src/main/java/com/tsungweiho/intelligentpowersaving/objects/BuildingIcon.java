@@ -52,12 +52,6 @@ public class BuildingIcon extends View implements BuildingConstants {
 
     private void initViews() {
         ivIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_indicator);
-        // Configure for small screen with width under 1080dp
-        if (MainActivity.screenWidth < 600) {
-            ivIndicator.setScaleX(0.75f);
-            ivIndicator.setScaleY(0.75f);
-        }
-
         tvConsump = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption);
         tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
         tvConsump.setText(building.getConsumption());
