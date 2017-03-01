@@ -286,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         pubnub.destroy();
     }
 }

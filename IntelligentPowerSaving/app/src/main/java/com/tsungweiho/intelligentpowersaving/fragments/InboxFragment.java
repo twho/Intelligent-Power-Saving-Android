@@ -101,6 +101,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_inbox, container, false);
         context = MainActivity.getContext();
+
         init();
         return view;
     }
@@ -135,6 +136,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
 
         setAllListeners();
+        onResume();
     }
 
     private void setAllListeners() {
@@ -147,7 +149,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     @Override
     public void onResume() {
         super.onResume();
-
         // use the data already saved
         currentBox = sharedPreferencesManager.getCurrentMessagebox();
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
