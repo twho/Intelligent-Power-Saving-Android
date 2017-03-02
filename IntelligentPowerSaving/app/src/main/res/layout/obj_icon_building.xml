@@ -65,6 +65,8 @@
             android:textStyle="bold" />
 
         <TextView
+            android:scaleX="@dimen/activity_main_text_scale"
+            android:scaleY="@dimen/activity_main_text_scale"
             android:id="@+id/obj_building_icon_tv_consumption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

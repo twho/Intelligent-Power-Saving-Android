@@ -58,9 +58,10 @@
             </LinearLayout>
         </FrameLayout>
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginBottom="@dimen/activity_main_space"
             android:layout_marginLeft="@dimen/activity_half_horizontal_margin"
             android:layout_marginRight="@dimen/activity_half_horizontal_margin"
@@ -68,10 +69,11 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/activity_main_space"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/activity_main_space"
+                android:layout_toLeftOf="@+id/fragment_home_ib_following"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="@{message.title}"
@@ -82,11 +84,12 @@
                 android:id="@+id/fragment_home_ib_following"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:layout_margin="@dimen/activity_main_space"
                 android:background="@drawable/background_content_transparent_button"
                 android:src="@mipmap/ic_unfollow" />
-        </FrameLayout>
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
@@ -141,32 +144,55 @@
                 app:time="@{message.time}" />
         </FrameLayout>
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/activity_main_space"
-            android:layout_marginLeft="@dimen/activity_half_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_half_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_main_space"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_margin="@dimen/activity_main_space"
-                android:lineSpacingExtra="@dimen/activity_main_space"
-                android:padding="@dimen/activity_main_space"
-                android:text="@{message.content}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@color/white" />
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/activity_main_space"
+                android:layout_marginLeft="@dimen/activity_half_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_half_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_main_space"
+                android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="@dimen/activity_main_space"
-                app:inboxLabel="@{message.inboxLabel}" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_margin="@dimen/activity_main_space"
+                    android:lineSpacingExtra="@dimen/activity_main_space"
+                    android:padding="@dimen/activity_main_space"
+                    android:text="@{message.content}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white" />
+
+                <FrameLayout
+                    android:id="@+id/fragment_message_layout_img"
+                    android:layout_width="@dimen/fragment_message_img_size"
+                    android:layout_height="@dimen/fragment_message_img_size"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/activity_main_space">
+
+                    <ImageView
+                        android:layout_width="@dimen/fragment_message_img_size"
+                        android:layout_height="@dimen/fragment_message_img_size"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:background="@color/semi_gray"
+                        android:padding="@dimen/activity_main_space"
+                        android:scaleType="fitCenter"
+                        app:inboxLabel="@{message.inboxLabel}" />
+
+
+                    <ProgressBar
+                        android:id="@+id/fragment_message_pb_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </layout>

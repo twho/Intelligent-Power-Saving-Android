@@ -9,10 +9,10 @@ android {
     }
     defaultConfig {
         applicationId "com.tsungweiho.intelligentpowersaving"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 19
+        targetSdkVersion 24
+        versionCode 3
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

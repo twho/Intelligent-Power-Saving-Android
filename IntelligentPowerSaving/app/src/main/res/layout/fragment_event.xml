@@ -222,8 +222,6 @@
                     android:background="@drawable/background_theme_button"
                     android:paddingRight="@dimen/activity_main_space"
                     android:scaleType="centerInside"
-                    android:scaleX="@dimen/activity_main_top_bar_widget_scale"
-                    android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                     android:src="@mipmap/ic_confirm"
                     android:textColor="@color/white" />
 
@@ -235,8 +233,6 @@
                     android:layout_weight="1"
                     android:background="@drawable/background_theme_button"
                     android:paddingLeft="@dimen/activity_main_space"
-                    android:scaleX="@dimen/activity_main_top_bar_widget_scale"
-                    android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                     android:src="@mipmap/ic_cancel"
                     android:textColor="@color/white" />
             </LinearLayout>

@@ -11,6 +11,7 @@ import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.BarChart;
+import org.achartengine.chart.XYChart;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;

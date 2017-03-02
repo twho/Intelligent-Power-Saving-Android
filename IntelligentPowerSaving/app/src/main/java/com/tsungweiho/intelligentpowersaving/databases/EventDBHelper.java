@@ -122,6 +122,29 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         return eventList;
     }
 
+    public Event getEventByUnId(String unId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {DB_EVENT_UNID, DB_EVENT_DETAIL, DB_EVENT_POS, DB_EVENT_IMG, DB_EVENT_POSTER, DB_EVENT_TIME, DB_EVENT_IF_FIXED};
+        String whereClause = DB_EVENT_UNID + " = ?;";
+        String[] whereArgs = {unId};
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,
+                null, null, null);
+        Event event = null;
+        while (cursor.moveToNext()) {
+            String uniqueId = cursor.getString(0);
+            String detail = cursor.getString(1);
+            String position = cursor.getString(2);
+            String img = cursor.getString(3);
+            String poster = cursor.getString(4);
+            String time = cursor.getString(5);
+            String ifFixed = cursor.getString(6);
+            event = new Event(uniqueId, detail, position, img, poster, time, ifFixed);
+        }
+        cursor.close();
+        db.close();
+        return event;
+    }
+
     public void deleteByUniqueId(String uniqueId) {
         SQLiteDatabase db = getWritableDatabase();
         String whereClause = DB_EVENT_UNID + " = ?;";

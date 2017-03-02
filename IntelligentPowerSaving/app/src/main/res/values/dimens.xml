@@ -12,16 +12,20 @@
     <dimen name="activity_main_min_img_size">30dp</dimen>
     <dimen name="activity_main_single_edittext_width">240dp</dimen>
     <item name="activity_main_widget_scale" format="float" type="dimen">0.75</item>
-    <item name="activity_main_top_bar_widget_scale" format="float" type="dimen">0.7</item>
+    <item name="activity_main_top_bar_widget_scale" format="float" type="dimen">0.75</item>
+    <item name="activity_main_text_scale" format="float" type="dimen">0.7</item>
 
     <!--follow material design rules-->
     <dimen name="activity_main_space">4dp</dimen>
     <dimen name="activity_main_img_frame">2dp</dimen>
     <dimen name="activity_main_small_icon_size">24dp</dimen>
 
-    <!--chart text size follow Android style sheet-->
-    <dimen name="activity_main_title_text_size">18sp</dimen>
-    <dimen name="activity_main_content_text_size">10sp</dimen>
+    <!--MessageFragment-->
+    <dimen name="fragment_message_img_size">240dp</dimen>
+
+    <!--BuildingFragment-->
+    <dimen name="activity_main_title_text_size">12sp</dimen>
+    <dimen name="activity_main_content_text_size">6sp</dimen>
 
     <!--DrawerListAdapter-->
     <dimen name="obj_drawer_width">200dp</dimen>

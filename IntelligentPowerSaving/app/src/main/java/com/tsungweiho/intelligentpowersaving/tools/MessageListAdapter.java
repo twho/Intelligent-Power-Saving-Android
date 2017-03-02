@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tsungweiho.intelligentpowersaving.MainActivity;
@@ -94,7 +95,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.obj_message_list_item, null);
             viewHolder = new ViewHolder();
-            viewHolder.frameLayout = (FrameLayout) convertView.findViewById(R.id.obj_message_list_item_view);
+            viewHolder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.obj_message_list_item_view);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.obj_message_list_item_iv);
             viewHolder.tvSender = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_sender);
             viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_title);
@@ -140,10 +141,10 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
         // Viewing Mode
         if (mode == MODE_VIEWING) {
-            viewHolder.frameLayout.setOnClickListener(null);
+            viewHolder.relativeLayout.setOnClickListener(null);
 
             // On long click: perform editing mode
-            viewHolder.frameLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            viewHolder.relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     if (null == fm)
@@ -156,7 +157,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             });
 
             // On click: view mail details
-            viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+            viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ((MainActivity) MainActivity.getContext()).setMessageFragment(message, position);
@@ -165,10 +166,10 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
             setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2], viewHolder.imageView);
         } else if (mode == MODE_EDITING) {
-            viewHolder.frameLayout.setOnTouchListener(null);
+            viewHolder.relativeLayout.setOnTouchListener(null);
 
             // On click in editing mode: select mail
-            viewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+            viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (null == fm)
@@ -189,7 +190,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
     }
 
     private class ViewHolder {
-        FrameLayout frameLayout;
+        RelativeLayout relativeLayout;
         ImageView imageView;
         TextView tvSender;
         TextView tvTitle;

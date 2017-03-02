@@ -14,6 +14,14 @@
     <dimen name="activity_main_single_edittext_width">320dp</dimen>
     <item name="activity_main_widget_scale" format="float" type="dimen">1.5</item>
     <item name="activity_main_top_bar_widget_scale" format="float" type="dimen">1</item>
+    <item name="activity_main_text_scale" format="float" type="dimen">1</item>
+
+    <!--BuildingFragment-->
+    <dimen name="activity_main_title_text_size">18sp</dimen>
+    <dimen name="activity_main_content_text_size">10sp</dimen>
+
+    <!--MessageFragment-->
+    <dimen name="fragment_message_img_size">400dp</dimen>
 
     <!--DrawerListAdapter-->
     <dimen name="obj_drawer_width">384dp</dimen>

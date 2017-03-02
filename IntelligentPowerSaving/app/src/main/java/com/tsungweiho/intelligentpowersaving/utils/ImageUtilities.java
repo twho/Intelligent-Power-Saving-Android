@@ -199,7 +199,10 @@ public class ImageUtilities {
         }
     }
 
-    public static void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar pbMarker) {
+    public static void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar progressBar) {
+
+        progressBar.animate();
+        progressBar.setVisibility(View.VISIBLE);
 
         if (!"".equalsIgnoreCase(url)) {
             Picasso.with(context).load(url).into(new Target() {
@@ -207,13 +210,13 @@ public class ImageUtilities {
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     imageView.invalidate();
                     imageView.setImageBitmap(bitmap);
-                    pbMarker.clearAnimation();
-                    pbMarker.setVisibility(View.GONE);
+                    progressBar.clearAnimation();
+                    progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onBitmapFailed(Drawable errorDrawable) {
-                    setImageViewFromUrl(url, imageView, pbMarker);
+                    setImageViewFromUrl(url, imageView, progressBar);
                 }
 
                 @Override
@@ -223,8 +226,8 @@ public class ImageUtilities {
             });
         } else {
             imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img));
-            pbMarker.clearAnimation();
-            pbMarker.setVisibility(View.GONE);
+            progressBar.clearAnimation();
+            progressBar.setVisibility(View.GONE);
         }
     }
 }

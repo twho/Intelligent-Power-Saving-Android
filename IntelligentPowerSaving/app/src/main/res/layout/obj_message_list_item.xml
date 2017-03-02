@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/obj_message_list_item_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/obj_message_list_item_right_side_view"
         android:padding="@dimen/activity_main_space">
 
         <ImageView
@@ -19,6 +21,7 @@
             android:layout_gravity="left|center_vertical"
             android:background="@drawable/background_circle_lightred"
             android:padding="@dimen/activity_main_img_frame"
+            android:layout_marginRight="@dimen/activity_main_space"
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_preload_img" />
 
@@ -26,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_main_space"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:orientation="vertical">
 
             <TextView
@@ -68,9 +70,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/obj_message_list_item_right_side_view"
+        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
+        android:gravity="center_vertical"
         android:orientation="vertical">
 
         <TextView
@@ -93,4 +97,4 @@
             android:scaleType="centerInside"
             android:src="@mipmap/ic_unfollow" />
     </LinearLayout>
-</FrameLayout>
+</RelativeLayout>

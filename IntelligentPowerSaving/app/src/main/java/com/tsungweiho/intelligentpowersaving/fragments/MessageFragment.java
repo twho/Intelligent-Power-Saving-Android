@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tsungweiho.intelligentpowersaving.MainActivity;
@@ -19,6 +21,7 @@ import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
+import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentMessageBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
@@ -41,6 +44,8 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     // UI views
     private ImageButton ibBack, ibDelete, ibRead;
     private ImageView ivSender;
+    private static FrameLayout imgLayout;
+    private static ProgressBar pbImg;
 
     // Functions
     private FragmentMessageBinding binding;
@@ -68,7 +73,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     private void init() {
         messageDBHelper = new MessageDBHelper(context);
-        imageUtilities = new ImageUtilities(context);
+        imageUtilities = MainActivity.getImageUtilities();
         timeUtilities = new TimeUtilities(context);
         messageFragmentListener = new MessageFragmentListener();
 
@@ -78,13 +83,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         this.position = Integer.parseInt(messageInfo.get(1));
         this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1];
         binding.setMessage(currentMessage);
-        Log.d("asdasdas", currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL) + "");
-        Log.d("asdasdas", currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1]);
 
         ibBack = (ImageButton) view.findViewById(R.id.fragment_message_ib_back);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_message_ib_delete);
         ibRead = (ImageButton) view.findViewById(R.id.fragment_message_ib_read);
         ivSender = (ImageView) view.findViewById(R.id.fragment_message_iv_sender);
+        imgLayout = (FrameLayout) view.findViewById(R.id.fragment_message_layout_img);
+        pbImg = (ProgressBar) view.findViewById(R.id.fragment_message_pb_img);
 
         setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2], ivSender);
         setAllListeners();
@@ -92,7 +97,15 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     @BindingAdapter({"bind:inboxLabel"})
     public static void loadImage(final ImageView imageView, final String inboxLabel) {
+        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[2].matches(".*\\d+.*")){
+            imgLayout.setVisibility(View.VISIBLE);
+            EventDBHelper eventDBHelper = new EventDBHelper(MainActivity.getContext());
 
+            String url = eventDBHelper.getEventByUnId(inboxLabel.split(SEPARATOR_MSG_LABEL)[2]).getImage();
+            imageUtilities.setImageViewFromUrl(url, imageView, pbImg);
+        } else {
+            imgLayout.setVisibility(View.GONE);
+        }
     }
 
     @BindingAdapter({"bind:time"})

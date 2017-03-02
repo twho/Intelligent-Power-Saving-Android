@@ -325,11 +325,11 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_event_ib_add:
-                    pbTopBar.animate();
-                    pbTopBar.setVisibility(View.VISIBLE);
                     if (edEvent.getText().toString().length() == 0) {
                         alertDialogManager.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
                     } else {
+                        pbTopBar.animate();
+                        pbTopBar.setVisibility(View.VISIBLE);
                         tempImgFile = imageUtilities.getFileFromBitmap(bmpBuffer);
                         createUpload(tempImgFile);
                         new UploadService(context).Execute(upload, new UiCallback());
@@ -377,8 +377,6 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         @Override
         public boolean onMarkerClick(Marker marker) {
             ivMarker.setImageDrawable(null);
-            pbMarker.setVisibility(View.VISIBLE);
-            pbMarker.animate();
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
             binding.executePendingBindings();
