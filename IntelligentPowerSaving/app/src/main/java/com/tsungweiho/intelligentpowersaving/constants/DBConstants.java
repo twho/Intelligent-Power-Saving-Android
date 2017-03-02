@@ -47,6 +47,7 @@ public interface DBConstants {
     String LABEL_MSG_UNREAD = "unread";
     String LABEL_MSG_INBOX = "inbox";
     String LABEL_MSG_STAR = "star";
+    String LABEL_MSG_UNSTAR = "unstar";
     String LABEL_MSG_TRASH = "trash";
     String SEPARATOR_MSG_LABEL = ",";
 }

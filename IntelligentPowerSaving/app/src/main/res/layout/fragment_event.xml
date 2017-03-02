@@ -132,6 +132,7 @@
                     android:scaleX="@dimen/activity_main_top_bar_widget_scale"
                     android:scaleY="@dimen/activity_main_top_bar_widget_scale"
                     android:text="@string/fragment_event_btn_full_map"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/white" />
 
                 <TextView

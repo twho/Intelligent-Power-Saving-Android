@@ -64,8 +64,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private View view;
 
     // UI Views
-    private DrawerListAdapter drawerListAdapter;
-    private FrameLayout flTopBar;
     private DrawerLayout drawer;
     private LinearLayout llDrawer, llEditing;
     private TextView tvTitle, tvMail;
@@ -92,6 +90,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private int MODE_EDITING = 1;
     private String currentBox;
     private Boolean ifSelectedRead;
+    private boolean ifShowUnread;
 
     // PubNub
     private PubNub pubnub = null;
@@ -113,11 +112,13 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         timeUtilities = new TimeUtilities(context);
         imageUtilities = MainActivity.getImageUtilities();
         sharedPreferencesManager = new SharedPreferencesManager(context);
+        ifShowUnread = false;
 
         // Add PubNub Listeners
         pubnub = MainActivity.getPubNub();
         pubnub.addListener(inboxFragmentListener);
 
+        DrawerListAdapter drawerListAdapter;
         drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
         drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
         navList = (ListView) view.findViewById(R.id.fragment_inbox_drawer_lv);
@@ -130,7 +131,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         ibInboxFunction = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_inbox_function);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_delete);
         btnUnread = (Button) view.findViewById(R.id.fragment_inbox_btn_unread);
-        flTopBar = (FrameLayout) view.findViewById(R.id.fragment_inbox_frame_layout);
         llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
         ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
@@ -144,6 +144,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         navList.setOnItemClickListener(inboxFragmentListener);
         ibDelete.setOnClickListener(inboxFragmentListener);
         ibInboxFunction.setOnClickListener(inboxFragmentListener);
+        btnUnread.setOnClickListener(inboxFragmentListener);
     }
 
     @Override
@@ -151,7 +152,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         super.onResume();
         // use the data already saved
         currentBox = sharedPreferencesManager.getCurrentMessagebox();
-        messageList = messageDBHelper.getMessageListByLabel(currentBox);
         MyAccountInfo myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
         ivDrawerPic.setImageBitmap(imageUtilities.getRoundedCroppedBitmap(imageUtilities.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
         tvMail.setText(myAccountInfo.getEmail());
@@ -165,10 +165,12 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
     }
 
+    // Initialize message list view
+    // Should be executed everytime loading the message list
     private void initInbox(ArrayList<Message> messageList) {
         if (null != messageSelectedList)
             messageSelectedList = null;
-        messageSelectedList = new ArrayList<Boolean>(Arrays.asList(new Boolean[messageList.size()]));
+        messageSelectedList = new ArrayList<>(Arrays.asList(new Boolean[messageList.size()]));
         Collections.fill(messageSelectedList, Boolean.FALSE);
 
         // Data set change
@@ -176,6 +178,8 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageListAdapter.setSelectedList(messageSelectedList);
     }
 
+    // Refresh message list view
+    // Should be executed everytime users have action on the message list
     private void refreshViewingInbox(ArrayList<Message> messageList) {
         this.messageList = messageList;
         initInbox(messageList);
@@ -201,6 +205,19 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageListAdapter.setSelectedList(messageSelectedList);
         messageListAdapter.notifyDataSetChanged();
         setIfSelectedRead(messageList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
+    }
+
+    public void markMailStar(int position, boolean ifStar) {
+        String strStar;
+        if (ifStar) {
+            strStar = LABEL_MSG_STAR;
+        } else {
+            strStar = LABEL_MSG_UNSTAR;
+        }
+
+        messageDBHelper.starMailByLabel(messageList.get(position), strStar);
+        messageList = messageDBHelper.getMessageListByLabel(currentBox);
+        refreshViewingInbox(messageList);
     }
 
     private void setIfSelectedRead(Boolean ifSelectedRead) {
@@ -298,6 +315,15 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     switchTopBar(MODE_VIEWING);
                     break;
                 case R.id.fragment_inbox_btn_unread:
+                    if (ifShowUnread) {
+                        btnUnread.setText(getString(R.string.unread));
+                        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
+                        ifShowUnread = false;
+                    } else {
+                        btnUnread.setText(getString(R.string.all_mails));
+                        refreshViewingInbox(messageDBHelper.getUnreadMessageListInBox(messageList));
+                        ifShowUnread = true;
+                    }
                     break;
             }
         }

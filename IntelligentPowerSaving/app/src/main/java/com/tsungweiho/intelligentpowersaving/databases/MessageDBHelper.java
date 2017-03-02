@@ -99,21 +99,51 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         return count;
     }
 
+    // Box label is recorded in the second label of inboxLabel
     public ArrayList<Message> getMessageListByLabel(String label) {
         SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Message> messageList = new ArrayList<Message>();
+
+        if (label.equalsIgnoreCase(LABEL_MSG_STAR)){
+            messageList = getStarMessageList(db);
+        } else {
+            String sql = "SELECT * FROM " + TABLE_NAME;
+            Cursor cursor = db.rawQuery(sql, null);
+            while (cursor.moveToNext()) {
+                if (cursor.getString(6).split(SEPARATOR_MSG_LABEL)[2].equalsIgnoreCase(label)) {
+                    String uniqueId = cursor.getString(1);
+                    String title = cursor.getString(2);
+                    String content = cursor.getString(3);
+                    String sender = cursor.getString(4);
+                    String time = cursor.getString(5);
+                    String inboxLabel = cursor.getString(6);
+                    Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
+                    messageList.add(message);
+                }
+            }
+            cursor.close();
+        }
+
+        return messageList;
+    }
+
+    // Get all starred mails without those in trash box
+    private ArrayList<Message> getStarMessageList(SQLiteDatabase db){
         ArrayList<Message> messageList = new ArrayList<Message>();
         String sql = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
-            if (cursor.getString(6).split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(label)) {
-                String uniqueId = cursor.getString(1);
-                String title = cursor.getString(2);
-                String content = cursor.getString(3);
-                String sender = cursor.getString(4);
-                String time = cursor.getString(5);
-                String inboxLabel = cursor.getString(6);
-                Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
-                messageList.add(message);
+            if (cursor.getString(6).split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
+                if (!cursor.getString(6).split(SEPARATOR_MSG_LABEL)[2].equalsIgnoreCase(LABEL_MSG_TRASH)){
+                    String uniqueId = cursor.getString(1);
+                    String title = cursor.getString(2);
+                    String content = cursor.getString(3);
+                    String sender = cursor.getString(4);
+                    String time = cursor.getString(5);
+                    String inboxLabel = cursor.getString(6);
+                    Message message = new Message(uniqueId, title, content, sender, time, inboxLabel);
+                    messageList.add(message);
+                }
             }
         }
         cursor.close();
@@ -121,12 +151,22 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         return messageList;
     }
 
+    public ArrayList<Message> getUnreadMessageListInBox(ArrayList<Message> currentMessageList) {
+        ArrayList<Message> unreadMessageList = new ArrayList<>();
+        for (int i = 0; i < currentMessageList.size(); i++) {
+            if (currentMessageList.get(i).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_UNREAD)) {
+                unreadMessageList.add(currentMessageList.get(i));
+            }
+        }
+        return unreadMessageList;
+    }
+
     // Handle un/read of mails
     public int markMailByLabel(Message message, String ifRead) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String newInboxLabel = ifRead + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1] +
-                SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
+        String newInboxLabel = ifRead + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1] + SEPARATOR_MSG_LABEL
+                + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2] + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3];
 
         ContentValues values = new ContentValues();
         values.put(DB_MESSAGE_UNID, message.getUniqueId());
@@ -142,12 +182,34 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         return count;
     }
 
-    // Handle mails moving between boxes
+    // Handle star mails
+    public int starMailByLabel(Message message, String ifStar) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String newInboxLabel = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0] + SEPARATOR_MSG_LABEL + ifStar + SEPARATOR_MSG_LABEL
+                + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2] + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3];
+
+        ContentValues values = new ContentValues();
+        values.put(DB_MESSAGE_UNID, message.getUniqueId());
+        values.put(DB_MESSAGE_TITLE, message.getTitle());
+        values.put(DB_MESSAGE_CONTENT, message.getContent());
+        values.put(DB_MESSAGE_SENDER, message.getSender());
+        values.put(DB_MESSAGE_TIME, message.getTime());
+        values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
+        String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
+
+        int count = db.update(TABLE_NAME, values, whereClause, null);
+
+        return count;
+    }
+
+    // Handle mails moving between inbox and trash
     public int moveToBoxByLabel(Message message, String label) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String newInboxLabel = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0] + SEPARATOR_MSG_LABEL
-                + label + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
+        String newInboxLabel = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0] + SEPARATOR_MSG_LABEL +
+                message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1] + SEPARATOR_MSG_LABEL +
+                label + SEPARATOR_MSG_LABEL + message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3];
 
         ContentValues values = new ContentValues();
         values.put(DB_MESSAGE_UNID, message.getUniqueId());

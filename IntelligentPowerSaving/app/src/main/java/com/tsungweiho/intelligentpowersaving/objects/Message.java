@@ -13,7 +13,7 @@ public class Message {
     private String inboxLabel;
     private String time;
 
-    // inbox label stores information (un/read,inbox,eventId)
+    // inbox label stores information (un/read,star,inbox,eventId)
     public Message(String uniqueId, String title, String content, String sender, String time, String inboxLabel) {
         this.uniqueId = uniqueId;
         this.title = title;

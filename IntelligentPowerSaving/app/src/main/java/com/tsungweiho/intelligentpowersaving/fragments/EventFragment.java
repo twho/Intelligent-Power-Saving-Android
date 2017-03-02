@@ -47,8 +47,6 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
@@ -132,6 +130,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     // PubNub
     private PubNub pubnub = null;
+    public static boolean ifFragmentActive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -159,21 +158,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
         initMap(savedInstanceState);
 
-        // find views
-        flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
-        llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
-        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_layout_marker_info);
-        ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_ib_add);
-        ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_ib_cancel);
-        ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_ib_camera);
-        tvTitle = (TextView) view.findViewById(R.id.fragment_event_title);
-        tvBottom = (TextView) view.findViewById(R.id.fragment_event_bottom);
-        edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
-        btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
-        ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
-        ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
-        pbMarker = (ProgressBar) view.findViewById(R.id.fragment_event_pb_marker_img);
-        pbTopBar = (ProgressBar) view.findViewById(R.id.fragment_event_pb);
+        findViews();
         setAllListeners();
     }
 
@@ -211,6 +196,23 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
         this.googleMap = googleMap;
         getChannelHistory();
+    }
+
+    private void findViews() {
+        flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
+        llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
+        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_layout_marker_info);
+        ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_ib_add);
+        ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_ib_cancel);
+        ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_ib_camera);
+        tvTitle = (TextView) view.findViewById(R.id.fragment_event_title);
+        tvBottom = (TextView) view.findViewById(R.id.fragment_event_bottom);
+        edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
+        btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
+        ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
+        ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
+        pbMarker = (ProgressBar) view.findViewById(R.id.fragment_event_pb_marker_img);
+        pbTopBar = (ProgressBar) view.findViewById(R.id.fragment_event_pb);
     }
 
     private void setAllMarkers() {
@@ -476,14 +478,17 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     @Override
     public void onResume() {
-        mapView.onResume();
         super.onResume();
+
+        mapView.onResume();
+        ifFragmentActive = true;
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
+        ifFragmentActive = false;
         // Clean memory
         eventDBHelper.closeDB();
     }

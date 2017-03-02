@@ -88,7 +88,8 @@
                 android:layout_centerVertical="true"
                 android:layout_margin="@dimen/activity_main_space"
                 android:background="@drawable/background_content_transparent_button"
-                android:src="@mipmap/ic_unfollow" />
+                android:src="@mipmap/ic_unfollow"
+                app:star="@{message.inboxLabel}"/>
         </RelativeLayout>
 
         <View

@@ -4,13 +4,10 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -26,8 +23,6 @@ import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -119,6 +114,34 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         viewHolder.tvTitle.setText(message.getTitle());
         viewHolder.tvContent.setText(message.getContent());
 
+        // Set star icon
+
+        if (message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
+            viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+        } else {
+            viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+        }
+
+        viewHolder.ibStar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean ifStar;
+                if (message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
+                    viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+                    ifStar = false;
+                } else {
+                    viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+                    ifStar = true;
+                }
+
+                if (null == fm)
+                    fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                inboxFragment.markMailStar(newOrderPosition, ifStar);
+            }
+        });
+
         // Check if in the same day to determine how to show the time
         if (message.getTime().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtilities.getDate()))
             viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[1]);
@@ -164,7 +187,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 }
             });
 
-            setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2], viewHolder.imageView);
+            setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], viewHolder.imageView);
         } else if (mode == MODE_EDITING) {
             viewHolder.relativeLayout.setOnTouchListener(null);
 

@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,13 +43,14 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     private View view;
 
     // UI views
-    private ImageButton ibBack, ibDelete, ibRead;
+    private ImageButton ibBack, ibDelete, ibRead, ibStar;
     private ImageView ivSender;
     private static FrameLayout imgLayout;
     private static ProgressBar pbImg;
 
     // Functions
     private FragmentMessageBinding binding;
+    private FragmentManager fm;
     private Context context;
     private ArrayList<String> messageInfo;
     private int position;
@@ -81,30 +83,40 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
         messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_READ);
         this.position = Integer.parseInt(messageInfo.get(1));
-        this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1];
+        this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
         binding.setMessage(currentMessage);
 
         ibBack = (ImageButton) view.findViewById(R.id.fragment_message_ib_back);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_message_ib_delete);
         ibRead = (ImageButton) view.findViewById(R.id.fragment_message_ib_read);
+        ibStar = (ImageButton) view.findViewById(R.id.fragment_home_ib_following);
         ivSender = (ImageView) view.findViewById(R.id.fragment_message_iv_sender);
         imgLayout = (FrameLayout) view.findViewById(R.id.fragment_message_layout_img);
         pbImg = (ProgressBar) view.findViewById(R.id.fragment_message_pb_img);
 
-        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2], ivSender);
+        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
         setAllListeners();
     }
 
     @BindingAdapter({"bind:inboxLabel"})
     public static void loadImage(final ImageView imageView, final String inboxLabel) {
-        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[2].matches(".*\\d+.*")){
+        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[3].matches(".*\\d+.*")) {
             imgLayout.setVisibility(View.VISIBLE);
             EventDBHelper eventDBHelper = new EventDBHelper(MainActivity.getContext());
 
-            String url = eventDBHelper.getEventByUnId(inboxLabel.split(SEPARATOR_MSG_LABEL)[2]).getImage();
+            String url = eventDBHelper.getEventByUnId(inboxLabel.split(SEPARATOR_MSG_LABEL)[3]).getImage();
             imageUtilities.setImageViewFromUrl(url, imageView, pbImg);
         } else {
             imgLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @BindingAdapter({"bind:star"})
+    public static void loadStar(final ImageButton imageButton, final String inboxLabel) {
+        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
+            imageButton.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_follow));
+        } else {
+            imageButton.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_unfollow));
         }
     }
 
@@ -121,6 +133,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         ibBack.setOnClickListener(messageFragmentListener);
         ibDelete.setOnClickListener(messageFragmentListener);
         ibRead.setOnClickListener(messageFragmentListener);
+        ibStar.setOnClickListener(messageFragmentListener);
     }
 
     private void setImageViewByLabel(String label, ImageView imageView) {
@@ -167,6 +180,22 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                 case R.id.fragment_message_ib_read:
                     messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
                     ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
+                    break;
+                case R.id.fragment_home_ib_following:
+                    boolean ifStar;
+                    if (currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
+                        ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+                        ifStar = false;
+                    } else {
+                        ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+                        ifStar = true;
+                    }
+
+                    if (null == fm)
+                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                    inboxFragment.markMailStar(position, ifStar);
                     break;
             }
         }

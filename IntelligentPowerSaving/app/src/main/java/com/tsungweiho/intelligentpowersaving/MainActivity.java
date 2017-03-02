@@ -1,6 +1,7 @@
 package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +26,7 @@ import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
+import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
@@ -151,6 +153,22 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         actionBar.selectTab(tabSettings);
 
         actionBar.selectTab(tabHome);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        startService();
+    }
+
+    private void startService() {
+        Intent intent = new Intent(MainActivity.this, MainService.class);
+        startService(intent);
+    }
+
+    private void stopService() {
+        Intent intent = new Intent(MainActivity.this, MainService.class);
+        stopService(intent);
     }
 
     @Override
@@ -287,6 +305,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // clean background listeners
+        stopService();
         pubnub.destroy();
     }
 }
