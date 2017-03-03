@@ -7,8 +7,8 @@ package com.tsungweiho.intelligentpowersaving.constants;
 public interface PubNubAPIConstants {
     // Project: Intelligent Power Saving
     // Pubnub keys
-    String PUBNUB_PUBLISH = "pub-c-dca997e6-cdc6-44eb-929d-d6cc56a56a1f";
-    String PUBNUB_SUBSCRIBE = "sub-c-1061b83c-f6e2-11e6-ac91-02ee2ddab7fe";
+    String PUBNUB_PUBLISH_KEY = "pub-c-dca997e6-cdc6-44eb-929d-d6cc56a56a1f";
+    String PUBNUB_SUBSCRIBE_KEY = "sub-c-1061b83c-f6e2-11e6-ac91-02ee2ddab7fe";
 
     // PubNub channels
     String CHANNEL_VERSION = "10";

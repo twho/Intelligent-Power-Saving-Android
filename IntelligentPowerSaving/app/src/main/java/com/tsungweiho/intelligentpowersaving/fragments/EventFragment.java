@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,13 +41,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
@@ -151,10 +148,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         eventFragmentListener = new EventFragmentListener();
         alertDialogManager = new AlertDialogManager(context);
         eventDBHelper = new EventDBHelper(context);
-
-        // Add PubNub Listeners
         pubnub = MainActivity.getPubNub();
-        pubnub.addListener(eventFragmentListener);
 
         initMap(savedInstanceState);
 
@@ -321,7 +315,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         btnFullMap.setOnClickListener(eventFragmentListener);
     }
 
-    private class EventFragmentListener extends SubscribeCallback implements View.OnClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
+    private class EventFragmentListener implements View.OnClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
         @Override
         public void onClick(View view) {
@@ -385,32 +379,6 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             animUtilities.setllSlideUp(llMarkerInfo);
             ifMarkerViewUp = true;
             return false;
-        }
-
-        @Override
-        public void status(PubNub pubnub, PNStatus status) {
-            if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
-                // TODO connectivity
-            }
-        }
-
-        @Override
-        public void message(PubNub pubnub, PNMessageResult message) {
-            if (!message.getChannel().equalsIgnoreCase(EVENT_CHANNEL) && !message.getChannel().equalsIgnoreCase(EVENT_CHANNEL_DELETED))
-                return;
-
-            try {
-                JSONObject jObject = new JSONObject(message.getMessage().toString());
-                insertDataToDB(jObject);
-                setAllMarkerOnUiThread();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-
         }
     }
 
@@ -493,7 +461,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         eventDBHelper.closeDB();
     }
 
-    private void setAllMarkerOnUiThread() {
+    public void setAllMarkerOnUiThread() {
         uiThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -532,7 +500,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         public void failure(RetrofitError error) {
             //Assume we have no connection, since error is null
             if (error == null) {
-
+                Log.d(TAG, "Upload error: " + error.getMessage());
             }
         }
 

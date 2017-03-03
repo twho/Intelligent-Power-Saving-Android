@@ -54,6 +54,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     private Context context;
     private ArrayList<String> messageInfo;
     private int position;
+
     private Message currentMessage;
     private String currentBox;
     private static ImageUtilities imageUtilities;
@@ -86,6 +87,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
         binding.setMessage(currentMessage);
 
+        findViews();
+
+        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
+        setAllListeners();
+    }
+
+    private void findViews() {
         ibBack = (ImageButton) view.findViewById(R.id.fragment_message_ib_back);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_message_ib_delete);
         ibRead = (ImageButton) view.findViewById(R.id.fragment_message_ib_read);
@@ -93,9 +101,6 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         ivSender = (ImageView) view.findViewById(R.id.fragment_message_iv_sender);
         imgLayout = (FrameLayout) view.findViewById(R.id.fragment_message_layout_img);
         pbImg = (ProgressBar) view.findViewById(R.id.fragment_message_pb_img);
-
-        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
-        setAllListeners();
     }
 
     @BindingAdapter({"bind:inboxLabel"})
@@ -171,6 +176,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
                     if (position + 1 < messageDBHelper.getMessageListByLabel(currentBox).size()) {
                         currentMessage = messageDBHelper.getMessageListByLabel(currentBox).get(position + 1);
+                        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
                         binding.setMessage(currentMessage);
                         position = position + 1;
                     } else {
@@ -182,20 +188,15 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
                     break;
                 case R.id.fragment_home_ib_following:
-                    boolean ifStar;
+                    currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
                     if (currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
                         ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
-                        ifStar = false;
+                        messageDBHelper.starMailByLabel(currentMessage, LABEL_MSG_UNSTAR);
                     } else {
                         ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
-                        ifStar = true;
+                        messageDBHelper.starMailByLabel(currentMessage, LABEL_MSG_STAR);
                     }
 
-                    if (null == fm)
-                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-
-                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
-                    inboxFragment.markMailStar(position, ifStar);
                     break;
             }
         }

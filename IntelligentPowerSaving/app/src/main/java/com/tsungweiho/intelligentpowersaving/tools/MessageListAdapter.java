@@ -183,7 +183,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) MainActivity.getContext()).setMessageFragment(message, position);
+                    ((MainActivity) MainActivity.getContext()).setMessageFragment(message, newOrderPosition);
                 }
             });
 

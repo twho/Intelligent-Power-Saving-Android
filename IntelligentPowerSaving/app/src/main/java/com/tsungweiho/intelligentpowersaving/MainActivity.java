@@ -89,10 +89,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
         // Pubnub init
         pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE);
-        pnConfiguration.setPublishKey(PUBNUB_PUBLISH);
+        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
+        pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
         pnConfiguration.setSecure(false);
         pubnub = new PubNub(pnConfiguration);
+        startService();
 
         setTab();
     }
@@ -153,12 +154,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         actionBar.selectTab(tabSettings);
 
         actionBar.selectTab(tabHome);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        startService();
     }
 
     private void startService() {

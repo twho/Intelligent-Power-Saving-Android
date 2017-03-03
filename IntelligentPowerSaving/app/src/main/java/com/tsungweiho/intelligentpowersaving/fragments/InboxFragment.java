@@ -1,20 +1,15 @@
 package com.tsungweiho.intelligentpowersaving.fragments;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,10 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
-import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -42,15 +33,9 @@ import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -66,7 +51,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     // UI Views
     private DrawerLayout drawer;
     private LinearLayout llDrawer, llEditing;
-    private TextView tvTitle, tvMail;
+    private TextView tvTitle, tvMail, tvNoMail;
     private ListView navList, lvMessages;
     private ImageButton ibOptions, ibDelete, ibInboxFunction;
     private Button btnUnread;
@@ -94,6 +79,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
     // PubNub
     private PubNub pubnub = null;
+    public static boolean ifFragmentActive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -112,12 +98,16 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         timeUtilities = new TimeUtilities(context);
         imageUtilities = MainActivity.getImageUtilities();
         sharedPreferencesManager = new SharedPreferencesManager(context);
+        pubnub = MainActivity.getPubNub();
         ifShowUnread = false;
 
-        // Add PubNub Listeners
-        pubnub = MainActivity.getPubNub();
-        pubnub.addListener(inboxFragmentListener);
+        findViews();
 
+        setAllListeners();
+        onResume();
+    }
+
+    private void findViews(){
         DrawerListAdapter drawerListAdapter;
         drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
         drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
@@ -125,6 +115,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         navList.setAdapter(drawerListAdapter);
         lvMessages = (ListView) view.findViewById(R.id.fragment_inbox_lv_message);
         tvMail = (TextView) view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
+        tvNoMail = (TextView) view.findViewById(R.id.fragmnet_inbox_tv_no_mail);
         tvTitle = (TextView) view.findViewById(R.id.fragment_inbox_tv_title);
         tvTitle.setText(context.getString(R.string.inbox));
         ibOptions = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_options);
@@ -134,9 +125,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
         ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
-
-        setAllListeners();
-        onResume();
     }
 
     private void setAllListeners() {
@@ -150,6 +138,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     @Override
     public void onResume() {
         super.onResume();
+
+        ifFragmentActive = true;
+
         // use the data already saved
         currentBox = sharedPreferencesManager.getCurrentMessagebox();
         MyAccountInfo myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
@@ -166,7 +157,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     }
 
     // Initialize message list view
-    // Should be executed everytime loading the message list
+    // Should be executed every time loading the message list
     private void initInbox(ArrayList<Message> messageList) {
         if (null != messageSelectedList)
             messageSelectedList = null;
@@ -179,13 +170,18 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     }
 
     // Refresh message list view
-    // Should be executed everytime users have action on the message list
+    // Should be executed every time users have action on the message list
     private void refreshViewingInbox(ArrayList<Message> messageList) {
         this.messageList = messageList;
         initInbox(messageList);
         switchTopBar(MODE_VIEWING);
         messageListAdapter.setMode(MODE_VIEWING);
         messageListAdapter.notifyDataSetChanged();
+        if (messageList.size() == 0){
+            tvNoMail.setVisibility(View.VISIBLE);
+        } else {
+            tvNoMail.setVisibility(View.GONE);
+        }
     }
 
     // Be executed only When firstly start editing mode
@@ -200,6 +196,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         setIfSelectedRead(messageList.get(initSelectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
     }
 
+    // Be executed When users selected another mail item
     public void setIndexSelected(int selectedPosition, Boolean ifSelected) {
         messageSelectedList.set(selectedPosition, ifSelected);
         messageListAdapter.setSelectedList(messageSelectedList);
@@ -220,6 +217,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         refreshViewingInbox(messageList);
     }
 
+    // Change top un/read button according to selected mail items
     private void setIfSelectedRead(Boolean ifSelectedRead) {
         this.ifSelectedRead = ifSelectedRead;
         if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) {
@@ -255,13 +253,17 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     @Override
     public void onPause() {
         super.onPause();
+
+        ifFragmentActive = false;
+
+        // Clean memory
         messageDBHelper.closeDB();
 
         // save which box the user is using
         sharedPreferencesManager.saveCurrentMessageBox(currentBox);
     }
 
-    private class InboxFragmentListener extends SubscribeCallback implements View.OnClickListener, AdapterView.OnItemClickListener {
+    private class InboxFragmentListener implements View.OnClickListener, AdapterView.OnItemClickListener {
 
         @Override
         public void onClick(View view) {
@@ -355,80 +357,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
             });
             drawer.closeDrawer(llDrawer);
         }
-
-        @Override
-        public void status(PubNub pubnub, PNStatus status) {
-
-        }
-
-        @Override
-        public void message(PubNub pubnub, PNMessageResult message) {
-            // deal with event channel
-            if (message.getChannel().equalsIgnoreCase(EVENT_CHANNEL) || message.getChannel().equalsIgnoreCase(EVENT_CHANNEL_DELETED)) {
-                try {
-                    JSONObject jObject = new JSONObject(message.getMessage().toString());
-                    convertEventToMessage(jObject);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else if (message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL) || message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL_DELETED)) {
-                if (message.getMessage().toString().contains(FROM_WEB_MESSAGE_SEPARATOR)) {
-                    String strMessage = message.getMessage().toString();
-                    String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
-                    if (!messageDBHelper.checkIfExist(uniqueId)) {
-                        String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
-                        String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
-                        String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
-                        String time = timeUtilities.getTimeByMillies(strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID]);
-                        String inboxLabel = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_INBOX_LABEL];
-                        Message newMessage = new Message(uniqueId, title, content, sender, time, inboxLabel);
-                        messageDBHelper.insertDB(newMessage);
-                        refreshViewingInboxOnUiThread();
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-
-        }
     }
 
-    private void convertEventToMessage(JSONObject jsonObject) {
-        try {
-            String uniqueId = jsonObject.getString(EVENT_UNID);
-            String detail = jsonObject.getString(EVENT_DETAIL);
-            String address = getAddressByPosition(jsonObject.getString(EVENT_POS));
-            String poster = jsonObject.getString(EVENT_POSTER);
-            String time = jsonObject.getString(EVENT_TIME);
-
-            if (!messageDBHelper.checkIfExist(uniqueId)) {
-                Message message = new Message(uniqueId, detail, getString(R.string.event_reported_around) + " " + address, poster, time, getString(R.string.label_default) + uniqueId);
-                messageDBHelper.insertDB(message);
-                refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String getAddressByPosition(String position) {
-        String address = "---";
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(context, Locale.getDefault());
-        try {
-            addresses = geocoder.getFromLocation(Double.valueOf(position.split(SEPARATOR_MSG_LABEL)[0]),
-                    Double.valueOf(position.split(SEPARATOR_MSG_LABEL)[1]), 1);
-            address = addresses.get(0).getAddressLine(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return address;
-    }
-
-    private void refreshViewingInboxOnUiThread() {
+    public void refreshViewingInboxOnUiThread() {
         if (null != uiThread)
             uiThread.interrupt();
 
@@ -444,6 +375,10 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
             }
         });
         uiThread.start();
+    }
+
+    public void refreshViewingFromService() {
+        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
     }
 
     private void makeDeleteToast(int count) {

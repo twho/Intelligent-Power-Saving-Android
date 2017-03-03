@@ -81,6 +81,18 @@
                 android:textColor="@color/white" />
         </FrameLayout>
 
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/fragmnet_inbox_tv_no_mail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_main_space"
+            android:gravity="center"
+            android:padding="@dimen/activity_main_space"
+            android:text="@string/no_mail"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/white" />
+
         <ListView
             android:id="@+id/fragment_inbox_lv_message"
             android:layout_width="match_parent"

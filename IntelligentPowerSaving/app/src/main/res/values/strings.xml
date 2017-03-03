@@ -4,7 +4,7 @@
     <!--MainActivity-->
     <string name="loading">Loading...</string>
     <string name="testing_account">testing@ipowersaving.com</string>
-    <string name="testing_name">iPower Saving Testing Account</string>
+    <string name="testing_name">iPS Testing Account</string>
 
     <!--MessageFragment-->
     <string name="unread">Unread</string>
@@ -17,6 +17,9 @@
     <string name="event_reported_around">Reported around</string>
     <string name="delete_caption1">You have deleted</string>
     <string name="delete_caption2">mail(s).</string>
+
+    <!--InboxFragment-->
+    <string name="no_mail">No mail to show in this mailbox.</string>
 
     <!--SettingsFragment-->
     <string name="fragment_settings_title">Settings</string>
