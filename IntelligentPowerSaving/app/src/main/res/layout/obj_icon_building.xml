@@ -50,7 +50,8 @@
                 android:scaleType="centerInside"
                 android:scaleX="@dimen/activity_main_top_bar_widget_scale"
                 android:scaleY="@dimen/activity_main_top_bar_widget_scale"
-                android:src="@mipmap/ic_increase" />
+                android:src="@mipmap/ic_increase"
+                android:visibility="gone" />
         </FrameLayout>
 
         <TextView

@@ -3,6 +3,7 @@ package com.tsungweiho.intelligentpowersaving.objects;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.ObjIconBuildingBinding;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
 /**
@@ -30,6 +32,7 @@ public class BuildingIcon extends View implements BuildingConstants {
 
     // Functions
     private static ImageUtilities imageUtilities;
+    private AnimUtilities animUtilities;
     private ObjIconBuildingBinding binding;
 
     public BuildingIcon(Context context, Building building) {
@@ -45,9 +48,18 @@ public class BuildingIcon extends View implements BuildingConstants {
 
 
     @BindingAdapter({"bind:imageUrl"})
-    public static void loadImage(ImageView imageView, String url) {
+    public static void loadImage(final ImageView imageView, final String url) {
         imageUtilities = new ImageUtilities(context);
         imageUtilities.setRoundCornerImageViewFromUrl(url, imageView);
+
+        // Auto refresh after 5 seconds.
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imageUtilities.setRoundCornerImageViewFromUrl(url, imageView);
+            }
+        }, 3500);
     }
 
     private void initViews() {
@@ -64,14 +76,9 @@ public class BuildingIcon extends View implements BuildingConstants {
             setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.green));
             ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_decrease));
         }
+        animUtilities = new AnimUtilities(context);
+        animUtilities.setIconAnimToVisible(ivIndicator);
         tvConsumpPercent.setText(building.getConsumption().split(",")[1] + " %");
-
-        view.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
     }
 
     private void setTextViewColor(TextView tvConsump, TextView tvConsumpPercent, int color) {

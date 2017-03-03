@@ -93,15 +93,6 @@ public class HomeFragment extends Fragment implements DBConstants {
         super.onResume();
 
         loadDataFromFirebase();
-
-        // Auto refresh after 5 seconds.
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshBuildingIcons();
-            }
-        }, 5000);
     }
 
     private void loadDataFromFirebase() {
@@ -135,7 +126,7 @@ public class HomeFragment extends Fragment implements DBConstants {
 
         // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)
-            addBuildingToDatabase();
+            addLocalDataToDatabase();
 
         llProgress.setVisibility(View.GONE);
         refreshBuildingIcons();
@@ -175,7 +166,7 @@ public class HomeFragment extends Fragment implements DBConstants {
         return json;
     }
 
-    private void addBuildingToDatabase() {
+    private void addLocalDataToDatabase() {
         JSONObject obj = null;
         try {
             obj = new JSONObject(loadJSONFromAsset());
