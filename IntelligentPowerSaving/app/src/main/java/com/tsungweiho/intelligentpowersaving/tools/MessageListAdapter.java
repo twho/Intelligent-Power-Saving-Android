@@ -115,7 +115,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         viewHolder.tvContent.setText(message.getContent());
 
         // Set star icon
-
         if (message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
             viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
         } else {
@@ -164,18 +163,23 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
         // Viewing Mode
         if (mode == MODE_VIEWING) {
+            viewHolder.imageView.setClickable(true);
             viewHolder.relativeLayout.setOnClickListener(null);
 
             // On long click: perform editing mode
             viewHolder.relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    if (null == fm)
-                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-
-                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
-                    inboxFragment.initEditingInbox(newOrderPosition, messageList);
+                    initEditingMode(newOrderPosition);
                     return false;
+                }
+            });
+
+            // On click on mail icon: perform editing mode
+            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    initEditingMode(newOrderPosition);
                 }
             });
 
@@ -189,7 +193,8 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
             setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], viewHolder.imageView);
         } else if (mode == MODE_EDITING) {
-            viewHolder.relativeLayout.setOnTouchListener(null);
+            viewHolder.imageView.setClickable(false);
+            viewHolder.relativeLayout.setOnLongClickListener(null);
 
             // On click in editing mode: select mail
             viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
@@ -206,6 +211,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                     }
                 }
             });
+
             setImageViewOnEditing(messageSelectedList.get(newOrderPosition), viewHolder.imageView);
         }
 
@@ -243,6 +249,14 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 break;
         }
         imageView.setImageDrawable(drawable);
+    }
+
+    private void initEditingMode(int position){
+        if (null == fm)
+            fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+        InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+        inboxFragment.initEditingInbox(position, messageList);
     }
 
     private void setImageViewOnEditing(Boolean select, ImageView imageView) {
