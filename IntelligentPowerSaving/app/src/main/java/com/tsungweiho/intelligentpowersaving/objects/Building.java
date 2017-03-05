@@ -8,12 +8,14 @@ public class Building {
     private String detail;
     private String consumption;
     private String imageUrl;
+    private String ifFollow;
 
-    public Building(String name, String detail, String consumption, String imageUrl) {
+    public Building(String name, String detail, String consumption, String imageUrl, String ifFollow) {
         this.name = name;
         this.detail = detail;
         this.consumption = consumption;
         this.imageUrl = imageUrl;
+        this.ifFollow = ifFollow;
     }
 
     public String getName() {
@@ -44,8 +46,16 @@ public class Building {
         return imageUrl;
     }
 
-    public void setImageUrl(String image) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getIfFollow() {
+        return ifFollow;
+    }
+
+    public void setIfFollow(String ifFollow) {
+        this.ifFollow = ifFollow;
     }
 
 }

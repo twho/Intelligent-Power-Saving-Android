@@ -43,6 +43,16 @@
                 app:imageUrl="@{building.imageUrl}" />
 
             <ImageView
+                android:id="@+id/obj_building_icon_iv_follow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|top"
+                android:scaleType="centerInside"
+                android:scaleX="@dimen/ibj_icon_building_ic_follow_scale"
+                android:scaleY="@dimen/ibj_icon_building_ic_follow_scale"
+                android:src="@mipmap/ic_follow" />
+
+            <ImageView
                 android:id="@+id/obj_building_icon_iv_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

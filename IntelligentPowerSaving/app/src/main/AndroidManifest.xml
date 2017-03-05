@@ -40,7 +40,12 @@
             android:name=".MainActivity"
             android:isScrollContainer="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"></activity>
+
+        <activity
+            android:name=".SplashActivity"
+            android:isScrollContainer="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

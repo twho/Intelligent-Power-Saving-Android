@@ -10,6 +10,7 @@ public class MyAccountInfo {
     private String name;
     private String imageUrl;
     private String subscription;
+    private String ifRequestPermission;
 
     // Subscription format = 1,1 means subscribe to event and public channels
     public MyAccountInfo(String email, String name, String imageUrl, String subscription) {

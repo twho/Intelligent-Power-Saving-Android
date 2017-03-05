@@ -32,21 +32,24 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.isseiaoki:simplecropview:1.1.4'
-    compile 'com.android.support:multidex:1.0.0'
-    compile group: 'com.pubnub', name: 'pubnub-gson', version: '4.5.0'
+
     compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'id.zelory:compressor:1.0.4'
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.google.android.gms:play-services:10.2.0'
     compile 'com.google.firebase:firebase-core:10.2.0'
     compile 'com.google.firebase:firebase-database:10.2.0'
     compile 'com.google.firebase:firebase-auth:10.2.0'
+
+    compile 'com.isseiaoki:simplecropview:1.1.4'
+    compile group: 'com.pubnub', name: 'pubnub-gson', version: '4.5.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'id.zelory:compressor:1.0.4'
+    compile 'com.android.support:design:25.0.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.google.android.gms:play-services:10.2.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.github.AKiniyalocts:imgur-api:-SNAPSHOT'
+
     testCompile 'junit:junit:4.12'
 }
 

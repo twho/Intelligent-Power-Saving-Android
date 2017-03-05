@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,7 +28,7 @@ public class BuildingIcon extends View implements BuildingConstants {
 
     // UI
     private View view;
-    private ImageView ivIndicator;
+    private ImageView ivIndicator, ivFollowIndicator;
     private TextView tvConsumpPercent, tvConsump;
 
     // Functions
@@ -63,10 +64,11 @@ public class BuildingIcon extends View implements BuildingConstants {
     }
 
     private void initViews() {
+        setupFollowIndicator();
         ivIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_indicator);
         tvConsump = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption);
         tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
-        tvConsump.setText(building.getConsumption());
+
         if (ENERGY_HIGH.equalsIgnoreCase(building.getConsumption().split(",")[0])) {
             tvConsump.setText(context.getString(R.string.increase_weekly));
             setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.light_red));
@@ -79,6 +81,15 @@ public class BuildingIcon extends View implements BuildingConstants {
         animUtilities = new AnimUtilities(context);
         animUtilities.setIconAnimToVisible(ivIndicator);
         tvConsumpPercent.setText(building.getConsumption().split(",")[1] + " %");
+    }
+
+    private void setupFollowIndicator(){
+        ivFollowIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_follow);
+        if (Boolean.parseBoolean(building.getIfFollow())){
+            ivFollowIndicator.setVisibility(View.VISIBLE);
+        } else {
+            ivFollowIndicator.setVisibility(View.GONE);
+        }
     }
 
     private void setTextViewColor(TextView tvConsump, TextView tvConsumpPercent, int color) {

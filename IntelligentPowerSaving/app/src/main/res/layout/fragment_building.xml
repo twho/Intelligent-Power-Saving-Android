@@ -41,6 +41,16 @@
                 android:text="@{building.name}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/fragment_building_iv_follow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:background="@drawable/background_theme_button"
+                android:scaleX="@dimen/activity_main_top_bar_widget_scale"
+                android:scaleY="@dimen/activity_main_top_bar_widget_scale"
+                android:src="@mipmap/ic_follow" />
         </FrameLayout>
 
         <ScrollView
@@ -129,6 +139,7 @@
                     android:padding="@dimen/activity_main_space">
 
                     <ImageView
+                        android:id="@+id/fragment_building_iv_ib_follow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/activity_main_space"
@@ -136,6 +147,7 @@
                         android:src="@mipmap/ic_follow" />
 
                     <TextView
+                        android:id="@+id/fragment_building_tv_ib_follow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/activity_main_space"

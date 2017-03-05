@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +25,7 @@ import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
+import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 
 import org.json.JSONArray;
@@ -40,7 +42,7 @@ import java.util.HashMap;
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class HomeFragment extends Fragment implements DBConstants {
+public class HomeFragment extends Fragment implements DBConstants, BuildingConstants {
 
     private String TAG = "HomeFragment";
 
@@ -50,13 +52,15 @@ public class HomeFragment extends Fragment implements DBConstants {
     // UI Views;
     private GridLayout gridLayout;
     private LinearLayout llProgress;
-    private ImageButton ibRefresh;
+    private ImageButton ibRefresh, ibFollowing;
+    private TextView tvNoBuilding;
 
     // Functions
     private Context context;
     private AnimUtilities animUtilities;
     private BuildingDBHelper buildingDBHelper;
-    private ArrayList<Building> buildingList;
+    private SharedPreferencesManager sharedPreferencesManager;
+    private boolean ifShowFollow = false;
 
     // Firebase
     private DatabaseReference databaseReference;
@@ -72,9 +76,27 @@ public class HomeFragment extends Fragment implements DBConstants {
 
     private void init() {
         animUtilities = new AnimUtilities(context);
+        buildingDBHelper = new BuildingDBHelper(context);
+
+        // find views
         gridLayout = (GridLayout) view.findViewById(R.id.fragment_home_grid_layout);
         llProgress = (LinearLayout) view.findViewById(R.id.fragment_home_progress_layout);
+        tvNoBuilding = (TextView) view.findViewById(R.id.fragmnet_home_tv_no_building);
         animUtilities.setllAnimToVisible(llProgress);
+
+        ibFollowing = (ImageButton) view.findViewById(R.id.fragment_home_ib_following);
+        ibFollowing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ifShowFollow) {
+                    ifShowFollow = false;
+                } else {
+                    ifShowFollow = true;
+                }
+                setupFollowingBuildings();
+            }
+        });
+
         ibRefresh = (ImageButton) view.findViewById(R.id.fragment_home_ib_refresh);
         ibRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,14 +110,37 @@ public class HomeFragment extends Fragment implements DBConstants {
             gridLayout.setColumnCount(2);
     }
 
+    private void setupFollowingBuildings() {
+        ArrayList<Building> buildingList;
+        if (ifShowFollow) {
+            buildingList = buildingDBHelper.getFollowedBuildingList();
+            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+        } else {
+            buildingList = buildingDBHelper.getAllBuildingList();
+            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+        }
+        refreshBuildingIcons(buildingList);
+
+        if (buildingList.size() == 0) {
+            tvNoBuilding.setVisibility(View.VISIBLE);
+        } else {
+            tvNoBuilding.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
 
         loadDataFromFirebase();
+
+        // Read current status
+        sharedPreferencesManager = new SharedPreferencesManager(context);
+        ifShowFollow = sharedPreferencesManager.getIfShowFollowedBuilding();
+        setupFollowingBuildings();
     }
 
-    private void loadDataFromFirebase() {
+    public void loadDataFromFirebase() {
         if (null == buildingDBHelper)
             buildingDBHelper = new BuildingDBHelper(context);
 
@@ -107,12 +152,18 @@ public class HomeFragment extends Fragment implements DBConstants {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot buildingSnapshot : dataSnapshot.getChildren()) {
                     String name = buildingSnapshot.child(FDB_NAME).getValue().toString();
-                    String detail = buildingSnapshot.child(FDB_DETAIL).getValue().toString();
                     String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue().toString();
-                    String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue().toString();
-                    building = new Building(name, detail, consumption, imgUrl);
-                    if (!buildingDBHelper.checkIfExist(name))
+
+                    if (!buildingDBHelper.checkIfExist(name)) {
+                        String detail = buildingSnapshot.child(FDB_DETAIL).getValue().toString();
+                        String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue().toString();
+                        building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
                         buildingDBHelper.insertDB(building);
+                    } else {
+                        building = buildingDBHelper.getBuildingByName(name);
+                        building.setConsumption(consumption);
+                        buildingDBHelper.updateDB(building);
+                    }
                 }
             }
 
@@ -122,18 +173,18 @@ public class HomeFragment extends Fragment implements DBConstants {
             }
         });
 
-        buildingList = buildingDBHelper.getAllBuildingList();
+        ArrayList<Building> buildingList = buildingDBHelper.getAllBuildingList();
 
         // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)
             addLocalDataToDatabase();
 
         llProgress.setVisibility(View.GONE);
-        refreshBuildingIcons();
+        setupFollowingBuildings();
         animUtilities.setglAnimToVisible(gridLayout);
     }
 
-    private void refreshBuildingIcons() {
+    private void refreshBuildingIcons(ArrayList<Building> buildingList) {
         Building building;
         gridLayout.removeAllViews();
         for (int index = 0; index < buildingList.size(); index++) {
@@ -167,12 +218,12 @@ public class HomeFragment extends Fragment implements DBConstants {
     }
 
     private void addLocalDataToDatabase() {
-        JSONObject obj = null;
+        JSONObject obj;
         try {
             obj = new JSONObject(loadJSONFromAsset());
             JSONArray jArry = obj.getJSONArray(JSON_ARRAY_NAME);
 
-            Building building = null;
+            Building building;
             for (int i = 0; i < jArry.length(); i++) {
                 JSONObject currentObj = jArry.getJSONObject(i);
 
@@ -180,12 +231,22 @@ public class HomeFragment extends Fragment implements DBConstants {
                 String detail = currentObj.getString(FDB_DETAIL);
                 String consumption = currentObj.getString(FDB_CONSUMPTION);
                 String imgUrl = currentObj.getString(FDB_IMGURL);
-                building = new Building(name, detail, consumption, imgUrl);
+                building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
+
+                // if already have in local, don't override the data
                 if (!buildingDBHelper.checkIfExist(name))
                     buildingDBHelper.insertDB(building);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Save current status
+        sharedPreferencesManager.saveIfShowFollowedBuilding(ifShowFollow);
     }
 }

@@ -23,6 +23,7 @@ import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.utils.AChartUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
@@ -42,12 +43,15 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     // UI views
     private LinearLayout llChart, ibFollow;
+    private TextView tvIbFollow;
+    private ImageView ivIbFollow, ivFollowIndicator;
     private View barView;
     private ImageButton ibBack;
 
     // Functions
     private Context context;
     private String buildingName;
+    private AnimUtilities animUtilities;
     private static ImageUtilities imageUtilities;
     private static TimeUtilities timeUtilities;
     private AChartUtilities aChartUtilities;
@@ -72,20 +76,31 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private void init() {
         buildingDBHelper = new BuildingDBHelper(context);
         imageUtilities = MainActivity.getImageUtilities();
+        animUtilities = new AnimUtilities(context);
         timeUtilities = new TimeUtilities(context);
         aChartUtilities = new AChartUtilities(context);
 
         building = buildingDBHelper.getBuildingByName(buildingName);
         binding.setBuilding(building);
 
-        llChart = (LinearLayout) view.findViewById(R.id.fragment_building_ll_chart);
+        ivFollowIndicator = (ImageView) view.findViewById(R.id.fragment_building_iv_follow);
+        ivIbFollow = (ImageView) view.findViewById(R.id.fragment_building_iv_ib_follow);
+        tvIbFollow = (TextView) view.findViewById(R.id.fragment_building_tv_ib_follow);
         ibFollow = (LinearLayout) view.findViewById(R.id.fragment_building_ib_follow);
         ibFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (Boolean.parseBoolean(building.getIfFollow())) {
+                    building.setIfFollow(BUILDING_NOT_FOLLOW);
+                } else {
+                    building.setIfFollow(BUILDING_FOLLOW);
+                }
+                setFollowButton(Boolean.parseBoolean(building.getIfFollow()));
             }
         });
+        setFollowButton(Boolean.parseBoolean(building.getIfFollow()));
+
+        llChart = (LinearLayout) view.findViewById(R.id.fragment_building_ll_chart);
 
         ibBack = (ImageButton) view.findViewById(R.id.fragment_building_ib_back);
         ibBack.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +128,18 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
             llChart.addView(barView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (MainActivity.screenHeight / 1.4)));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
+        }
+    }
+
+    private void setFollowButton(Boolean ifFollow) {
+        if (ifFollow) {
+            animUtilities.setIconAnimToVisible(ivFollowIndicator);
+            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+            tvIbFollow.setText(getString(R.string.unfollow_this));
+        } else {
+            ivFollowIndicator.setVisibility(View.GONE);
+            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+            tvIbFollow.setText(getString(R.string.follow_this));
         }
     }
 
@@ -150,7 +177,14 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
             lastHour += 24;
 
         textView.setText(MainActivity.getContext().getString(R.string.consump_this_hour) + " " + consumptionList.get(currentHour - 1) +
-                " kWh \n" + MainActivity.getContext().getString(R.string.consump_last_hour) + " " + consumptionList.get(lastHour) +
-                " kWh \n" + energyInfo);
+                BUILDING_UNIT + MainActivity.getContext().getString(R.string.consump_last_hour) + " " + consumptionList.get(lastHour) +
+                BUILDING_UNIT + energyInfo);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        buildingDBHelper.updateDB(building);
     }
 }

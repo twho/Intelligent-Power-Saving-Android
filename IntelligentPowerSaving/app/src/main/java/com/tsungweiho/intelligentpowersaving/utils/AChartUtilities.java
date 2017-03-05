@@ -52,9 +52,9 @@ public class AChartUtilities implements BuildingConstants {
         Renderer.setXTitle(XTitle);
 
         // set text size
-        Renderer.setChartTitleTextSize(context.getResources().getDimension(R.dimen.activity_main_title_text_size));
-        Renderer.setAxisTitleTextSize(context.getResources().getDimension(R.dimen.activity_main_content_text_size));
-        Renderer.setLabelsTextSize(context.getResources().getDimension(R.dimen.activity_main_content_text_size));
+        Renderer.setChartTitleTextSize(context.getResources().getDimension(R.dimen.fragment_building_title_text_size));
+        Renderer.setAxisTitleTextSize(context.getResources().getDimension(R.dimen.fragment_building_content_text_size));
+        Renderer.setLabelsTextSize(context.getResources().getDimension(R.dimen.fragment_building_content_text_size));
         // set text color
         Renderer.setLabelsColor(Color.WHITE);
         Renderer.setXLabelsColor(Color.WHITE);

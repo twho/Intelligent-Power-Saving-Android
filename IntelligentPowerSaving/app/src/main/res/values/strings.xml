@@ -33,6 +33,7 @@
 
     <!--HomeFragment-->
     <string name="fragment_home_title">Energy Consumption Dashboard</string>
+    <string name="no_building">No building is followed.</string>
 
     <!--BuildingFragment-->
     <string name="follow_this">Follow this</string>

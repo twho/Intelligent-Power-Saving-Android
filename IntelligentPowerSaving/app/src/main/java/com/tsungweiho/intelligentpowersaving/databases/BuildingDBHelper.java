@@ -35,7 +35,8 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
                 DB_BUILDING_NAME + " VARCHAR(15)," +
                 DB_BUILDING_DETAIL + " VARCHAR(30)," +
                 DB_BUILDING_CONSUMPTION + " TEXT," +
-                DB_BUILDING_IMG_URL + " TEXT" + ");");
+                DB_BUILDING_IMG_URL + " TEXT," +
+                DB_BUILDING_IF_FOLLOW + " VARCHAR(10)" + ");");
     }
 
     public Boolean checkIfExist(String name) {
@@ -71,11 +72,28 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_BUILDING_DETAIL, building.getDetail());
         values.put(DB_BUILDING_CONSUMPTION, building.getConsumption());
         values.put(DB_BUILDING_IMG_URL, building.getImageUrl());
+        values.put(DB_BUILDING_IF_FOLLOW, building.getIfFollow());
 
         long rowId = db.insert(TABLE_NAME, null, values);
         db.close();
 
         return rowId;
+    }
+
+    public int updateDB(Building building) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DB_BUILDING_NAME, building.getName());
+        values.put(DB_BUILDING_DETAIL, building.getDetail());
+        values.put(DB_BUILDING_CONSUMPTION, building.getConsumption());
+        values.put(DB_BUILDING_IMG_URL, building.getImageUrl());
+        values.put(DB_BUILDING_IF_FOLLOW, building.getIfFollow());
+        String whereClause = DB_BUILDING_NAME + "='" + building.getName() + "'";
+
+        int count = db.update(TABLE_NAME, values, whereClause, null);
+
+        return count;
     }
 
     public ArrayList<Building> getAllBuildingList() {
@@ -88,8 +106,32 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
             String detail = cursor.getString(2);
             String consumption = cursor.getString(3);
             String imgUrl = cursor.getString(4);
-            Building building = new Building(name, detail, consumption, imgUrl);
+            String ifFollow = cursor.getString(5);
+            Building building = new Building(name, detail, consumption, imgUrl, ifFollow);
             buildingList.add(building);
+        }
+        cursor.close();
+        db.close();
+
+        return buildingList;
+    }
+
+    public ArrayList<Building> getFollowedBuildingList() {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Building> buildingList = new ArrayList<Building>();
+        String sql = "SELECT * FROM " + TABLE_NAME;
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            String ifFollow = cursor.getString(5);
+            if (Boolean.parseBoolean(ifFollow)){
+                String name = cursor.getString(1);
+                String detail = cursor.getString(2);
+                String consumption = cursor.getString(3);
+                String imgUrl = cursor.getString(4);
+
+                Building building = new Building(name, detail, consumption, imgUrl, ifFollow);
+                buildingList.add(building);
+            }
         }
         cursor.close();
         db.close();
@@ -99,7 +141,7 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
 
     public Building getBuildingByName(String buildingName) {
         SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL};
+        String[] columns = {DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL, DB_BUILDING_IF_FOLLOW};
         String whereClause = DB_BUILDING_NAME + " = ?;";
         String[] whereArgs = {buildingName};
         Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,
@@ -110,7 +152,8 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
             String detail = cursor.getString(1);
             String consumption = cursor.getString(2);
             String imgUrl = cursor.getString(3);
-            building = new Building(name, detail, consumption, imgUrl);
+            String ifFollow = cursor.getString(4);
+            building = new Building(name, detail, consumption, imgUrl, ifFollow);
         }
         cursor.close();
         db.close();

@@ -12,7 +12,7 @@ import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
  * Created by Tsung Wei Ho on 2017/2/28.
  */
 
-public class SharedPreferencesManager implements DBConstants{
+public class SharedPreferencesManager implements DBConstants {
     private Context context;
     private SharedPreferences sharedPreferences;
 
@@ -21,6 +21,9 @@ public class SharedPreferencesManager implements DBConstants{
 
     // Inbox Fragment use
     private String CURRENT_INBOX = "CURRENT_INBOX";
+
+    // Home Fragment use
+    private String CURRENT_DISPLAY_MODE = "CURRENT_DISPLAY_MODE";
 
     public SharedPreferencesManager(Context context) {
         this.context = context;
@@ -36,7 +39,6 @@ public class SharedPreferencesManager implements DBConstants{
     }
 
     public MyAccountInfo getMyAccountInfo() {
-        sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String defaultAccount = gson.toJson(new MyAccountInfo(context.getString(R.string.testing_account), context.getString(R.string.testing_name), "", "1,1"));
         String json = sharedPreferences.getString(PREF_USER_ACCOUNT, defaultAccount);
@@ -44,13 +46,22 @@ public class SharedPreferencesManager implements DBConstants{
     }
 
     public String getCurrentMessagebox() {
-        sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         return sharedPreferences.getString(CURRENT_INBOX, LABEL_MSG_INBOX);
     }
 
-    public void saveCurrentMessageBox(String currentBox){
+    public void saveCurrentMessageBox(String currentBox) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putString(CURRENT_INBOX, currentBox);
+        prefsEditor.apply();
+    }
+
+    public boolean getIfShowFollowedBuilding() {
+        return sharedPreferences.getBoolean(CURRENT_DISPLAY_MODE, false);
+    }
+
+    public void saveIfShowFollowedBuilding(boolean ifShowFollowedBuilding) {
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        prefsEditor.putBoolean(CURRENT_DISPLAY_MODE, ifShowFollowedBuilding);
         prefsEditor.apply();
     }
 }

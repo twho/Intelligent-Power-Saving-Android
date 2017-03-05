@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -33,15 +34,16 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.RunnableFuture;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
 
     // functions
     public static Context context;
     private String TAG = "MainActivity";
-    private PermissionManager permissionManager;
     private SharedPreferencesManager sharedPreferencesManager;
     private MyAccountInfo myAccountInfo;
+    private PermissionManager permissionManager;
     private static ImageUtilities imageUtilities;
     private String PREF_SEPARTOR = ",";
 
@@ -68,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     private void init() {
         fragmentManager = getSupportFragmentManager();
-        permissionManager = new PermissionManager(context);
+
+        permissionManager = new PermissionManager(this);
         permissionManager.requestLocationPermission();
         permissionManager.requestStoragePermission();
         permissionManager.requestNetworkPermission();
@@ -83,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         screenWidth = metrics.widthPixels / density;
         screenHeight = metrics.heightPixels / density;
 
-        // Firebase sign in
-        auth = FirebaseAuth.getInstance();
-        auth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD);
-
         // Pubnub init
         pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
@@ -95,7 +94,17 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         pubnub = new PubNub(pnConfiguration);
         startService();
 
-        setTab();
+        initTabViews();
+    }
+
+    // Alleviate main thread work loading
+    private void initTabViews() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setTab();
+            }
+        }).start();
     }
 
     @Override
@@ -105,13 +114,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 break;
             case PermissionManager.PERMISSION_ACCESS_FINE_LOCATION:
                 break;
-            case PermissionManager.PERMISSION_READ_EXTERNAL_STORAGE:
-                break;
             case PermissionManager.PERMISSION_WRITE_EXTERNAL_STORAGE:
+                break;
+            case PermissionManager.PERMISSION_READ_EXTERNAL_STORAGE:
                 break;
             case PermissionManager.PERMISSION_ACCESS_NETWORK_STATE:
                 break;
             case PermissionManager.PERMISSION_ACCESS_WIFI_STATE:
+                break;
+            case PermissionManager.PERMISSION_CAMERA:
                 break;
         }
     }
@@ -167,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
 
         // Read users preference

@@ -15,8 +15,11 @@
     <item name="activity_main_text_scale" format="float" type="dimen">1</item>
 
     <!--BuildingFragment-->
-    <dimen name="activity_main_title_text_size">16sp</dimen>
-    <dimen name="activity_main_content_text_size">9sp</dimen>
+    <dimen name="fragment_building_title_text_size">16sp</dimen>
+    <dimen name="fragment_building_content_text_size">9sp</dimen>
+
+    <!--BuildingIcon-->
+    <item name="ibj_icon_building_ic_follow_scale" format="float" type="dimen">0.75</item>
 
     <!--MessageFragment-->
     <dimen name="fragment_message_img_size">360dp</dimen>

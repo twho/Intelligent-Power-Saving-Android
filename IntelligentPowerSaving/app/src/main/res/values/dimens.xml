@@ -24,8 +24,11 @@
     <dimen name="fragment_message_img_size">240dp</dimen>
 
     <!--BuildingFragment-->
-    <dimen name="activity_main_title_text_size">12sp</dimen>
-    <dimen name="activity_main_content_text_size">6sp</dimen>
+    <dimen name="fragment_building_title_text_size">12sp</dimen>
+    <dimen name="fragment_building_content_text_size">6sp</dimen>
+
+    <!--BuildingIcon-->
+    <item name="ibj_icon_building_ic_follow_scale" format="float" type="dimen">0.5</item>
 
     <!--DrawerListAdapter-->
     <dimen name="obj_drawer_width">200dp</dimen>
