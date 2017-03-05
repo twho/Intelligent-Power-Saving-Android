@@ -34,7 +34,6 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.RunnableFuture;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
 
@@ -99,12 +98,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     // Alleviate main thread work loading
     private void initTabViews() {
-        new Thread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 setTab();
             }
-        }).start();
+        });
     }
 
     @Override
