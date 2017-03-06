@@ -9,6 +9,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -46,6 +47,7 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.SplashActivity;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
@@ -87,7 +89,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     // UIs
     private FrameLayout flTopBarAddEvent;
-    private LinearLayout llTopBarAddEvent, llMarkerInfo;
+    private LinearLayout llTopBarAddEvent, llMarkerInfo, llOpen;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
     private ImageView ivAddIcon, ivMarker;
@@ -112,6 +114,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private static Runnable runnable;
 
     // Google map
+    private Bundle savedInstanceState;
     private GoogleMap googleMap;
     private MapView mapView;
     private LatLngBounds bounds;
@@ -135,13 +138,14 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         view = binding.getRoot();
 
+        this.savedInstanceState = savedInstanceState;
         context = MainActivity.getContext();
-        init(savedInstanceState);
+        init();
 
         return view;
     }
 
-    private void init(Bundle savedInstanceState) {
+    private void init() {
         imageUtilities = MainActivity.getImageUtilities();
         animUtilities = new AnimUtilities(context);
         timeUtilities = new TimeUtilities(context);
@@ -150,52 +154,15 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         eventDBHelper = new EventDBHelper(context);
         pubnub = MainActivity.getPubNub();
 
-        initMap(savedInstanceState);
-
         findViews();
         setAllListeners();
-    }
-
-    private void initMap(Bundle savedInstanceState) {
-        mapView = (MapView) view.findViewById(R.id.fragment_event_map_view);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        // Limit the map to NTUST campus
-        bounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
-        final LatLngBounds ADELAIDE = bounds;
-        googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
-        googleMap.setMinZoomPreference(18.0f);
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        // Map initial settings
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.setTrafficEnabled(true);
-        googleMap.setIndoorEnabled(true);
-        googleMap.setBuildingsEnabled(true);
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
-
-        // Check permission before execute
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            googleMap.setMyLocationEnabled(true);
-
-        // Map listeners
-        googleMap.setOnMapLongClickListener(eventFragmentListener);
-        googleMap.setOnMapClickListener(eventFragmentListener);
-
-        this.googleMap = googleMap;
-        getChannelHistory();
     }
 
     private void findViews() {
         flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
         llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
-        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_layout_marker_info);
+        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_ll_marker_info);
+        llOpen = (LinearLayout) view.findViewById(R.id.fragment_event_ll_open);
         ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_ib_add);
         ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_ib_cancel);
         ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_ib_camera);
@@ -207,105 +174,6 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
         pbMarker = (ProgressBar) view.findViewById(R.id.fragment_event_pb_marker_img);
         pbTopBar = (ProgressBar) view.findViewById(R.id.fragment_event_pb);
-    }
-
-    private void setAllMarkers() {
-        eventList = eventDBHelper.getAllEventList();
-        mapMarkers = new HashMap<>();
-
-        googleMap.clear();
-
-        for (int index = 0; index < eventList.size(); index++) {
-            Event event = eventList.get(index);
-
-            double latitude = Double.valueOf(event.getPosition().split(",")[0]);
-            double longitude = Double.valueOf(event.getPosition().split(",")[1]);
-
-            // create marker
-            MarkerOptions markerOpt = new MarkerOptions().position(new LatLng(latitude, longitude)).title(event.getDetail());
-
-            // Changing marker icon
-            markerOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-            Marker marker = this.googleMap.addMarker(markerOpt);
-            mapMarkers.put(marker, event);
-        }
-        // Set all markers listener
-        googleMap.setOnMarkerClickListener(eventFragmentListener);
-    }
-
-    private void getChannelHistory() {
-        pubnub.history()
-                .channel(EVENT_CHANNEL)
-                .count(100)
-                .async(new PNCallback<PNHistoryResult>() {
-                    @Override
-                    public void onResponse(PNHistoryResult result, PNStatus status) {
-                        if (null == result)
-                            return;
-
-                        eventDBHelper.deleteAllDB();
-                        try {
-                            for (int index = 0; index < result.getMessages().size(); index++) {
-                                JSONObject jObject = new JSONObject(String.valueOf(result.getMessages().get(index).getEntry()));
-                                insertDataToDB(jObject);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        pubnub.history()
-                .channel(EVENT_CHANNEL_DELETED) // where to fetch history from
-                .count(100) // how many items to fetch
-                .async(new PNCallback<PNHistoryResult>() {
-                    @Override
-                    public void onResponse(PNHistoryResult result, PNStatus status) {
-                        if (null == result)
-                            return;
-                        try {
-                            JSONArray jsonArray = new JSONArray(result.getMessages().toString());
-                            for (int index = 0; index < jsonArray.length(); index++) {
-                                JSONObject jObject = new JSONObject(String.valueOf(jsonArray.getJSONObject(index)));
-                                deleteDataInDB(jObject);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-        setAllMarkers();
-    }
-
-    private void insertDataToDB(JSONObject jObject) {
-        Event event = getEventByJSONObj(jObject);
-        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
-            eventDBHelper.insertDB(event);
-        }
-    }
-
-    private void deleteDataInDB(JSONObject jObject) {
-        Event event = getEventByJSONObj(jObject);
-        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
-            eventDBHelper.deleteByUniqueId(event.getUniqueId());
-        }
-    }
-
-    private Event getEventByJSONObj(JSONObject jsonObject) {
-        Event event = null;
-        try {
-            String uniqueId = jsonObject.getString(EVENT_UNID);
-            String detail = jsonObject.getString(EVENT_DETAIL);
-            String position = jsonObject.getString(EVENT_POS);
-            String image = jsonObject.getString(EVENT_IMG);
-            String poster = jsonObject.getString(EVENT_POSTER);
-            String time = jsonObject.getString(EVENT_TIME);
-            String ifFixed = jsonObject.getString(EVENT_IF_FIXED);
-            event = new Event(uniqueId, detail, position, image, poster, time, ifFixed);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return event;
     }
 
     private void setAllListeners() {
@@ -448,8 +316,118 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     public void onResume() {
         super.onResume();
 
+        // Play animation when loading map
+        llOpen.setVisibility(View.VISIBLE);
+        initMap(savedInstanceState);
         mapView.onResume();
         ifFragmentActive = true;
+    }
+
+    private void initMap(Bundle savedInstanceState) {
+        mapView = (MapView) view.findViewById(R.id.fragment_event_map_view);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Limit the map to NTUST campus
+        bounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
+        final LatLngBounds ADELAIDE = bounds;
+        googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
+        googleMap.setMinZoomPreference(18.0f);
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        // Map initial settings
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setTrafficEnabled(true);
+        googleMap.setIndoorEnabled(true);
+        googleMap.setBuildingsEnabled(true);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // Check permission before execute
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            googleMap.setMyLocationEnabled(true);
+
+        // Map listeners
+        googleMap.setOnMapLongClickListener(eventFragmentListener);
+        googleMap.setOnMapClickListener(eventFragmentListener);
+
+        this.googleMap = googleMap;
+        getEventChannelHistory();
+        llOpen.setVisibility(View.GONE);
+        animUtilities.setMapAnimToVisible(mapView);
+    }
+
+    private void setAllMarkers() {
+        eventList = eventDBHelper.getAllEventList();
+        mapMarkers = new HashMap<>();
+
+        googleMap.clear();
+
+        for (int index = 0; index < eventList.size(); index++) {
+            Event event = eventList.get(index);
+
+            double latitude = Double.valueOf(event.getPosition().split(",")[0]);
+            double longitude = Double.valueOf(event.getPosition().split(",")[1]);
+
+            // create marker
+            MarkerOptions markerOpt = new MarkerOptions().position(new LatLng(latitude, longitude)).title(event.getDetail());
+
+            // Changing marker icon
+            markerOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            Marker marker = this.googleMap.addMarker(markerOpt);
+            mapMarkers.put(marker, event);
+        }
+        // Set all markers listener
+        googleMap.setOnMarkerClickListener(eventFragmentListener);
+    }
+
+    private void getEventChannelHistory() {
+        pubnub.history().channel(EVENT_CHANNEL).count(100)
+                .async(new PNCallback<PNHistoryResult>() {
+                    @Override
+                    public void onResponse(PNHistoryResult result, PNStatus status) {
+                        try {
+                            if (null != result) {
+                                eventDBHelper.deleteAllDB();
+                                for (int index = 0; index < result.getMessages().size(); index++) {
+                                    JSONObject jObject = new JSONObject(String.valueOf(result.getMessages().get(index).getEntry()));
+                                    insertDataToDB(jObject);
+                                }
+                                setAllMarkers();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    private void insertDataToDB(JSONObject jObject) {
+        Event event = getEventByJSONObj(jObject);
+        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
+            eventDBHelper.insertDB(event);
+        }
+    }
+
+    private Event getEventByJSONObj(JSONObject jsonObject) {
+        Event event = null;
+        try {
+            String uniqueId = jsonObject.getString(EVENT_UNID);
+            String detail = jsonObject.getString(EVENT_DETAIL);
+            String position = jsonObject.getString(EVENT_POS);
+            String image = jsonObject.getString(EVENT_IMG);
+            String poster = jsonObject.getString(EVENT_POSTER);
+            String time = jsonObject.getString(EVENT_TIME);
+            String ifFixed = jsonObject.getString(EVENT_IF_FIXED);
+            event = new Event(uniqueId, detail, position, image, poster, time, ifFixed);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return event;
     }
 
     @Override
@@ -457,8 +435,10 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         super.onPause();
 
         ifFragmentActive = false;
+
         // Clean memory
         eventDBHelper.closeDB();
+        mapView.onPause();
     }
 
     public void setAllMarkerOnUiThread() {
@@ -508,14 +488,14 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     @Override
     public void onDestroy() {
-        mapView.onDestroy();
         super.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
-        mapView.onLowMemory();
         super.onLowMemory();
+        mapView.onLowMemory();
     }
 
     public static void closeKeyboard(Context context, IBinder windowToken) {

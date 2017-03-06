@@ -115,20 +115,6 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         if (currentHour == 0)
             currentHour += 24;
         Collections.fill(consumptionList, "0");
-
-        // The first two data are building's energy efficiency, not hourly power consumption
-        for (int x = 2; x < currentHour + 2; x++) {
-            consumptionList.set(x - 2, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
-        }
-
-        try {
-            barView = aChartUtilities.getBarChart(context.getResources().getString(R.string.chart_title),
-                    context.getResources().getString(R.string.chart_x_title), context.getResources().getString(R.string.chart_y_title), consumptionList);
-            llChart.removeAllViews();
-            llChart.addView(barView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (MainActivity.screenHeight / 1.4)));
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
     }
 
     private void setFollowButton(Boolean ifFollow) {
@@ -179,6 +165,29 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         textView.setText(MainActivity.getContext().getString(R.string.consump_this_hour) + " " + consumptionList.get(currentHour - 1) +
                 BUILDING_UNIT + MainActivity.getContext().getString(R.string.consump_last_hour) + " " + consumptionList.get(lastHour) +
                 BUILDING_UNIT + energyInfo);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        setupChartView();
+    }
+
+    private void setupChartView(){
+        // The first two data are building's energy efficiency, not hourly power consumption
+        for (int x = 2; x < currentHour + 2; x++) {
+            consumptionList.set(x - 2, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
+        }
+
+        try {
+            barView = aChartUtilities.getBarChart(context.getResources().getString(R.string.chart_title),
+                    context.getResources().getString(R.string.chart_x_title), context.getResources().getString(R.string.chart_y_title), consumptionList);
+            llChart.removeAllViews();
+            llChart.addView(barView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (MainActivity.screenHeight / 1.4)));
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     @Override

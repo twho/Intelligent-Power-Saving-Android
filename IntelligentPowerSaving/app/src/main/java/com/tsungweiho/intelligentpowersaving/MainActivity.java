@@ -85,25 +85,24 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         screenWidth = metrics.widthPixels / density;
         screenHeight = metrics.heightPixels / density;
 
-        // Pubnub init
-        pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
-        pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
-        pnConfiguration.setSecure(false);
-        pubnub = new PubNub(pnConfiguration);
-        startService();
+        setupServiceInThread();
 
-        initTabViews();
+        setTab();
     }
 
     // Alleviate main thread work loading
-    private void initTabViews() {
-        runOnUiThread(new Runnable() {
-            @Override
+    private void setupServiceInThread() {
+        new Thread(new Runnable() {
             public void run() {
-                setTab();
+                // Pubnub init
+                pnConfiguration = new PNConfiguration();
+                pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
+                pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
+                pnConfiguration.setSecure(false);
+                pubnub = new PubNub(pnConfiguration);
+                startService();
             }
-        });
+        }).start();
     }
 
     @Override

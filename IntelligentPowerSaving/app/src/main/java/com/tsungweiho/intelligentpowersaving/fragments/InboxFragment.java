@@ -76,9 +76,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private String currentBox;
     private Boolean ifSelectedRead;
     private boolean ifShowUnread;
-
-    // PubNub
-    private PubNub pubnub = null;
     public static boolean ifFragmentActive;
 
     @Override
@@ -98,7 +95,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         timeUtilities = new TimeUtilities(context);
         imageUtilities = MainActivity.getImageUtilities();
         sharedPreferencesManager = new SharedPreferencesManager(context);
-        pubnub = MainActivity.getPubNub();
         ifShowUnread = false;
 
         findViews();

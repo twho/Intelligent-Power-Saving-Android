@@ -9,10 +9,30 @@
     </data>
 
     <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/hashtag_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/fragment_event_ll_open"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/activity_main_img_size"
+                android:layout_height="@dimen/activity_main_img_size"
+                android:layout_margin="@dimen/activity_main_space"
+                android:src="@drawable/img_event" />
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_main_space" />
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -24,7 +44,7 @@
                 android:layout_height="match_parent" />
 
             <LinearLayout
-                android:id="@+id/fragment_event_layout_marker_info"
+                android:id="@+id/fragment_event_ll_marker_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"

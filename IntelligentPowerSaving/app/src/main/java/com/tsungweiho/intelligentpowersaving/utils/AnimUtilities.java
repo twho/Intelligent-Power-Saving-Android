@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.MapView;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
@@ -58,6 +59,14 @@ public class AnimUtilities {
         Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         am.setDuration(MID_ANIM_DURATION);
         listView.setAnimation(am);
+        am.startNow();
+    }
+
+    public void setMapAnimToVisible(final MapView mapView) {
+        mapView.setVisibility(View.VISIBLE);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+        am.setDuration(ANIM_DURATION);
+        mapView.setAnimation(am);
         am.startNow();
     }
 
