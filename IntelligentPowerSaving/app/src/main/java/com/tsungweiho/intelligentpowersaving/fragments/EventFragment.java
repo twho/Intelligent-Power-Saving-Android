@@ -9,7 +9,6 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -47,7 +46,6 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
-import com.tsungweiho.intelligentpowersaving.SplashActivity;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
@@ -61,7 +59,6 @@ import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -114,12 +111,12 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private static Runnable runnable;
 
     // Google map
-    private Bundle savedInstanceState;
     private GoogleMap googleMap;
     private MapView mapView;
     private LatLngBounds bounds;
     private LatLng clickedLatLng;
     private HashMap<Marker, Event> mapMarkers;
+    private Marker currentAddedMarker;
     private boolean ifMarkerViewUp = false;
     private boolean lockLocation = false;
 
@@ -138,14 +135,13 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         view = binding.getRoot();
 
-        this.savedInstanceState = savedInstanceState;
         context = MainActivity.getContext();
-        init();
+        init(savedInstanceState);
 
         return view;
     }
 
-    private void init() {
+    private void init(Bundle savedInstanceState) {
         imageUtilities = MainActivity.getImageUtilities();
         animUtilities = new AnimUtilities(context);
         timeUtilities = new TimeUtilities(context);
@@ -156,6 +152,10 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
         findViews();
         setAllListeners();
+
+        // Play animation when loading map
+        llOpen.setVisibility(View.VISIBLE);
+        initMap(savedInstanceState);
     }
 
     private void findViews() {
@@ -201,6 +201,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                     break;
                 case R.id.fragment_event_ib_cancel:
                     dismissAddView();
+                    setAllMarkers();
                     break;
                 case R.id.fragment_event_ib_camera:
                     closeKeyboard(context, edEvent.getWindowToken());
@@ -225,6 +226,11 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
             clickedLatLng = latLng;
             lockLocation = true;
+
+            // Add a temporary marker
+            MarkerOptions markerOpt = new MarkerOptions().position(clickedLatLng);
+            markerOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            currentAddedMarker = googleMap.addMarker(markerOpt);
         }
 
         @Override
@@ -312,17 +318,6 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         upload.description = edEvent.getText().toString();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Play animation when loading map
-        llOpen.setVisibility(View.VISIBLE);
-        initMap(savedInstanceState);
-        mapView.onResume();
-        ifFragmentActive = true;
-    }
-
     private void initMap(Bundle savedInstanceState) {
         mapView = (MapView) view.findViewById(R.id.fragment_event_map_view);
         mapView.onCreate(savedInstanceState);
@@ -357,8 +352,19 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
         this.googleMap = googleMap;
         getEventChannelHistory();
-        llOpen.setVisibility(View.GONE);
-        animUtilities.setMapAnimToVisible(mapView);
+
+        // Switch view after 2 seconds
+        switchToMapView();
+    }
+
+    private void switchToMapView() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                llOpen.setVisibility(View.GONE);
+                animUtilities.setMapAnimToVisible(mapView);
+            }
+        }, 2000);
     }
 
     private void setAllMarkers() {
@@ -428,6 +434,14 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             e.printStackTrace();
         }
         return event;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mapView.onResume();
+        ifFragmentActive = true;
     }
 
     @Override

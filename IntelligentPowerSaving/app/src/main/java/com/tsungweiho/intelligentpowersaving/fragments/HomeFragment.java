@@ -35,7 +35,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -226,16 +225,16 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             Building building;
             for (int i = 0; i < jArry.length(); i++) {
                 JSONObject currentObj = jArry.getJSONObject(i);
-
                 String name = currentObj.getString(FDB_NAME);
-                String detail = currentObj.getString(FDB_DETAIL);
-                String consumption = currentObj.getString(FDB_CONSUMPTION);
-                String imgUrl = currentObj.getString(FDB_IMGURL);
-                building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
 
                 // if already have in local, don't override the data
-                if (!buildingDBHelper.checkIfExist(name))
+                if (!buildingDBHelper.checkIfExist(name)) {
+                    String detail = currentObj.getString(FDB_DETAIL);
+                    String consumption = currentObj.getString(FDB_CONSUMPTION);
+                    String imgUrl = currentObj.getString(FDB_IMGURL);
+                    building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
                     buildingDBHelper.insertDB(building);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
