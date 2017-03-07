@@ -3,6 +3,7 @@ package com.tsungweiho.intelligentpowersaving;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -70,10 +71,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     private void init() {
         fragmentManager = getSupportFragmentManager();
 
-        permissionManager = new PermissionManager(this);
-        permissionManager.requestLocationPermission();
-        permissionManager.requestStoragePermission();
-        permissionManager.requestNetworkPermission();
+        // Request permissions
+        if (!PermissionManager.hasAllPermissions(MainActivity.this))
+            ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
 
         // For the app-wide use
         imageUtilities = new ImageUtilities(context);
@@ -107,22 +107,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PermissionManager.PERMISSION_ACCESS_COARSE_LOCATION:
-                break;
-            case PermissionManager.PERMISSION_ACCESS_FINE_LOCATION:
-                break;
-            case PermissionManager.PERMISSION_WRITE_EXTERNAL_STORAGE:
-                break;
-            case PermissionManager.PERMISSION_READ_EXTERNAL_STORAGE:
-                break;
-            case PermissionManager.PERMISSION_ACCESS_NETWORK_STATE:
-                break;
-            case PermissionManager.PERMISSION_ACCESS_WIFI_STATE:
-                break;
-            case PermissionManager.PERMISSION_CAMERA:
-                break;
-        }
+        // Request permissions
+        if (!PermissionManager.hasAllPermissions(MainActivity.this))
+            ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
     }
 
     public static PubNub getPubNub() {
