@@ -13,6 +13,7 @@
     <color name="white">#ffffff</color>
     <color name="semi_white">#b9ffffff</color>
     <color name="semi_gray">#96484848</color>
+    <color name="dark_semi_gray">#d8484848</color>
     <color name="green">#00bf8c</color>
     <color name="teal">#7fc9c2</color>
     <color name="light_red">#ff6666</color>

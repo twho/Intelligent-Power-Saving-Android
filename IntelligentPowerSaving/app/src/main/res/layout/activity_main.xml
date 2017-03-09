@@ -1,5 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,4 +10,45 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"></FrameLayout>
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/activity_main_fl_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/dark_semi_gray"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/activity_main_pb_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="@dimen/activity_main_space"
+            android:scaleX="@dimen/ibj_icon_building_ic_follow_scale"
+            android:scaleY="@dimen/ibj_icon_building_ic_follow_scale"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/activity_main_tv_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/activity_main_space"
+            android:gravity="center"
+            android:padding="@dimen/activity_main_space"
+            android:text="@string/internet_error"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/light_red" />
+
+        <Button
+            android:id="@+id/activity_main_btn_reconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_margin="@dimen/activity_main_space"
+            android:background="@drawable/background_theme_button"
+            android:text="@string/try_again"
+            android:textColor="@color/teal" />
+    </FrameLayout>
+</RelativeLayout>

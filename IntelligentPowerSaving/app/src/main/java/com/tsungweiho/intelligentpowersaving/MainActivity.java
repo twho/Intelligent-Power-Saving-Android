@@ -2,7 +2,6 @@ package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,8 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -32,29 +34,33 @@ import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.NetworkUtilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
 
+    private String TAG = "MainActivity";
+
     // functions
     public static Context context;
-    private String TAG = "MainActivity";
+    private static ImageUtilities imageUtilities;
     private SharedPreferencesManager sharedPreferencesManager;
     private MyAccountInfo myAccountInfo;
-    private PermissionManager permissionManager;
-    private static ImageUtilities imageUtilities;
+    private NetworkUtilities networkUtilities;
     private String PREF_SEPARTOR = ",";
+
+    // UI Widgets
+    private FrameLayout flError;
+    private Button btnConnect;
+    private ProgressBar pbError;
 
     //screen info
     public static float screenWidth;
     public static float screenHeight;
     public static ActionBar actionBar;
     private FragmentManager fragmentManager;
-
-    // Databases
-    private FirebaseAuth auth;
 
     // PubNub Configuration
     public static PNConfiguration pnConfiguration;
@@ -70,6 +76,18 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     private void init() {
         fragmentManager = getSupportFragmentManager();
+        flError = (FrameLayout) findViewById(R.id.activity_main_fl_error);
+        pbError = (ProgressBar) findViewById(R.id.activity_main_pb_error);
+        btnConnect = (Button) findViewById(R.id.activity_main_btn_reconnect);
+        btnConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (null == networkUtilities)
+                    networkUtilities = new NetworkUtilities();
+                networkUtilities.checkNetworkConnection();
+                pbError.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Request permissions
         if (!PermissionManager.hasAllPermissions(MainActivity.this))
@@ -110,6 +128,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         // Request permissions
         if (!PermissionManager.hasAllPermissions(MainActivity.this))
             ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
+    }
+
+    public void setIfShowErrorMessage(boolean ifConnected) {
+        pbError.setVisibility(View.GONE);
+        if (ifConnected) {
+            flError.setVisibility(View.GONE);
+        } else {
+            flError.setVisibility(View.VISIBLE);
+        }
     }
 
     public static PubNub getPubNub() {
@@ -165,6 +192,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Check internet connection
+        networkUtilities = new NetworkUtilities();
+        networkUtilities.checkNetworkConnection();
 
         // Read users preference
         myAccountInfo = sharedPreferencesManager.getMyAccountInfo();

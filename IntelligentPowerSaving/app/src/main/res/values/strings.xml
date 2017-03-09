@@ -5,6 +5,8 @@
     <string name="loading">Loading...</string>
     <string name="testing_account">testing@ipowersaving.com</string>
     <string name="testing_name">iPS Testing Account</string>
+    <string name="internet_error">Internet error</string>
+    <string name="try_again">Try again</string>
 
     <!--MessageFragment-->
     <string name="unread">Unread</string>

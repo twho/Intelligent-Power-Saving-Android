@@ -493,7 +493,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         @Override
         public void failure(RetrofitError error) {
             //Assume we have no connection, since error is null
-            if (error == null) {
+            if (error != null) {
                 Log.d(TAG, "Upload error: " + error.getMessage());
             }
         }
