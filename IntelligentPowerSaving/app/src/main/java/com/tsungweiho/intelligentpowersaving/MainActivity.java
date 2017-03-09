@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     private MyAccountInfo myAccountInfo;
     private NetworkUtilities networkUtilities;
     private String PREF_SEPARTOR = ",";
+    private String[] mainTabList = {HOME_FRAGMENT, EVENT_FRAGMENT, INBOX_FRAGMENT, SETTINGS_FRAGMENT};
 
     // UI Widgets
     private FrameLayout flError;
-    private Button btnConnect;
     private ProgressBar pbError;
 
     //screen info
@@ -76,9 +76,19 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     private void init() {
         fragmentManager = getSupportFragmentManager();
+
+        // Request permissions
+        if (!PermissionManager.hasAllPermissions(MainActivity.this))
+            ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
+
+        // For the app-wide use
+        imageUtilities = new ImageUtilities(context);
+        sharedPreferencesManager = new SharedPreferencesManager(context);
+
+        // View init
         flError = (FrameLayout) findViewById(R.id.activity_main_fl_error);
         pbError = (ProgressBar) findViewById(R.id.activity_main_pb_error);
-        btnConnect = (Button) findViewById(R.id.activity_main_btn_reconnect);
+        Button btnConnect = (Button) findViewById(R.id.activity_main_btn_reconnect);
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,14 +98,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 pbError.setVisibility(View.VISIBLE);
             }
         });
-
-        // Request permissions
-        if (!PermissionManager.hasAllPermissions(MainActivity.this))
-            ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
-
-        // For the app-wide use
-        imageUtilities = new ImageUtilities(context);
-        sharedPreferencesManager = new SharedPreferencesManager(context);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         pubnub = new PubNub(pnConfiguration);
         setupServiceInThread();
 
-        setTab();
+        setActionbar();
     }
 
     // Alleviate main thread work loading
@@ -121,6 +123,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 startService();
             }
         }).start();
+    }
+
+    private void startService() {
+        Intent intent = new Intent(MainActivity.this, MainService.class);
+        startService(intent);
     }
 
     @Override
@@ -147,46 +154,43 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         return imageUtilities;
     }
 
-    private void setTab() {
+    private void setActionbar() {
         actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setLogo(R.mipmap.ic_launcher);
         actionBar.setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayUseLogoEnabled(true);
         if (screenHeight >= 800)
             actionBar.setDisplayShowTitleEnabled(true);
 
-        android.support.v7.app.ActionBar.Tab tabHome = actionBar.newTab()
-                .setIcon(R.mipmap.ic_home_unclick).setTabListener(this);
-        actionBar.addTab(tabHome);
-
-        // All icons are padding 25%
-        android.support.v7.app.ActionBar.Tab tabEvent = actionBar
-                .newTab().setIcon(R.mipmap.ic_event_unclick).setTabListener(this);
-        actionBar.addTab(tabEvent);
-        actionBar.selectTab(tabEvent);
-
-        android.support.v7.app.ActionBar.Tab tabMessage = actionBar
-                .newTab().setIcon(R.mipmap.ic_mail_unclick).setTabListener(this);
-        actionBar.addTab(tabMessage);
-        actionBar.selectTab(tabMessage);
-
-        android.support.v7.app.ActionBar.Tab tabSettings = actionBar
-                .newTab().setIcon(R.mipmap.ic_settings_unclick).setTabListener(this);
-        actionBar.addTab(tabSettings);
-        actionBar.selectTab(tabSettings);
-
-        actionBar.selectTab(tabHome);
+        for (int index = 0; index < mainTabList.length; index++) {
+            addTab(mainTabList[index], index);
+        }
     }
 
-    private void startService() {
-        Intent intent = new Intent(MainActivity.this, MainService.class);
-        startService(intent);
-    }
+    private void addTab(String fragmentTag, int index) {
+        android.support.v7.app.ActionBar.Tab tab = actionBar.newTab().setTabListener(this);
 
-    private void stopService() {
-        Intent intent = new Intent(MainActivity.this, MainService.class);
-        stopService(intent);
+        // All icons are from Android Studio with padding 25%
+        switch (fragmentTag) {
+            case HOME_FRAGMENT:
+                tab.setIcon(R.mipmap.ic_home_unclick);
+                break;
+            case EVENT_FRAGMENT:
+                tab.setIcon(R.mipmap.ic_event_unclick);
+                break;
+            case INBOX_FRAGMENT:
+                tab.setIcon(R.mipmap.ic_mail_unclick);
+                break;
+            case SETTINGS_FRAGMENT:
+                tab.setIcon(R.mipmap.ic_settings_unclick);
+                break;
+        }
+
+        if (fragmentTag.equalsIgnoreCase(HOME_FRAGMENT)) {
+            actionBar.addTab(tab);
+        } else {
+            actionBar.addTab(tab, index, false);
+        }
     }
 
     @Override
@@ -257,11 +261,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 if (null == fragment)
                     fragment = new SettingsFragment();
                 break;
-            case BUILDING_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(BUILDING_FRAGMENT);
-                if (null == fragment)
-                    fragment = new BuildingFragment();
-                break;
         }
 
         startReplaceFragment(fragment, fragmentTag);
@@ -272,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         bundle.putString(BUILDING_FRAGMENT_KEY, building.getName());
         BuildingFragment buildingFragment = new BuildingFragment();
         buildingFragment.setArguments(bundle);
+
         startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
     }
 
@@ -283,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         bundle.putStringArrayList(MESSAGE_FRAGMENT_KEY, messageInfo);
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
+
         startReplaceFragment(messageFragment, MESSAGE_FRAGMENT);
     }
 
@@ -331,5 +332,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         // clean background listeners
         stopService();
         pubnub.destroy();
+    }
+
+    private void stopService() {
+        Intent intent = new Intent(MainActivity.this, MainService.class);
+        stopService(intent);
     }
 }
