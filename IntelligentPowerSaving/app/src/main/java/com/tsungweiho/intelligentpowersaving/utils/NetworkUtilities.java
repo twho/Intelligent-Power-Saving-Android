@@ -60,7 +60,8 @@ public class NetworkUtilities {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            ((MainActivity) MainActivity.getContext()).setIfShowErrorMessage(result);
+            if (null != MainActivity.getContext())
+                ((MainActivity) MainActivity.getContext()).setIfShowErrorMessage(result);
         }
     }
 }
