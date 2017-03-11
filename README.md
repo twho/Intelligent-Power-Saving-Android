@@ -18,3 +18,6 @@
 - Location: Taipei, Taiwan / Ann Arbor, Michigan
 - Release Dates: 06/2015
 - Recent Update: 02/2017
+
+## System Architecture
+<a href="http://imgur.com/Xj7pBlm"><img src="http://i.imgur.com/Xj7pBlm.png" title="source: imgur.com" /></a>
