@@ -156,6 +156,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="@dimen/activity_main_space"
+                    android:scaleX="@dimen/activity_main_top_bar_text_scale"
+                    android:scaleY="@dimen/activity_main_top_bar_text_scale"
                     android:text="@string/fragment_event_title"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="@color/white" />

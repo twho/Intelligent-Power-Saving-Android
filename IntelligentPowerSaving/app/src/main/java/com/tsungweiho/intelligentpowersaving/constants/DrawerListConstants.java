@@ -7,6 +7,6 @@ import com.tsungweiho.intelligentpowersaving.R;
  */
 
 public interface DrawerListConstants {
-    int[] MESSAGE_DRAWER = {R.string.inbox, R.string.starred, R.string.trash};
-    int[] MESSAGE_DRAWER_IMG = {R.mipmap.ic_inbox, R.mipmap.ic_star, R.mipmap.ic_trash};
+    int[] MESSAGE_DRAWER = {R.string.inbox, R.string.starred, R.string.followed, R.string.trash};
+    int[] MESSAGE_DRAWER_IMG = {R.mipmap.ic_inbox, R.mipmap.ic_star, R.mipmap.ic_mark, R.mipmap.ic_trash};
 }

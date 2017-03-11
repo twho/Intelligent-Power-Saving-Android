@@ -113,10 +113,10 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         ArrayList<Building> buildingList;
         if (ifShowFollow) {
             buildingList = buildingDBHelper.getFollowedBuildingList();
-            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_highlight));
         } else {
             buildingList = buildingDBHelper.getAllBuildingList();
-            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_unhighlight));
         }
         refreshBuildingIcons(buildingList);
 

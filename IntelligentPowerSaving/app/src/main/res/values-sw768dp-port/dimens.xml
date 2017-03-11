@@ -13,6 +13,7 @@
     <dimen name="activity_main_min_img_size">50dp</dimen>
     <dimen name="activity_main_single_edittext_width">320dp</dimen>
     <item name="activity_main_widget_scale" format="float" type="dimen">1.5</item>
+    <item name="activity_main_top_bar_text_scale" format="float" type="dimen">1</item>
     <item name="activity_main_top_bar_widget_scale" format="float" type="dimen">1</item>
     <item name="activity_main_text_scale" format="float" type="dimen">1</item>
 

@@ -103,7 +103,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         onResume();
     }
 
-    private void findViews(){
+    private void findViews() {
         DrawerListAdapter drawerListAdapter;
         drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
         drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
@@ -173,7 +173,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         switchTopBar(MODE_VIEWING);
         messageListAdapter.setMode(MODE_VIEWING);
         messageListAdapter.notifyDataSetChanged();
-        if (messageList.size() == 0){
+        if (messageList.size() == 0) {
             tvNoMail.setVisibility(View.VISIBLE);
         } else {
             tvNoMail.setVisibility(View.GONE);
@@ -341,6 +341,8 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                             currentBox = LABEL_MSG_STAR;
                             break;
                         case 2:
+                            break;
+                        case 3:
                             tvTitle.setText(getString(R.string.trash));
                             currentBox = LABEL_MSG_TRASH;
                             break;

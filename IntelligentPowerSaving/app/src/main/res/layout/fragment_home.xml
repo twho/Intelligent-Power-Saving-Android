@@ -22,6 +22,8 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:padding="@dimen/activity_main_space"
+                android:scaleX="@dimen/activity_main_top_bar_text_scale"
+                android:scaleY="@dimen/activity_main_top_bar_text_scale"
                 android:text="@string/fragment_home_title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/white" />
@@ -34,7 +36,7 @@
                 android:background="@drawable/background_theme_button"
                 android:scaleX="@dimen/activity_main_top_bar_widget_scale"
                 android:scaleY="@dimen/activity_main_top_bar_widget_scale"
-                android:src="@mipmap/ic_unfollow" />
+                android:src="@mipmap/ic_label_unhighlight" />
 
             <ImageButton
                 android:id="@+id/fragment_home_ib_refresh"

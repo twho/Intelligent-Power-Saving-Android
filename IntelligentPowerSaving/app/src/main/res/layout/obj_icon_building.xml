@@ -50,7 +50,7 @@
                 android:scaleType="centerInside"
                 android:scaleX="@dimen/ibj_icon_building_ic_follow_scale"
                 android:scaleY="@dimen/ibj_icon_building_ic_follow_scale"
-                android:src="@mipmap/ic_follow" />
+                android:src="@mipmap/ic_label_highlight" />
 
             <ImageView
                 android:id="@+id/obj_building_icon_iv_indicator"

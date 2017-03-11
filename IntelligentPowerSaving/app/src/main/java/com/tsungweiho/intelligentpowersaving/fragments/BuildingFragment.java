@@ -120,11 +120,11 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private void setFollowButton(Boolean ifFollow) {
         if (ifFollow) {
             animUtilities.setIconAnimToVisible(ivFollowIndicator);
-            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
+            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_unhighlight));
             tvIbFollow.setText(getString(R.string.unfollow_this));
         } else {
             ivFollowIndicator.setVisibility(View.GONE);
-            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
+            ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_highlight));
             tvIbFollow.setText(getString(R.string.follow_this));
         }
     }

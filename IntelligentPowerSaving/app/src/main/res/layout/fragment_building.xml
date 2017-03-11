@@ -38,6 +38,8 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
+                android:scaleX="@dimen/activity_main_top_bar_text_scale"
+                android:scaleY="@dimen/activity_main_top_bar_text_scale"
                 android:text="@{building.name}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/white" />
@@ -50,7 +52,7 @@
                 android:background="@drawable/background_theme_button"
                 android:scaleX="@dimen/activity_main_top_bar_widget_scale"
                 android:scaleY="@dimen/activity_main_top_bar_widget_scale"
-                android:src="@mipmap/ic_follow" />
+                android:src="@mipmap/ic_label_highlight" />
         </FrameLayout>
 
         <ScrollView
@@ -144,7 +146,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/activity_main_space"
                         android:clickable="false"
-                        android:src="@mipmap/ic_follow" />
+                        android:src="@mipmap/ic_label_highlight" />
 
                     <TextView
                         android:id="@+id/fragment_building_tv_ib_follow"

@@ -13,6 +13,7 @@
     <string name="read">Read</string>
     <string name="inbox">Inbox</string>
     <string name="starred">Starred</string>
+    <string name="followed">Followed buildings</string>
     <string name="all_mails">All mails</string>
     <string name="trash">Trash</string>
     <string name="label_default">unread,unstar,inbox,</string>

@@ -31,6 +31,8 @@
                 android:src="@mipmap/ic_options" />
 
             <TextView
+                android:scaleX="@dimen/activity_main_top_bar_text_scale"
+                android:scaleY="@dimen/activity_main_top_bar_text_scale"
                 android:id="@+id/fragment_inbox_tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
