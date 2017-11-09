@@ -20,7 +20,7 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -31,23 +31,21 @@ import java.util.ArrayList;
 
 public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstants, DBConstants, FragmentTags {
     private Context context;
-    private LayoutInflater layoutInflater;
+
     private ArrayList<Message> messageList;
     private ArrayList<Boolean> messageSelectedList;
     private int mode;
 
     // functions
-    private TimeUtilities timeUtilities;
+    private TimeUtils timeUtils;
     private FragmentManager fm;
-    private int MODE_VIEWING = 0;
-    private int MODE_EDITING = 1;
 
     public MessageListAdapter(Context context, ArrayList<Message> messageList, ArrayList<Boolean> messageSelectedList, int mode) {
         this.context = context;
         this.messageList = messageList;
         this.messageSelectedList = messageSelectedList;
         this.mode = mode;
-        timeUtilities = new TimeUtilities(context);
+        timeUtils = TimeUtils.getInstance();
     }
 
     public void setMessageList(ArrayList<Message> messageList) {
@@ -56,6 +54,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
     public void setSelectedList(ArrayList<Boolean> messageSelectedList) {
         this.messageSelectedList = messageSelectedList;
+        this.notifyDataSetChanged();
     }
 
     public int getMode() {
@@ -64,6 +63,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
     public void setMode(int mode) {
         this.mode = mode;
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -84,8 +84,9 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
-        layoutInflater = LayoutInflater.from(context);
         final int newOrderPosition = getCount() - position - 1;
+
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.obj_message_list_item, null);
@@ -142,11 +143,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         });
 
         // Check if in the same day to determine how to show the time
-        if (message.getTime().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtilities.getDate()))
-            viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[1]);
-        else {
-            viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[0]);
-        }
+        viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[message.getTime().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtils.getDate()) ? 1 : 0]);
 
         // set read message as gray, unread message as white bold
         if (message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ)) {
@@ -160,6 +157,9 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 tvSet.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             }
         }
+
+        int MODE_VIEWING = 0;
+        int MODE_EDITING = 1;
 
         // Viewing Mode
         if (mode == MODE_VIEWING) {
@@ -204,11 +204,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                         fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
                     InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
-                    if (messageSelectedList.get(newOrderPosition)) {
-                        inboxFragment.setIndexSelected(newOrderPosition, Boolean.FALSE);
-                    } else {
-                        inboxFragment.setIndexSelected(newOrderPosition, Boolean.TRUE);
-                    }
+                    inboxFragment.setIndexSelected(newOrderPosition, !messageSelectedList.get(newOrderPosition));
                 }
             });
 
@@ -251,7 +247,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         imageView.setImageDrawable(drawable);
     }
 
-    private void initEditingMode(int position){
+    private void initEditingMode(int position) {
         if (null == fm)
             fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 

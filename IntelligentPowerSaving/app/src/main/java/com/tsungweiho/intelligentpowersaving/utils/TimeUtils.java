@@ -10,12 +10,15 @@ import java.util.Calendar;
  * Created by Tsung Wei Ho on 2017/2/23.
  */
 
-public class TimeUtilities {
-    private Context context;
+public class TimeUtils {
 
-    public TimeUtilities(Context context) {
-        this.context = context;
+    private static final TimeUtils ourInstance = new TimeUtils();
+
+    public static TimeUtils getInstance() {
+        return ourInstance;
     }
+
+    private TimeUtils() {}
 
     public String getTimeMillies() {
         return Calendar.getInstance().getTimeInMillis() + "";

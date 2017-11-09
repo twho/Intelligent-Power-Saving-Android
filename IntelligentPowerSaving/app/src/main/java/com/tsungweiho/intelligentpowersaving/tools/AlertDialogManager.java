@@ -2,7 +2,7 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 /**
  * Created by MichaelHo on 2015/4/15.
- * Updated by MichaelHo on 2017/2/17.
+ * Updated by MichaelHo on 2017/11/10.
  */
 
 import android.Manifest;
@@ -29,15 +29,23 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
+import com.tsungweiho.intelligentpowersaving.utils.AChartUtils;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
 public class AlertDialogManager implements BuildingConstants, FragmentTags {
+
+    private static final AlertDialogManager ourInstance = new AlertDialogManager();
+
+    public static AlertDialogManager getInstance() {
+        return ourInstance;
+    }
+
     private Context context;
 
-    public AlertDialogManager(Context context) {
-        this.context = context;
+    private AlertDialogManager() {
+        this.context = MainActivity.getContext();
     }
 
     public void showAlertDialog(String title, String message) {
@@ -56,8 +64,8 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         alertDialog.show();
     }
 
-    public static final int REQUEST_CODE_CAMERA = 1;
-    public static final int REQUEST_CODE_IMAGE = 0;
+    private static final int REQUEST_CODE_CAMERA = 1;
+    private static final int REQUEST_CODE_IMAGE = 0;
 
     public void showCameraDialog(final String fragmentCalledThis) {
         FragmentManager fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
@@ -131,12 +139,15 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         dialog.show();
     }
 
-    boolean ifCropped = false;
+    private boolean ifCropped = false;
 
     public void showCropImageDialog(final ImageView imageView, final Bitmap bitmap) {
+        // Setup dialog view
         final Dialog dialog = new Dialog(context);
         LayoutInflater li = LayoutInflater.from(context);
         View dialogView = li.inflate(R.layout.obj_dialog_crop_image, null);
+
+        // Setup cropped image view
         final CropImageView cropImageView = (CropImageView) dialogView.findViewById(R.id.obj_dialog_crop_image_civ);
         cropImageView.setImageBitmap(bitmap);
         cropImageView.setEnabled(true);
@@ -145,17 +156,10 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         btnCrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!ifCropped) {
-                    cropImageView.setCropEnabled(false);
-                    cropImageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
-                    btnCrop.setText(context.getString(R.string.alert_dialog_manager_crop_img_revert));
-                    ifCropped = true;
-                } else {
-                    cropImageView.setImageBitmap(bitmap);
-                    cropImageView.setCropEnabled(true);
-                    btnCrop.setText(context.getString(R.string.alert_dialog_manager_crop_img_crop));
-                    ifCropped = false;
-                }
+                cropImageView.setCropEnabled(ifCropped);
+                cropImageView.setImageBitmap(ifCropped ? bitmap : cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
+                btnCrop.setText(context.getString(ifCropped ? R.string.alert_dialog_manager_crop_img_crop : R.string.alert_dialog_manager_crop_img_revert));
+                ifCropped = !ifCropped;
             }
         });
 

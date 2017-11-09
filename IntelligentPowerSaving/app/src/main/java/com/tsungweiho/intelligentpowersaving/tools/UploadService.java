@@ -1,12 +1,11 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.constants.ImgurAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Upload;
-import com.tsungweiho.intelligentpowersaving.utils.NetworkUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -21,27 +20,26 @@ import retrofit.mime.TypedFile;
 
 /**
  * Created by AKiniyalocts on 1/12/15.
- * Modified by Tsung Wei Ho on 2/19/17
+ * Modified by Tsung Wei Ho on 11/10/17
  */
 public class UploadService implements ImgurAPIConstants {
-    public final static String TAG = UploadService.class.getSimpleName();
 
-    private WeakReference<Context> mContext;
+    private WeakReference<Context> context;
 
     public UploadService(Context context) {
-        this.mContext = new WeakReference<>(context);
+        this.context = new WeakReference<>(context);
     }
 
     public void Execute(Upload upload, Callback<ImageResponse> callback) {
         final Callback<ImageResponse> cb = callback;
 
-        if (!NetworkUtilities.isConnected(mContext.get())) {
+        if (!NetworkUtils.isConnected(context.get())) {
             //Callback will be called, so we prevent a unnecessary notification
             cb.failure(null);
             return;
         }
 
-        final NotificationHelper notificationHelper = new NotificationHelper(mContext.get());
+        final NotificationHelper notificationHelper = NotificationHelper.getInstance();
         notificationHelper.createUploadingNotification();
 
         RestAdapter restAdapter = buildRestAdapter();
@@ -58,15 +56,12 @@ public class UploadService implements ImgurAPIConstants {
                     public void success(ImageResponse imageResponse, Response response) {
                         if (cb != null) cb.success(imageResponse, response);
                         if (response == null) {
-                            /*
-                             Notify image was NOT uploaded successfully
-                            */
+                            // Notify image was NOT uploaded successfully
                             notificationHelper.createFailedUploadNotification();
                             return;
                         }
-                        /*
-                        Notify image was uploaded successfully
-                        */
+
+                        // Notify image was uploaded successfully
                         if (imageResponse.success) {
                             notificationHelper.createUploadedNotification(imageResponse);
                         }
@@ -85,9 +80,7 @@ public class UploadService implements ImgurAPIConstants {
                 .setEndpoint(ImgurAPIConstants.server)
                 .build();
 
-        /*
-        Set rest adapter logging if we're already logging
-        */
+        // Set rest adapter logging if we're already logging
         if (LOGGING)
             imgurAdapter.setLogLevel(RestAdapter.LogLevel.FULL);
         return imgurAdapter;
@@ -95,6 +88,6 @@ public class UploadService implements ImgurAPIConstants {
 
     @Override
     public void postImage(@Header("Authorization") String auth, @Query("title") String title, @Query("description") String description, @Query("album") String albumId, @Query("account_url") String username, @Body TypedFile file, Callback<ImageResponse> cb) {
-        // unused here
+        // unused
     }
 }

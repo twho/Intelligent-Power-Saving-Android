@@ -33,8 +33,7 @@ import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.NetworkUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,13 +42,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     private String TAG = "MainActivity";
 
-    // functions
     public static Context context;
-    private static ImageUtilities imageUtilities;
-    private SharedPreferencesManager sharedPreferencesManager;
-    private MyAccountInfo myAccountInfo;
-    private NetworkUtilities networkUtilities;
-    private String PREF_SEPARTOR = ",";
+
+    // functions
+    private NetworkUtils networkUtils;
     private String[] mainTabList = {HOME_FRAGMENT, EVENT_FRAGMENT, INBOX_FRAGMENT, SETTINGS_FRAGMENT};
 
     // UI Widgets
@@ -81,10 +77,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         if (!PermissionManager.hasAllPermissions(MainActivity.this))
             ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
 
-        // For the app-wide use
-        imageUtilities = new ImageUtilities(context);
-        sharedPreferencesManager = new SharedPreferencesManager(context);
-
         // View init
         flError = (FrameLayout) findViewById(R.id.activity_main_fl_error);
         pbError = (ProgressBar) findViewById(R.id.activity_main_pb_error);
@@ -92,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (null == networkUtilities)
-                    networkUtilities = new NetworkUtilities();
-                networkUtilities.checkNetworkConnection();
+                if (null == networkUtils)
+                    networkUtils = new NetworkUtils();
+                networkUtils.checkNetworkConnection();
                 pbError.setVisibility(View.VISIBLE);
             }
         });
@@ -150,15 +142,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         return pubnub;
     }
 
-    public static ImageUtilities getImageUtilities() {
-        return imageUtilities;
-    }
-
     private void setActionbar() {
         actionBar = getSupportActionBar();
+        if (null == actionBar)
+            return;
+
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayUseLogoEnabled(true);
+
         if (screenHeight >= 800)
             actionBar.setDisplayShowTitleEnabled(true);
 
@@ -198,14 +190,17 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         super.onResume();
 
         // Check internet connection
-        networkUtilities = new NetworkUtilities();
-        networkUtilities.checkNetworkConnection();
+        networkUtils = new NetworkUtils();
+        networkUtils.checkNetworkConnection();
 
         // Read users preference
-        myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
-        if (myAccountInfo.getSubscription().split(PREF_SEPARTOR)[0].equalsIgnoreCase("1"))
+        String PREF_SEPARATOR = ",";
+        MyAccountInfo myAccountInfo;
+
+        myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
+        if (myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0].equalsIgnoreCase("1"))
             pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-        if (myAccountInfo.getSubscription().split(PREF_SEPARTOR)[1].equalsIgnoreCase("1"))
+        if (myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1].equalsIgnoreCase("1"))
             pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
     }
 
@@ -317,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
     }
 
     @Override

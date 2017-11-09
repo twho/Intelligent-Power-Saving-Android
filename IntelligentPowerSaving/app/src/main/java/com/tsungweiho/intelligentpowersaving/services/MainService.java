@@ -27,7 +27,7 @@ import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.tools.NotificationHelper;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,11 +46,10 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     // Functions
     private Context context;
     private MainServiceListener mainServiceListener;
-    private NotificationHelper notificationHelper;
     private FragmentManager fm;
     private EventDBHelper eventDBHelper;
     private MessageDBHelper messageDBHelper;
-    private TimeUtilities timeUtilities;
+    private TimeUtils timeUtils;
 
     @Nullable
     @Override
@@ -69,10 +68,9 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private void init() {
         mainServiceListener = new MainServiceListener();
         fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-        notificationHelper = new NotificationHelper(context);
         eventDBHelper = new EventDBHelper(context);
         messageDBHelper = new MessageDBHelper(context);
-        timeUtilities = new TimeUtilities(context);
+        timeUtils = TimeUtils.getInstance();
     }
 
     @Override
@@ -113,7 +111,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                         String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
                         String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
                         String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
-                        String time = timeUtilities.getTimeByMillies(strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID]);
+                        String time = timeUtils.getTimeByMillies(strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID]);
                         String inboxLabel = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_INBOX_LABEL];
                         Message newMessage = new Message(uniqueId, title, content, sender, time, inboxLabel);
                         messageDBHelper.insertDB(newMessage);

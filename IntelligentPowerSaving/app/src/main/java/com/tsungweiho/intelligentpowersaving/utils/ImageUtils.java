@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 
 import java.io.ByteArrayOutputStream;
@@ -34,15 +35,22 @@ import id.zelory.compressor.Compressor;
  * Created by Tsung Wei Ho on 2015/4/7.
  */
 
-public class ImageUtilities {
+// Singleton class
+public class ImageUtils {
 
     private static Context context;
 
     // unit KB
     private static final int MAX_SIZE = (200) * 1024;
 
-    public ImageUtilities(Context context) {
-        this.context = context;
+    private static final ImageUtils ourInstance = new ImageUtils();
+
+    public static ImageUtils getInstance() {
+        return ourInstance;
+    }
+
+    private ImageUtils() {
+        this.context = MainActivity.getContext();
     }
 
     public static Bitmap decodeBase64ToBitmap(String input) {

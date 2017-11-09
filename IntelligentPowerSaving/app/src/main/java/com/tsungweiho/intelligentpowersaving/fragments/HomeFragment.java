@@ -2,7 +2,6 @@ package com.tsungweiho.intelligentpowersaving.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +25,7 @@ import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
-import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +42,7 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment implements DBConstants, BuildingConstants {
 
-    private String TAG = "HomeFragment";
+    private final String TAG = "HomeFragment";
 
     // Home Fragment View
     private View view;
@@ -56,9 +55,8 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
 
     // Functions
     private Context context;
-    private AnimUtilities animUtilities;
+    private AnimUtils animUtils;
     private BuildingDBHelper buildingDBHelper;
-    private SharedPreferencesManager sharedPreferencesManager;
     private boolean ifShowFollow = false;
 
     // Firebase
@@ -74,24 +72,20 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     }
 
     private void init() {
-        animUtilities = new AnimUtilities(context);
+        animUtils = AnimUtils.getInstance();
         buildingDBHelper = new BuildingDBHelper(context);
 
         // find views
         gridLayout = (GridLayout) view.findViewById(R.id.fragment_home_grid_layout);
         llProgress = (LinearLayout) view.findViewById(R.id.fragment_home_progress_layout);
         tvNoBuilding = (TextView) view.findViewById(R.id.fragmnet_home_tv_no_building);
-        animUtilities.setllAnimToVisible(llProgress);
+        animUtils.setllAnimToVisible(llProgress);
 
         ibFollowing = (ImageButton) view.findViewById(R.id.fragment_home_ib_following);
         ibFollowing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ifShowFollow) {
-                    ifShowFollow = false;
-                } else {
-                    ifShowFollow = true;
-                }
+                ifShowFollow = !ifShowFollow;
                 setupFollowingBuildings();
             }
         });
@@ -120,11 +114,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         }
         refreshBuildingIcons(buildingList);
 
-        if (buildingList.size() == 0) {
-            tvNoBuilding.setVisibility(View.VISIBLE);
-        } else {
-            tvNoBuilding.setVisibility(View.GONE);
-        }
+        tvNoBuilding.setVisibility(buildingList.size() == 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -134,8 +124,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         loadDataFromFirebase();
 
         // Read current status
-        sharedPreferencesManager = new SharedPreferencesManager(context);
-        ifShowFollow = sharedPreferencesManager.getIfShowFollowedBuilding();
+        ifShowFollow = SharedPreferencesManager.getInstance().getIfShowFollowedBuilding();
         setupFollowingBuildings();
     }
 
@@ -180,7 +169,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
 
         llProgress.setVisibility(View.GONE);
         setupFollowingBuildings();
-        animUtilities.setglAnimToVisible(gridLayout);
+        animUtils.setglAnimToVisible(gridLayout);
     }
 
     private void refreshBuildingIcons(ArrayList<Building> buildingList) {
@@ -246,6 +235,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         super.onPause();
 
         // Save current status
-        sharedPreferencesManager.saveIfShowFollowedBuilding(ifShowFollow);
+        SharedPreferencesManager.getInstance().saveIfShowFollowedBuilding(ifShowFollow);
     }
 }

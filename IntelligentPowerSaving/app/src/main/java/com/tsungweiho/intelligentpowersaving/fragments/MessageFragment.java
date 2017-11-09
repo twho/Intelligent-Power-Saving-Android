@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +25,8 @@ import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentMessageBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -57,8 +56,6 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     private Message currentMessage;
     private String currentBox;
-    private static ImageUtilities imageUtilities;
-    private static TimeUtilities timeUtilities;
     private MessageDBHelper messageDBHelper;
     private MessageFragmentListener messageFragmentListener;
 
@@ -76,8 +73,6 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     private void init() {
         messageDBHelper = new MessageDBHelper(context);
-        imageUtilities = MainActivity.getImageUtilities();
-        timeUtilities = new TimeUtilities(context);
         messageFragmentListener = new MessageFragmentListener();
 
         // Mark message as read when getting in the message screen
@@ -110,7 +105,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
             EventDBHelper eventDBHelper = new EventDBHelper(MainActivity.getContext());
 
             String url = eventDBHelper.getEventByUnId(inboxLabel.split(SEPARATOR_MSG_LABEL)[3]).getImage();
-            imageUtilities.setImageViewFromUrl(url, imageView, pbImg);
+            ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbImg);
         } else {
             imgLayout.setVisibility(View.GONE);
         }
@@ -127,7 +122,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     @BindingAdapter({"bind:time"})
     public static void loadTime(final TextView textView, final String time) {
-        if (time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtilities.getDate()))
+        if (time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(TimeUtils.getInstance().getDate()))
             textView.setText(time.split(SEPARATOR_MSG_LABEL)[1]);
         else {
             textView.setText(time.split(SEPARATOR_MSG_LABEL)[0]);

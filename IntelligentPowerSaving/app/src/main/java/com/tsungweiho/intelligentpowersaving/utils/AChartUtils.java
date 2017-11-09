@@ -11,7 +11,6 @@ import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.BarChart;
-import org.achartengine.chart.XYChart;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
@@ -22,14 +21,17 @@ import java.util.ArrayList;
 /**
  * Created by MichaelHo on 2015/5/27.
  */
-public class AChartUtilities implements BuildingConstants {
-    private Context context;
+public class AChartUtils implements BuildingConstants {
 
-    public AChartUtilities(Context context) {
-        this.context = context;
+    private static final AChartUtils ourInstance = new AChartUtils();
+
+    public static AChartUtils getInstance() {
+        return ourInstance;
     }
 
-    public View getBarChart(String chartTitle, String XTitle, String YTitle, ArrayList<String> seriesValue) {
+    private AChartUtils() {}
+
+    public View getBarChart(Context context, String chartTitle, String XTitle, String YTitle, ArrayList<String> seriesValue) {
 
         XYSeries Series = new XYSeries(YTitle);
 

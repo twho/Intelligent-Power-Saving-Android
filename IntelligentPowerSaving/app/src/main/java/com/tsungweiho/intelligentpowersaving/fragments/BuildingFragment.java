@@ -22,10 +22,10 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
-import com.tsungweiho.intelligentpowersaving.utils.AChartUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.AChartUtils;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,28 +33,25 @@ import java.util.Collections;
 
 /**
  * Created by Tsung Wei Ho on 2017/2/18.
+ * Updated by Tsung Wei Ho on 2017/11/9
  */
 
 public class BuildingFragment extends Fragment implements FragmentTags, BuildingConstants {
-    private String TAG = "BuildingFragment";
+    private final String TAG = "BuildingFragment";
 
     // Settings Fragment View
     private View view;
 
     // UI views
-    private LinearLayout llChart, ibFollow;
+    private LinearLayout llChart;
     private TextView tvIbFollow;
     private ImageView ivIbFollow, ivFollowIndicator;
-    private View barView;
-    private ImageButton ibBack;
 
     // Functions
     private Context context;
     private String buildingName;
-    private AnimUtilities animUtilities;
-    private static ImageUtilities imageUtilities;
-    private static TimeUtilities timeUtilities;
-    private AChartUtilities aChartUtilities;
+    private AnimUtils animUtils;
+    private AChartUtils aChartUtils;
     private BuildingDBHelper buildingDBHelper;
     private Building building;
     private FragmentBuildingBinding binding;
@@ -75,10 +72,10 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     private void init() {
         buildingDBHelper = new BuildingDBHelper(context);
-        imageUtilities = MainActivity.getImageUtilities();
-        animUtilities = new AnimUtilities(context);
-        timeUtilities = new TimeUtilities(context);
-        aChartUtilities = new AChartUtilities(context);
+
+        // singleton classes
+        aChartUtils = AChartUtils.getInstance();
+        animUtils = AnimUtils.getInstance();
 
         building = buildingDBHelper.getBuildingByName(buildingName);
         binding.setBuilding(building);
@@ -86,6 +83,8 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         ivFollowIndicator = (ImageView) view.findViewById(R.id.fragment_building_iv_follow);
         ivIbFollow = (ImageView) view.findViewById(R.id.fragment_building_iv_ib_follow);
         tvIbFollow = (TextView) view.findViewById(R.id.fragment_building_tv_ib_follow);
+
+        LinearLayout ibFollow;
         ibFollow = (LinearLayout) view.findViewById(R.id.fragment_building_ib_follow);
         ibFollow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +101,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
         llChart = (LinearLayout) view.findViewById(R.id.fragment_building_ll_chart);
 
+        ImageButton ibBack;
         ibBack = (ImageButton) view.findViewById(R.id.fragment_building_ib_back);
         ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,16 +110,16 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
             }
         });
 
-        currentHour = Integer.parseInt(timeUtilities.getTimeHH());
+        currentHour = Integer.parseInt(TimeUtils.getInstance().getTimeHH());
         consumptionList = new ArrayList<>(Arrays.asList(new String[TIME_HOURS.length]));
-        if (currentHour == 0)
-            currentHour += 24;
+        currentHour += currentHour == 0 ? 24 : 0;
+
         Collections.fill(consumptionList, "0");
     }
 
     private void setFollowButton(Boolean ifFollow) {
         if (ifFollow) {
-            animUtilities.setIconAnimToVisible(ivFollowIndicator);
+            animUtils.setIconAnimToVisible(ivFollowIndicator);
             ivIbFollow.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_unhighlight));
             tvIbFollow.setText(getString(R.string.unfollow_this));
         } else {
@@ -131,14 +131,14 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
-        imageUtilities.setRoundCornerImageViewFromUrl(url, imageView);
+        ImageUtils.getInstance().setRoundCornerImageViewFromUrl(url, imageView);
 
         // Auto refresh after 5 seconds.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                imageUtilities.setRoundCornerImageViewFromUrl(url, imageView);
+                ImageUtils.getInstance().setRoundCornerImageViewFromUrl(url, imageView);
             }
         }, 5000);
     }
@@ -159,8 +159,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
         // Get the data from yesterday
         int lastHour = currentHour - 2;
-        if (lastHour < 0)
-            lastHour += 24;
+        lastHour += lastHour < 0 ? 24 : 0;
 
         textView.setText(MainActivity.getContext().getString(R.string.consump_this_hour) + " " + consumptionList.get(currentHour - 1) +
                 BUILDING_UNIT + MainActivity.getContext().getString(R.string.consump_last_hour) + " " + consumptionList.get(lastHour) +
@@ -174,14 +173,15 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         setupChartView();
     }
 
-    private void setupChartView(){
+    private void setupChartView() {
         // The first two data are building's energy efficiency, not hourly power consumption
         for (int x = 2; x < currentHour + 2; x++) {
             consumptionList.set(x - 2, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
         }
 
+        View barView;
         try {
-            barView = aChartUtilities.getBarChart(context.getResources().getString(R.string.chart_title),
+            barView = aChartUtils.getBarChart(context, context.getResources().getString(R.string.chart_title),
                     context.getResources().getString(R.string.chart_x_title), context.getResources().getString(R.string.chart_y_title), consumptionList);
             llChart.removeAllViews();
             llChart.addView(barView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (MainActivity.screenHeight / 1.4)));

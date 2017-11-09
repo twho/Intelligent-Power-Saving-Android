@@ -5,18 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.MainActivity;
-import com.tsungweiho.intelligentpowersaving.utils.NetworkUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 /**
  * Created by Tsung Wei Ho on 2017/3/8.
  */
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
-    private NetworkUtilities networkUtilities;
+    private NetworkUtils networkUtils;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -26,8 +24,8 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         boolean isConnected = (wifi != null && wifi.isConnectedOrConnecting()) || (mobile != null && mobile.isConnectedOrConnecting());
 
-        networkUtilities = new NetworkUtilities();
-        networkUtilities.checkNetworkConnection();
+        networkUtils = new NetworkUtils();
+        networkUtils.checkNetworkConnection();
         if (!isConnected) {
             if (null != MainActivity.getContext())
                 ((MainActivity) MainActivity.getContext()).setIfShowErrorMessage(false);

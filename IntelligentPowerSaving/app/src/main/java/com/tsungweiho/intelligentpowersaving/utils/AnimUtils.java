@@ -12,22 +12,29 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.MapView;
+import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
  * Created by Tsung Wei Ho on 2/3/17.
  */
 
-public class AnimUtilities {
-    private static Context context;
+public class AnimUtils {
+    private Context context;
 
     // Animation duration
     private int ANIM_DURATION = 1000;
     private int MID_ANIM_DURATION = 500;
     private int FAST_ANIM_DURATION = 250;
 
-    public AnimUtilities(Context context) {
-        this.context = context;
+    private static final AnimUtils ourInstance = new AnimUtils();
+
+    public static AnimUtils getInstance() {
+        return ourInstance;
+    }
+
+    private AnimUtils() {
+        this.context = MainActivity.getContext();
     }
 
     public void setllAnimToVisible(final LinearLayout linearLayout) {

@@ -25,7 +25,7 @@ public interface ImgurAPIConstants {
 
     /****************************************
      * Upload
-     * Image upload API
+     * ImageUt upload API
      */
 
     /**

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
-import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
@@ -33,7 +29,7 @@ import com.tsungweiho.intelligentpowersaving.databinding.FragmentSettingsBinding
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,11 +37,11 @@ import java.util.Arrays;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Updated by Tsung Wei Ho on 2017/11/10.
  */
 
 public class SettingsFragment extends Fragment implements FragmentTags, DBConstants, PubNubAPIConstants {
-    private String TAG = "SettingsFragment";
+    private final String TAG = "SettingsFragment";
 
     // Settings Fragment View
     private View view;
@@ -57,13 +53,11 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
     // Functions
     private Context context;
-    private SharedPreferencesManager sharedPreferencesManager;
     private MyAccountInfo myAccountInfo;
     private FragmentSettingsBinding binding;
     private AlertDialogManager alertDialogManager;
-    private static ImageUtilities imageUtilities;
     private Bitmap bmpBuffer;
-    private String PREF_SEPARTOR = ",";
+    private String PREF_SEPARATOR = ",";
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -85,9 +79,9 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
     private void init() {
         pubnub = MainActivity.getPubNub();
-        alertDialogManager = new AlertDialogManager(context);
-        sharedPreferencesManager = new SharedPreferencesManager(context);
-        imageUtilities = MainActivity.getImageUtilities();
+
+        // Singleton classes
+        alertDialogManager = AlertDialogManager.getInstance();
 
         edName = (EditText) view.findViewById(R.id.fragment_settings_ed_name);
         edEmail = (EditText) view.findViewById(R.id.fragment_settings_ed_email);
@@ -99,16 +93,17 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
                 alertDialogManager.showCameraDialog(SETTINGS_FRAGMENT);
             }
         });
+
         swEvent = (Switch) view.findViewById(R.id.fragment_settings_sw_event);
         swEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {
                 if (ifChecked) {
                     pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription("1," + myAccountInfo.getSubscription().split(PREF_SEPARTOR)[1]);
+                    myAccountInfo.setSubscription("1," + myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1]);
                 } else {
                     pubnub.unsubscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription("0," + myAccountInfo.getSubscription().split(PREF_SEPARTOR)[1]);
+                    myAccountInfo.setSubscription("0," + myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1]);
                 }
             }
         });
@@ -119,10 +114,10 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {
                 if (ifChecked) {
                     pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARTOR)[0] + ",1");
+                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0] + ",1");
                 } else {
                     pubnub.unsubscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARTOR)[0] + ",0");
+                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0] + ",0");
                 }
             }
         });
@@ -158,7 +153,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         if (url.equalsIgnoreCase("")) {
             imageView.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
         } else {
-            imageView.setImageBitmap(imageUtilities.getRoundedCroppedBitmap(imageUtilities.decodeBase64ToBitmap(url)));
+            imageView.setImageBitmap(ImageUtils.getInstance().getRoundedCroppedBitmap(ImageUtils.getInstance().decodeBase64ToBitmap(url)));
         }
     }
 
@@ -166,21 +161,21 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     public void onResume() {
         super.onResume();
 
-        myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
+        myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
         binding.setMyAccountInfo(myAccountInfo);
-        swEvent.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARTOR)[0].equalsIgnoreCase("1"));
-        swPublic.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARTOR)[1].equalsIgnoreCase("1"));
+        swEvent.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0].equalsIgnoreCase("1"));
+        swPublic.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1].equalsIgnoreCase("1"));
     }
 
     @Override
     public void onPause() {
         super.onPause();
         if (null != ivProfile.getDrawingCache()) {
-            myAccountInfo.setImageUrl(imageUtilities.encodeBase64ToString(ivProfile.getDrawingCache()));
+            myAccountInfo.setImageUrl(ImageUtils.getInstance().encodeBase64ToString(ivProfile.getDrawingCache()));
         }
 
         myAccountInfo.setName(edName.getText().toString());
         myAccountInfo.setEmail(edEmail.getText().toString());
-        sharedPreferencesManager.saveMyAccountInfo(myAccountInfo);
+        SharedPreferencesManager.getInstance().saveMyAccountInfo(myAccountInfo);
     }
 }

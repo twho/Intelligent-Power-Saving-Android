@@ -19,8 +19,8 @@ import java.net.URL;
  * <p>
  * Basic network utils
  */
-public class NetworkUtilities {
-    public static final String TAG = "NetworkUtilities";
+public class NetworkUtils {
+    private static final String TAG = "NetworkUtils";
 
     public static boolean isConnected(Context context) {
         try {

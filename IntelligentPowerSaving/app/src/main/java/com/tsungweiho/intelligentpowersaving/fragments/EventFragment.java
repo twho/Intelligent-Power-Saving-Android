@@ -55,9 +55,9 @@ import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Upload;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
-import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,7 +79,7 @@ import retrofit.client.Response;
 
 public class EventFragment extends Fragment implements FragmentTags, PubNubAPIConstants, OnMapReadyCallback {
 
-    private String TAG = "EventFragment";
+    private final String TAG = "EventFragment";
 
     // Event Fragment View
     private View view;
@@ -98,10 +98,10 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private Context context;
     private EventDBHelper eventDBHelper;
     private ArrayList<Event> eventList;
-    private static ImageUtilities imageUtilities;
-    private AnimUtilities animUtilities;
-    private TimeUtilities timeUtilities;
-    private AlertDialogManager alertDialogManager;
+    private static ImageUtils imageUtils;
+    private AnimUtils animUtils;
+    private TimeUtils timeUtils;
+    private AlertDialogManager alertDialogMgr;
     private EventFragmentListener eventFragmentListener;
     private FragmentEventBinding binding;
     private Upload upload;
@@ -142,13 +142,15 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     }
 
     private void init(Bundle savedInstanceState) {
-        imageUtilities = MainActivity.getImageUtilities();
-        animUtilities = new AnimUtilities(context);
-        timeUtilities = new TimeUtilities(context);
         eventFragmentListener = new EventFragmentListener();
-        alertDialogManager = new AlertDialogManager(context);
         eventDBHelper = new EventDBHelper(context);
         pubnub = MainActivity.getPubNub();
+
+        // Singleton classes
+        timeUtils = TimeUtils.getInstance();
+        animUtils = AnimUtils.getInstance();
+        alertDialogMgr = AlertDialogManager.getInstance();
+        imageUtils = ImageUtils.getInstance();
 
         findViews();
         setAllListeners();
@@ -190,11 +192,11 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             switch (view.getId()) {
                 case R.id.fragment_event_ib_add:
                     if (edEvent.getText().toString().length() == 0) {
-                        alertDialogManager.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
+                        alertDialogMgr.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.fragment_event_err_no_ed));
                     } else {
                         pbTopBar.animate();
                         pbTopBar.setVisibility(View.VISIBLE);
-                        tempImgFile = imageUtilities.getFileFromBitmap(bmpBuffer);
+                        tempImgFile = imageUtils.getFileFromBitmap(bmpBuffer);
                         createUpload(tempImgFile);
                         new UploadService(context).Execute(upload, new UiCallback());
                     }
@@ -206,9 +208,9 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                 case R.id.fragment_event_ib_camera:
                     closeKeyboard(context, edEvent.getWindowToken());
                     if (null == bmpBuffer)
-                        alertDialogManager.showCameraDialog(EVENT_FRAGMENT);
+                        alertDialogMgr.showCameraDialog(EVENT_FRAGMENT);
                     else {
-                        alertDialogManager.showImageDialog(EVENT_FRAGMENT, bmpBuffer);
+                        alertDialogMgr.showImageDialog(EVENT_FRAGMENT, bmpBuffer);
                     }
                     break;
                 case R.id.fragment_event_btn_full_map:
@@ -220,10 +222,12 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
         @Override
         public void onMapLongClick(LatLng latLng) {
-            animUtilities.setflAnimToVisible(flTopBarAddEvent);
-            animUtilities.setllAnimToVisible(llTopBarAddEvent);
+            animUtils.setflAnimToVisible(flTopBarAddEvent);
+            animUtils.setllAnimToVisible(llTopBarAddEvent);
+
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
+
             clickedLatLng = latLng;
             lockLocation = true;
 
@@ -239,7 +243,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                 clickedLatLng = latLng;
 
             if (ifMarkerViewUp) {
-                animUtilities.setllSlideDown(llMarkerInfo);
+                animUtils.setllSlideDown(llMarkerInfo);
                 ifMarkerViewUp = false;
             }
         }
@@ -250,7 +254,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
             binding.executePendingBindings();
-            animUtilities.setllSlideUp(llMarkerInfo);
+            animUtils.setllSlideUp(llMarkerInfo);
             ifMarkerViewUp = true;
             return false;
         }
@@ -258,8 +262,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     @BindingAdapter({"bind:image"})
     public static void loadImage(final ImageView imageView, final String url) {
-        imageUtilities = new ImageUtilities(MainActivity.getContext());
-        imageUtilities.setImageViewFromUrl(url, imageView, pbMarker);
+        ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
 
         if (null != handler)
             handler.removeCallbacks(runnable);
@@ -268,7 +271,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         runnable = new Runnable() {
             @Override
             public void run() {
-                imageUtilities.setImageViewFromUrl(url, imageView, pbMarker);
+                ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
             }
         };
 
@@ -306,14 +309,14 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             }
 
             if (null != bmpBuffer)
-                animUtilities.setIconAnimToVisible(ivAddIcon);
+                animUtils.setIconAnimToVisible(ivAddIcon);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void createUpload(File image) {
         upload = new Upload();
-        upload.image = imageUtilities.getCompressedImgFile(image);
+        upload.image = imageUtils.getCompressedImgFile(image);
         upload.title = edEvent.getText().toString();
         upload.description = edEvent.getText().toString();
     }
@@ -328,8 +331,9 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     public void onMapReady(GoogleMap googleMap) {
         // Limit the map to NTUST campus
         bounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
-        final LatLngBounds ADELAIDE = bounds;
-        googleMap.setLatLngBoundsForCameraTarget(ADELAIDE);
+        final LatLngBounds range = bounds;
+        googleMap.setLatLngBoundsForCameraTarget(range);
+
         googleMap.setMinZoomPreference(18.0f);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -362,7 +366,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
             @Override
             public void run() {
                 llOpen.setVisibility(View.GONE);
-                animUtilities.setMapAnimToVisible(mapView);
+                animUtils.setMapAnimToVisible(mapView);
             }
         }, 2000);
     }
@@ -475,8 +479,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         @Override
         public void success(ImageResponse imageResponse, Response response) {
             tempImgFile.delete();
-            pubnub.publish().message(new Event(timeUtilities.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, getString(R.string.testing_name), timeUtilities.getDate() + "," + timeUtilities.getTimehhmm(), "0"))
+            pubnub.publish().message(new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
+                    clickedLatLng.longitude, imageResponse.data.link, getString(R.string.testing_name), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override

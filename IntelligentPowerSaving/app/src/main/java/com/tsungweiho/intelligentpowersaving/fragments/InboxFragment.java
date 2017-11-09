@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -29,9 +28,9 @@ import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
-import com.tsungweiho.intelligentpowersaving.utils.AnimUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtilities;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtilities;
+import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
+import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,15 +58,13 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
     // Functions
     private Context context;
-    private ImageUtilities imageUtilities;
-    private AnimUtilities animUtilities;
-    private TimeUtilities timeUtilities;
+    private ImageUtils imageUtilities;
+    private AnimUtils animUtils;
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
-    private SharedPreferencesManager sharedPreferencesManager;
     private Thread uiThread;
 
-    // Mailbox functions, topbar buttons are padding 15%
+    // Mailbox functions, top bar buttons are padding 15%
     private MessageListAdapter messageListAdapter;
     private ArrayList<Message> messageList;
     private ArrayList<Boolean> messageSelectedList;
@@ -91,10 +88,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private void init() {
         inboxFragmentListener = new InboxFragmentListener();
         messageDBHelper = new MessageDBHelper(context);
-        animUtilities = new AnimUtilities(context);
-        timeUtilities = new TimeUtilities(context);
-        imageUtilities = MainActivity.getImageUtilities();
-        sharedPreferencesManager = new SharedPreferencesManager(context);
+
+        // Singleton classes
+        animUtils = AnimUtils.getInstance();
+        imageUtilities = ImageUtils.getInstance();
+
         ifShowUnread = false;
 
         findViews();
@@ -104,8 +102,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     }
 
     private void findViews() {
-        DrawerListAdapter drawerListAdapter;
-        drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
+        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
         drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
         navList = (ListView) view.findViewById(R.id.fragment_inbox_drawer_lv);
         navList.setAdapter(drawerListAdapter);
@@ -138,18 +135,21 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         ifFragmentActive = true;
 
         // use the data already saved
-        currentBox = sharedPreferencesManager.getCurrentMessagebox();
-        MyAccountInfo myAccountInfo = sharedPreferencesManager.getMyAccountInfo();
+        MyAccountInfo myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
         ivDrawerPic.setImageBitmap(imageUtilities.getRoundedCroppedBitmap(imageUtilities.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
+        currentBox = SharedPreferencesManager.getInstance().getCurrentMessagebox();
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
         messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
         initInbox(messageList);
+
         lvMessages.setAdapter(messageListAdapter);
-        animUtilities.setlvAnimToVisible(lvMessages);
+        animUtils.setlvAnimToVisible(lvMessages);
+
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
+        tvNoMail.setVisibility(messageList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
     }
 
     // Initialize message list view
@@ -172,12 +172,8 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         initInbox(messageList);
         switchTopBar(MODE_VIEWING);
         messageListAdapter.setMode(MODE_VIEWING);
-        messageListAdapter.notifyDataSetChanged();
-        if (messageList.size() == 0) {
-            tvNoMail.setVisibility(View.VISIBLE);
-        } else {
-            tvNoMail.setVisibility(View.GONE);
-        }
+
+        tvNoMail.setVisibility(messageList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
     }
 
     // Be executed only When firstly start editing mode
@@ -188,7 +184,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageSelectedList.set(initSelectedPosition, Boolean.TRUE);
         messageListAdapter.setMode(MODE_EDITING);
         messageListAdapter.setSelectedList(messageSelectedList);
-        messageListAdapter.notifyDataSetChanged();
         setIfSelectedRead(messageList.get(initSelectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
     }
 
@@ -196,17 +191,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     public void setIndexSelected(int selectedPosition, Boolean ifSelected) {
         messageSelectedList.set(selectedPosition, ifSelected);
         messageListAdapter.setSelectedList(messageSelectedList);
-        messageListAdapter.notifyDataSetChanged();
         setIfSelectedRead(messageList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
     }
 
     public void markMailStar(int position, boolean ifStar) {
-        String strStar;
-        if (ifStar) {
-            strStar = LABEL_MSG_STAR;
-        } else {
-            strStar = LABEL_MSG_UNSTAR;
-        }
+        String strStar = ifStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR;
 
         messageDBHelper.starMailByLabel(messageList.get(position), strStar);
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
@@ -217,11 +206,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private void setIfSelectedRead(Boolean ifSelectedRead) {
         this.ifSelectedRead = ifSelectedRead;
         if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) {
-            if (ifSelectedRead) {
-                ibInboxFunction.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_read));
-            } else {
-                ibInboxFunction.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unread));
-            }
+            ibInboxFunction.setImageDrawable(context.getResources().getDrawable(ifSelectedRead ? R.mipmap.ic_read : R.mipmap.ic_unread));
         }
     }
 
@@ -229,20 +214,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         if (mode == MODE_EDITING) {
             llEditing.setVisibility(View.VISIBLE);
             btnUnread.setVisibility(View.GONE);
-            animUtilities.rotateToIcon(ibOptions, R.mipmap.ic_back);
+            animUtils.rotateToIcon(ibOptions, R.mipmap.ic_back);
         } else if (mode == MODE_VIEWING) {
             llEditing.setVisibility(View.GONE);
             btnUnread.setVisibility(View.VISIBLE);
-            animUtilities.rotateToIcon(ibOptions, R.mipmap.ic_options);
-        }
-    }
-
-    private void switchBoxFunctions(String currentBox) {
-        // The buttons in trash box is different from the other two
-        if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) {
-            ibInboxFunction.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_move_back));
-        } else {
-            ibInboxFunction.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unread));
+            animUtils.rotateToIcon(ibOptions, R.mipmap.ic_options);
         }
     }
 
@@ -256,7 +232,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageDBHelper.closeDB();
 
         // save which box the user is using
-        sharedPreferencesManager.saveCurrentMessageBox(currentBox);
+        SharedPreferencesManager.getInstance().saveCurrentMessageBox(currentBox);
     }
 
     private class InboxFragmentListener implements View.OnClickListener, AdapterView.OnItemClickListener {
@@ -301,11 +277,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                                 messageDBHelper.moveToBoxByLabel(messageList.get(i), LABEL_MSG_INBOX);
                             } else {
                                 // Check if mail is read or unread
-                                if (ifSelectedRead) {
-                                    messageDBHelper.markMailByLabel(messageList.get(i), LABEL_MSG_UNREAD);
-                                } else {
-                                    messageDBHelper.markMailByLabel(messageList.get(i), LABEL_MSG_READ);
-                                }
+                                messageDBHelper.markMailByLabel(messageList.get(i), ifSelectedRead ? LABEL_MSG_UNREAD : LABEL_MSG_READ);
                             }
                         }
                     }
@@ -313,15 +285,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     switchTopBar(MODE_VIEWING);
                     break;
                 case R.id.fragment_inbox_btn_unread:
-                    if (ifShowUnread) {
-                        btnUnread.setText(getString(R.string.unread));
-                        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-                        ifShowUnread = false;
-                    } else {
-                        btnUnread.setText(getString(R.string.all_mails));
-                        refreshViewingInbox(messageDBHelper.getUnreadMessageListInBox(messageList));
-                        ifShowUnread = true;
-                    }
+                    btnUnread.setText(ifShowUnread ? getString(R.string.unread) : getString(R.string.all_mails));
+                    refreshViewingInbox(ifShowUnread ? messageDBHelper.getMessageListByLabel(currentBox) : messageDBHelper.getUnreadMessageListInBox(messageList));
+                    ifShowUnread = !ifShowUnread;
                     break;
             }
         }
@@ -347,9 +313,12 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                             currentBox = LABEL_MSG_TRASH;
                             break;
                     }
-                    switchBoxFunctions(currentBox);
+
+                    // If the mailbox is trash, the button is changed to be move back
+                    ibInboxFunction.setImageDrawable(context.getResources().getDrawable(currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) ? R.mipmap.ic_move_back : R.mipmap.ic_unread));
+
                     refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-                    animUtilities.setlvAnimToVisible(lvMessages);
+                    animUtils.setlvAnimToVisible(lvMessages);
                     super.onDrawerClosed(drawerView);
                 }
             });

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 /**
  * Created by Tsung Wei Ho on 2017/2/28.
@@ -25,8 +27,14 @@ public class SharedPreferencesManager implements DBConstants {
     // Home Fragment use
     private String CURRENT_DISPLAY_MODE = "CURRENT_DISPLAY_MODE";
 
-    public SharedPreferencesManager(Context context) {
-        this.context = context;
+    private static final SharedPreferencesManager ourInstance = new SharedPreferencesManager();
+
+    public static SharedPreferencesManager getInstance() {
+        return ourInstance;
+    }
+
+    private SharedPreferencesManager() {
+        this.context = MainActivity.getContext();
         this.sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
