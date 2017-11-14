@@ -18,9 +18,8 @@ import java.util.ArrayList;
 
 public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, PubNubAPIConstants {
 
-    public static final String TABLE_NAME = "message_details";
-    public static final String DB_NAME = TABLE_NAME + ".db.sqlite";
-    public static final String SEPARATOR = TABLE_NAME + ".db.sqlite";
+    private static final String TABLE_NAME = "message_details";
+    private static final String DB_NAME = TABLE_NAME + ".db.sqlite";
 
     public MessageDBHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
@@ -55,13 +54,10 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         String[] whereArgs = {uniqueId};
 
         Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, null);
-        Boolean ifExist;
-        if (cursor.getCount() != 0) {
-            ifExist = true;
-        } else {
-            ifExist = false;
-        }
+        Boolean ifExist = cursor.getCount() != 0;
+
         cursor.close();
+        db.close();
 
         return ifExist;
     }

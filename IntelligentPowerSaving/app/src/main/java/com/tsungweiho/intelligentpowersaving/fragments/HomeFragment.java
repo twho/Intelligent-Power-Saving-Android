@@ -34,6 +34,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -50,7 +52,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     // UI Views;
     private GridLayout gridLayout;
     private LinearLayout llProgress;
-    private ImageButton ibRefresh, ibFollowing;
+    private ImageButton ibFollowing;
     private TextView tvNoBuilding;
 
     // Functions
@@ -90,6 +92,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             }
         });
 
+        ImageButton ibRefresh;
         ibRefresh = (ImageButton) view.findViewById(R.id.fragment_home_ib_refresh);
         ibRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,10 +109,10 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     private void setupFollowingBuildings() {
         ArrayList<Building> buildingList;
         if (ifShowFollow) {
-            buildingList = buildingDBHelper.getFollowedBuildingList();
+            buildingList = buildingDBHelper.getFollowedBuildingSet();
             ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_highlight));
         } else {
-            buildingList = buildingDBHelper.getAllBuildingList();
+            buildingList = buildingDBHelper.getAllBuildingSet();
             ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_unhighlight));
         }
         refreshBuildingIcons(buildingList);
@@ -161,7 +164,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             }
         });
 
-        ArrayList<Building> buildingList = buildingDBHelper.getAllBuildingList();
+        ArrayList<Building> buildingList = buildingDBHelper.getAllBuildingSet();
 
         // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)
@@ -175,8 +178,10 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     private void refreshBuildingIcons(ArrayList<Building> buildingList) {
         Building building;
         gridLayout.removeAllViews();
-        for (int index = 0; index < buildingList.size(); index++) {
-            building = buildingList.get(index);
+
+        Iterator<Building> iterator = buildingList.iterator();
+        for (int i = 0; i < buildingList.size(); i++) {
+            building = buildingList.get(i);
             BuildingIcon buildingIcon = new BuildingIcon(context, building);
             final Building finalBuilding = building;
             buildingIcon.getView().setOnClickListener(new View.OnClickListener() {
