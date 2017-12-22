@@ -67,7 +67,11 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
 
     private void init() {
         mainServiceListener = new MainServiceListener();
-        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+
+        if (null != MainActivity.getContext()) {
+            fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+        }
+
         eventDBHelper = new EventDBHelper(context);
         messageDBHelper = new MessageDBHelper(context);
         timeUtils = TimeUtils.getInstance();

@@ -79,7 +79,7 @@ public class AnimUtils {
 
     public void setIconAnimToVisible(ImageView imageView) {
         imageView.setVisibility(View.VISIBLE);
-        Animation am = AnimationUtils.loadAnimation(context, R.anim.design_fab_in);
+        Animation am = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         am.setDuration(ANIM_DURATION);
         imageView.setAnimation(am);
         am.startNow();

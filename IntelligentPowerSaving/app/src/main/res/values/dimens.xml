@@ -27,6 +27,7 @@
     <!--BuildingFragment-->
     <dimen name="fragment_building_title_text_size">12sp</dimen>
     <dimen name="fragment_building_content_text_size">6sp</dimen>
+    <dimen name="fragment_building_chart_height">200dp</dimen>
 
     <!--BuildingIcon-->
     <item name="ibj_icon_building_ic_follow_scale" format="float" type="dimen">0.5</item>

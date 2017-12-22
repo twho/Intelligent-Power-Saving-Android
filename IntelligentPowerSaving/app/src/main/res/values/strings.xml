@@ -43,7 +43,7 @@
     <string name="unfollow_this">Unfollow this</string>
     <string name="chart_title">Daily Energy Consumption</string>
     <string name="chart_x_title">Hour</string>
-    <string name="chart_y_title">Energy Consumption (kWh)</string>
+    <string name="chart_y_title">Daily Energy Consumption (kWh)</string>
     <string name="use_dept">Department using: </string>
     <string name="consump_this_hour">Current consumption:</string>
     <string name="consump_last_hour">Last hour consumption:</string>

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -22,7 +23,8 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
-import com.tsungweiho.intelligentpowersaving.utils.AChartUtils;
+import com.tsungweiho.intelligentpowersaving.objects.MarkerView;
+import com.tsungweiho.intelligentpowersaving.utils.ChartUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
@@ -43,7 +45,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private View view;
 
     // UI views
-    private LinearLayout llChart;
+    private LineChart lineChart;
     private TextView tvIbFollow;
     private ImageView ivIbFollow, ivFollowIndicator;
 
@@ -51,7 +53,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private Context context;
     private String buildingName;
     private AnimUtils animUtils;
-    private AChartUtils aChartUtils;
+    private ChartUtils chartUtils;
     private BuildingDBHelper buildingDBHelper;
     private Building building;
     private FragmentBuildingBinding binding;
@@ -73,8 +75,8 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private void init() {
         buildingDBHelper = new BuildingDBHelper(context);
 
-        // singleton classes
-        aChartUtils = AChartUtils.getInstance();
+        // Singleton classes
+        chartUtils = ChartUtils.getInstance();
         animUtils = AnimUtils.getInstance();
 
         building = buildingDBHelper.getBuildingByName(buildingName);
@@ -99,10 +101,10 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         });
         setFollowButton(Boolean.parseBoolean(building.getIfFollow()));
 
-        llChart = (LinearLayout) view.findViewById(R.id.fragment_building_ll_chart);
+        // Draw chart
+        lineChart = (LineChart) view.findViewById(R.id.fragment_building_chart);
 
-        ImageButton ibBack;
-        ibBack = (ImageButton) view.findViewById(R.id.fragment_building_ib_back);
+        ImageButton ibBack = (ImageButton) view.findViewById(R.id.fragment_building_ib_back);
         ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,7 +115,6 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         currentHour = Integer.parseInt(TimeUtils.getInstance().getTimeHH());
         consumptionList = new ArrayList<>(Arrays.asList(new String[TIME_HOURS.length]));
         currentHour += currentHour == 0 ? 24 : 0;
-
         Collections.fill(consumptionList, "0");
     }
 
@@ -170,24 +171,17 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     public void onResume() {
         super.onResume();
 
-        setupChartView();
+        setChartData();
     }
 
-    private void setupChartView() {
-        // The first two data are building's energy efficiency, not hourly power consumption
+    private void setChartData() {
+        // Dummy data: The first two data are building's energy efficiency, not hourly power consumption
         for (int x = 2; x < currentHour + 2; x++) {
             consumptionList.set(x - 2, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
         }
 
-        View barView;
-        try {
-            barView = aChartUtils.getBarChart(context, context.getResources().getString(R.string.chart_title),
-                    context.getResources().getString(R.string.chart_x_title), context.getResources().getString(R.string.chart_y_title), consumptionList);
-            llChart.removeAllViews();
-            llChart.addView(barView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (MainActivity.screenHeight / 1.4)));
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
+        // Setup chart and its data
+        chartUtils.setupLineChart(context, lineChart, consumptionList);
     }
 
     @Override

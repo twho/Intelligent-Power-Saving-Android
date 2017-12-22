@@ -23,6 +23,7 @@
 
     <!--BuildingIcon-->
     <item name="ibj_icon_building_ic_follow_scale" format="float" type="dimen">0.9</item>
+    <dimen name="fragment_building_chart_height">320dp</dimen>
 
     <!--MessageFragment-->
     <dimen name="fragment_message_img_size">400dp</dimen>

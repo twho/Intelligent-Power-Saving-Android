@@ -121,15 +121,13 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/fragment_building_ll_chart"
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/fragment_building_chart"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/fragment_building_chart_height"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="@dimen/activity_vertical_margin"
-                    android:layout_marginRight="@dimen/activity_vertical_margin"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/activity_main_space"></LinearLayout>
+                    android:layout_margin="@dimen/activity_vertical_margin"
+                    android:padding="@dimen/activity_main_space" />
 
                 <LinearLayout
                     android:id="@+id/fragment_building_ib_follow"

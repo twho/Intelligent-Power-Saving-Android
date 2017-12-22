@@ -162,6 +162,8 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         super.onResume();
 
         myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
+
+        // Bind data to UIs
         binding.setMyAccountInfo(myAccountInfo);
         swEvent.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0].equalsIgnoreCase("1"));
         swPublic.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1].equalsIgnoreCase("1"));

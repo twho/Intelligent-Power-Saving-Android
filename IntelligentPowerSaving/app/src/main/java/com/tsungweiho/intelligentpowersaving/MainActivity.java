@@ -315,11 +315,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     @Override
-    public void onBackPressed() {
-        // lock back button
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 

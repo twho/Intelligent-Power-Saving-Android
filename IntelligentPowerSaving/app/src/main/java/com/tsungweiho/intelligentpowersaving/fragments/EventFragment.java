@@ -329,8 +329,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Limit the map to NTUST campus
-        bounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
+        // Limit the map to University of Michigan campus
+        bounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));
         final LatLngBounds range = bounds;
         googleMap.setLatLngBoundsForCameraTarget(range);
 

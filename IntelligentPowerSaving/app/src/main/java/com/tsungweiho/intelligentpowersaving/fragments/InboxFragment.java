@@ -98,7 +98,6 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         findViews();
 
         setAllListeners();
-        onResume();
     }
 
     private void findViews() {
@@ -106,17 +105,23 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
         navList = (ListView) view.findViewById(R.id.fragment_inbox_drawer_lv);
         navList.setAdapter(drawerListAdapter);
+
         lvMessages = (ListView) view.findViewById(R.id.fragment_inbox_lv_message);
+
         tvMail = (TextView) view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
         tvNoMail = (TextView) view.findViewById(R.id.fragmnet_inbox_tv_no_mail);
         tvTitle = (TextView) view.findViewById(R.id.fragment_inbox_tv_title);
         tvTitle.setText(context.getString(R.string.inbox));
+
         ibOptions = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_options);
         ibInboxFunction = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_inbox_function);
         ibDelete = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_delete);
+
         btnUnread = (Button) view.findViewById(R.id.fragment_inbox_btn_unread);
+
         llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
+
         ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
     }
 
