@@ -7,10 +7,11 @@ package com.tsungweiho.intelligentpowersaving.constants;
 public interface DBConstants {
 
     // Firebase
-    String BUILDING_DB = "buildingList";
+    String BUILDING_DB = "ntustBuildingList";
     String SYSTEM_ACCOUNT = "tsungwei50521@hotmail.com";
     String SYSTEM_PWD = "801020";
     String FDB_NAME = "name";
+    String FDB_EFFICIENCY = "efficiency";
     String FDB_CONSUMPTION = "consumption";
     String FDB_DETAIL = "detail";
     String FDB_IMGURL = "img_url";
@@ -18,12 +19,13 @@ public interface DBConstants {
     String JSON_ARRAY_NAME = "buildingList";
 
     // For all databases
-    int VERSION = 3;
+    int VERSION = 6;
     String ID = "Id";
 
     // BuildingDBHelper
     String DB_BUILDING_NAME = "BUILDING_NAME";
     String DB_BUILDING_DETAIL = "BUILDING_DETAIL";
+    String DB_BUILDING_EFFICIENCY = "BUILDING_EFFICIENCY";
     String DB_BUILDING_CONSUMPTION = "BUILDING_CONSUMPTION";
     String DB_BUILDING_IMG_URL = "BUILDING_IMG_URL";
     String DB_BUILDING_IF_FOLLOW = "DB_BUILDING_IF_FOLLOW";

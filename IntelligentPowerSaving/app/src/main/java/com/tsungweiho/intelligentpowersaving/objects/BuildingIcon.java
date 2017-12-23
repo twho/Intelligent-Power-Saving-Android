@@ -17,6 +17,7 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 /**
  * Created by Tsung Wei Ho on 2/18/2017.
+ * Updated by Tsung Wei Ho on 12/22/2017
  */
 
 public class BuildingIcon extends View implements BuildingConstants {
@@ -37,10 +38,13 @@ public class BuildingIcon extends View implements BuildingConstants {
 
         this.context = context;
         this.building = building;
+
+        // Data binding
         LayoutInflater li = LayoutInflater.from(context);
         binding = DataBindingUtil.inflate(li, R.layout.obj_icon_building, null, false);
         binding.setBuilding(building);
         view = binding.getRoot();
+
         initViews();
     }
 
@@ -49,7 +53,7 @@ public class BuildingIcon extends View implements BuildingConstants {
     public static void loadImage(final ImageView imageView, final String url) {
         ImageUtils.getInstance().setRoundCornerImageViewFromUrl(url, imageView);
 
-        // Auto refresh after 5 seconds.
+        // Auto refresh after 3.5 seconds.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -59,33 +63,22 @@ public class BuildingIcon extends View implements BuildingConstants {
         }, 3500);
     }
 
+    // Compile with SDK 26, no need to cast views
     private void initViews() {
-        setupFollowIndicator();
-        ivIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_indicator);
-        tvConsump = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption);
-        tvConsumpPercent = (TextView) view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
+        ivFollowIndicator = view.findViewById(R.id.obj_building_icon_iv_follow);
+        ivFollowIndicator.setVisibility(Boolean.parseBoolean(building.getIfFollow()) ? View.VISIBLE : View.GONE);
 
-        if (ENERGY_HIGH.equalsIgnoreCase(building.getConsumption().split(",")[0])) {
-            tvConsump.setText(context.getString(R.string.increase_weekly));
-            setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.light_red));
-            ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_increase));
-        } else {
-            tvConsump.setText(context.getString(R.string.decrease_weekly));
-            setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(R.color.green));
-            ivIndicator.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_decrease));
-        }
+        ivIndicator = view.findViewById(R.id.obj_building_icon_iv_indicator);
+        tvConsump = view.findViewById(R.id.obj_building_icon_tv_consumption);
+        tvConsumpPercent = view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
+
+        Boolean energyIncrease = Integer.valueOf(building.getEfficiency().split(",")[0]) > 0;
+        tvConsump.setText(context.getString(energyIncrease ? R.string.increase_weekly : R.string.decrease_weekly));
+        setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(energyIncrease ? R.color.light_red : R.color.green));
+        ivIndicator.setImageDrawable(context.getResources().getDrawable(energyIncrease ? R.mipmap.ic_increase : R.mipmap.ic_decrease));
 
         AnimUtils.getInstance().setIconAnimToVisible(ivIndicator);
-        tvConsumpPercent.setText(building.getConsumption().split(",")[1] + " %");
-    }
-
-    private void setupFollowIndicator(){
-        ivFollowIndicator = (ImageView) view.findViewById(R.id.obj_building_icon_iv_follow);
-        if (Boolean.parseBoolean(building.getIfFollow())){
-            ivFollowIndicator.setVisibility(View.VISIBLE);
-        } else {
-            ivFollowIndicator.setVisibility(View.GONE);
-        }
+        tvConsumpPercent.setText(building.getEfficiency().split(",")[0] + " %");
     }
 
     private void setTextViewColor(TextView tvConsump, TextView tvConsumpPercent, int color) {

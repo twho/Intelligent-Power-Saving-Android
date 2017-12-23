@@ -47,19 +47,19 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         onCreate(db);
     }
 
-    public Boolean checkIfExist(String uniqueId) {
+    public Boolean isExist(String uniqueId) {
         SQLiteDatabase db = getReadableDatabase();
         String[] columns = {DB_MESSAGE_UNID};
         String whereClause = DB_MESSAGE_UNID + " = ?;";
         String[] whereArgs = {uniqueId};
 
         Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, null);
-        Boolean ifExist = cursor.getCount() != 0;
+        Boolean isExist = cursor.getCount() != 0;
 
         cursor.close();
         db.close();
 
-        return ifExist;
+        return isExist;
     }
 
     public long insertDB(Message message) {

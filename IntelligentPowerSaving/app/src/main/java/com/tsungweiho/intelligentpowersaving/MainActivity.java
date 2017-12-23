@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public void setBuildingFragment(Building building) {
         Bundle bundle = new Bundle();
         bundle.putString(BUILDING_FRAGMENT_KEY, building.getName());
+
         BuildingFragment buildingFragment = new BuildingFragment();
         buildingFragment.setArguments(bundle);
 

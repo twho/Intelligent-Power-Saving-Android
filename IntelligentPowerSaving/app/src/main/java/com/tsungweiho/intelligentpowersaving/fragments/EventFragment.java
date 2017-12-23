@@ -119,6 +119,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     private Marker currentAddedMarker;
     private boolean ifMarkerViewUp = false;
     private boolean lockLocation = false;
+    private Float initMapZoom = 16.0f;
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -160,22 +161,23 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         initMap(savedInstanceState);
     }
 
+    // Compile with SDK 26, no need to cast views
     private void findViews() {
-        flTopBarAddEvent = (FrameLayout) view.findViewById(R.id.fragment_event_top_bar_add_event1);
-        llTopBarAddEvent = (LinearLayout) view.findViewById(R.id.fragment_event_top_bar_add_event2);
-        llMarkerInfo = (LinearLayout) view.findViewById(R.id.fragment_event_ll_marker_info);
-        llOpen = (LinearLayout) view.findViewById(R.id.fragment_event_ll_open);
-        ibAdd = (ImageButton) view.findViewById(R.id.fragment_event_ib_add);
-        ibCancel = (ImageButton) view.findViewById(R.id.fragment_event_ib_cancel);
-        ibCamera = (ImageButton) view.findViewById(R.id.fragment_event_ib_camera);
-        tvTitle = (TextView) view.findViewById(R.id.fragment_event_title);
-        tvBottom = (TextView) view.findViewById(R.id.fragment_event_bottom);
-        edEvent = (EditText) view.findViewById(R.id.fragment_event_ed_event);
-        btnFullMap = (Button) view.findViewById(R.id.fragment_event_btn_full_map);
-        ivAddIcon = (ImageView) view.findViewById(R.id.fragment_event_add_icon);
-        ivMarker = (ImageView) view.findViewById(R.id.fragment_event_iv_marker_img);
-        pbMarker = (ProgressBar) view.findViewById(R.id.fragment_event_pb_marker_img);
-        pbTopBar = (ProgressBar) view.findViewById(R.id.fragment_event_pb);
+        flTopBarAddEvent = view.findViewById(R.id.fragment_event_top_bar_add_event1);
+        llTopBarAddEvent = view.findViewById(R.id.fragment_event_top_bar_add_event2);
+        llMarkerInfo = view.findViewById(R.id.fragment_event_ll_marker_info);
+        llOpen = view.findViewById(R.id.fragment_event_ll_open);
+        ibAdd = view.findViewById(R.id.fragment_event_ib_add);
+        ibCancel = view.findViewById(R.id.fragment_event_ib_cancel);
+        ibCamera = view.findViewById(R.id.fragment_event_ib_camera);
+        tvTitle = view.findViewById(R.id.fragment_event_title);
+        tvBottom = view.findViewById(R.id.fragment_event_bottom);
+        edEvent = view.findViewById(R.id.fragment_event_ed_event);
+        btnFullMap = view.findViewById(R.id.fragment_event_btn_full_map);
+        ivAddIcon = view.findViewById(R.id.fragment_event_add_icon);
+        ivMarker = view.findViewById(R.id.fragment_event_iv_marker_img);
+        pbMarker = view.findViewById(R.id.fragment_event_pb_marker_img);
+        pbTopBar = view.findViewById(R.id.fragment_event_pb);
     }
 
     private void setAllListeners() {
@@ -214,7 +216,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
                     }
                     break;
                 case R.id.fragment_event_btn_full_map:
-                    CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).zoom(18.0f).build();
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).zoom(initMapZoom).build();
                     googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     break;
             }
@@ -316,13 +318,19 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     private void createUpload(File image) {
         upload = new Upload();
-        upload.image = imageUtils.getCompressedImgFile(image);
-        upload.title = edEvent.getText().toString();
-        upload.description = edEvent.getText().toString();
+
+        try {
+            upload.image = imageUtils.getCompressedImgFile(image);
+            upload.title = edEvent.getText().toString();
+            upload.description = edEvent.getText().toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            alertDialogMgr.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.notification_fail));
+        }
     }
 
     private void initMap(Bundle savedInstanceState) {
-        mapView = (MapView) view.findViewById(R.id.fragment_event_map_view);
+        mapView = view.findViewById(R.id.fragment_event_map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     }
@@ -334,7 +342,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
         final LatLngBounds range = bounds;
         googleMap.setLatLngBoundsForCameraTarget(range);
 
-        googleMap.setMinZoomPreference(18.0f);
+        googleMap.setMinZoomPreference(initMapZoom);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
@@ -418,7 +426,7 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
 
     private void insertDataToDB(JSONObject jObject) {
         Event event = getEventByJSONObj(jObject);
-        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
+        if (!eventDBHelper.isExist(event.getUniqueId())) {
             eventDBHelper.insertDB(event);
         }
     }

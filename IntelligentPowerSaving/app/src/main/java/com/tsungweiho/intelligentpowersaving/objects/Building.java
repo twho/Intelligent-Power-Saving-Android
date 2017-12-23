@@ -6,13 +6,15 @@ package com.tsungweiho.intelligentpowersaving.objects;
 public class Building {
     private String name;
     private String detail;
+    private String efficiency;
     private String consumption;
     private String imageUrl;
     private String ifFollow;
 
-    public Building(String name, String detail, String consumption, String imageUrl, String ifFollow) {
+    public Building(String name, String detail, String efficiency, String consumption, String imageUrl, String ifFollow) {
         this.name = name;
         this.detail = detail;
+        this.efficiency = efficiency;
         this.consumption = consumption;
         this.imageUrl = imageUrl;
         this.ifFollow = ifFollow;
@@ -32,6 +34,14 @@ public class Building {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public String getEfficiency() {
+        return efficiency;
+    }
+
+    public void setEfficiency(String efficiency) {
+        this.efficiency = efficiency;
     }
 
     public String getConsumption() {

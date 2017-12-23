@@ -18,7 +18,7 @@
     <string name="trash">Trash</string>
     <string name="label_default">unread,unstar,inbox,</string>
     <string name="event_reported_around">Reported around</string>
-    <string name="delete_caption1">You have deleted</string>
+    <string name="delete_caption1">You deleted</string>
     <string name="delete_caption2">mail(s).</string>
 
     <!--InboxFragment-->
@@ -59,7 +59,7 @@
     <string name="fragment_event_err_no_ed">Please enter at least one event name.</string>
 
     <!--Imgur API-->
-    <string name="notification_fail">Image failed to upload...</string>
+    <string name="notification_fail">Failed to upload image...</string>
     <string name="notification_share_link">Share link</string>
     <string name="notifaction_success">Successfully uploaded</string>
     <string name="notification_progress">Uploading image...</string>

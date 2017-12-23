@@ -61,9 +61,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     private BuildingDBHelper buildingDBHelper;
     private boolean ifShowFollow = false;
 
-    // Firebase
-    private DatabaseReference databaseReference;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,12 +75,13 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         buildingDBHelper = new BuildingDBHelper(context);
 
         // find views
-        gridLayout = (GridLayout) view.findViewById(R.id.fragment_home_grid_layout);
-        llProgress = (LinearLayout) view.findViewById(R.id.fragment_home_progress_layout);
-        tvNoBuilding = (TextView) view.findViewById(R.id.fragmnet_home_tv_no_building);
+        // Compile with SDK 26, no need to cast views
+        gridLayout = view.findViewById(R.id.fragment_home_grid_layout);
+        llProgress = view.findViewById(R.id.fragment_home_progress_layout);
+        tvNoBuilding = view.findViewById(R.id.fragmnet_home_tv_no_building);
         animUtils.setllAnimToVisible(llProgress);
 
-        ibFollowing = (ImageButton) view.findViewById(R.id.fragment_home_ib_following);
+        ibFollowing = view.findViewById(R.id.fragment_home_ib_following);
         ibFollowing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,12 +90,11 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             }
         });
 
-        ImageButton ibRefresh;
-        ibRefresh = (ImageButton) view.findViewById(R.id.fragment_home_ib_refresh);
+        ImageButton ibRefresh = view.findViewById(R.id.fragment_home_ib_refresh);
         ibRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadDataFromFirebase();
+                loadDataFromFDB();
             }
         });
 
@@ -107,14 +104,9 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     }
 
     private void setupFollowingBuildings() {
-        ArrayList<Building> buildingList;
-        if (ifShowFollow) {
-            buildingList = buildingDBHelper.getFollowedBuildingSet();
-            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_highlight));
-        } else {
-            buildingList = buildingDBHelper.getAllBuildingSet();
-            ibFollowing.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_unhighlight));
-        }
+        ArrayList<Building> buildingList = ifShowFollow ? buildingDBHelper.getFollowedBuildingSet() : buildingDBHelper.getAllBuildingSet();
+        ibFollowing.setImageDrawable(context.getResources().getDrawable(ifShowFollow ? R.mipmap.ic_label_highlight : R.mipmap.ic_label_unhighlight));
+
         refreshBuildingIcons(buildingList);
 
         tvNoBuilding.setVisibility(buildingList.size() == 0 ? View.VISIBLE : View.GONE);
@@ -124,35 +116,40 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     public void onResume() {
         super.onResume();
 
-        loadDataFromFirebase();
+        loadDataFromFDB();
 
         // Read current status
         ifShowFollow = SharedPreferencesManager.getInstance().getIfShowFollowedBuilding();
         setupFollowingBuildings();
     }
 
-    public void loadDataFromFirebase() {
+    /**
+     * Parse JSON downloaded from Firebase database
+     */
+    public void loadDataFromFDB() {
         if (null == buildingDBHelper)
             buildingDBHelper = new BuildingDBHelper(context);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child(BUILDING_DB);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(BUILDING_DB);
         databaseReference.addValueEventListener(new ValueEventListener() {
             Building building = null;
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot buildingSnapshot : dataSnapshot.getChildren()) {
-                    String name = buildingSnapshot.child(FDB_NAME).getValue().toString();
-                    String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue().toString();
+                    String name = buildingSnapshot.child(FDB_NAME).getValue() + "";
+                    String efficiency = buildingSnapshot.child(FDB_EFFICIENCY).getValue() + "";
+                    String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue() + "";
 
-                    if (!buildingDBHelper.checkIfExist(name)) {
-                        String detail = buildingSnapshot.child(FDB_DETAIL).getValue().toString();
-                        String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue().toString();
-                        building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
+                    if (!buildingDBHelper.isExist(name)) {
+                        String detail = buildingSnapshot.child(FDB_DETAIL).getValue() + "";
+                        String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue() + "";
+                        building = new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW);
                         buildingDBHelper.insertDB(building);
                     } else {
                         building = buildingDBHelper.getBuildingByName(name);
                         building.setConsumption(consumption);
+                        building.setEfficiency(efficiency);
                         buildingDBHelper.updateDB(building);
                     }
                 }
@@ -179,10 +176,10 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         Building building;
         gridLayout.removeAllViews();
 
-        Iterator<Building> iterator = buildingList.iterator();
         for (int i = 0; i < buildingList.size(); i++) {
             building = buildingList.get(i);
             BuildingIcon buildingIcon = new BuildingIcon(context, building);
+
             final Building finalBuilding = building;
             buildingIcon.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -191,6 +188,33 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
                 }
             });
             gridLayout.addView(buildingIcon.getView());
+        }
+    }
+
+    /**
+     * Load data from local storage if network is bad
+     */
+    private void addLocalDataToDatabase() {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(loadJSONFromAsset());
+            JSONArray jArr = obj.getJSONArray(JSON_ARRAY_NAME);
+
+            for (int i = 0; i < jArr.length(); i++) {
+                JSONObject currentObj = jArr.getJSONObject(i);
+                String name = currentObj.getString(FDB_NAME);
+
+                // if already have in local, don't override the data
+                if (!buildingDBHelper.isExist(name)) {
+                    String detail = currentObj.getString(FDB_DETAIL);
+                    String efficiency = currentObj.getString(FDB_EFFICIENCY);
+                    String consumption = currentObj.getString(FDB_CONSUMPTION);
+                    String imgUrl = currentObj.getString(FDB_IMGURL);
+                    buildingDBHelper.insertDB(new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -208,31 +232,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             Log.d(TAG, e.getMessage());
         }
         return json;
-    }
-
-    private void addLocalDataToDatabase() {
-        JSONObject obj;
-        try {
-            obj = new JSONObject(loadJSONFromAsset());
-            JSONArray jArry = obj.getJSONArray(JSON_ARRAY_NAME);
-
-            Building building;
-            for (int i = 0; i < jArry.length(); i++) {
-                JSONObject currentObj = jArry.getJSONObject(i);
-                String name = currentObj.getString(FDB_NAME);
-
-                // if already have in local, don't override the data
-                if (!buildingDBHelper.checkIfExist(name)) {
-                    String detail = currentObj.getString(FDB_DETAIL);
-                    String consumption = currentObj.getString(FDB_CONSUMPTION);
-                    String imgUrl = currentObj.getString(FDB_IMGURL);
-                    building = new Building(name, detail, consumption, imgUrl, BUILDING_NOT_FOLLOW);
-                    buildingDBHelper.insertDB(building);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

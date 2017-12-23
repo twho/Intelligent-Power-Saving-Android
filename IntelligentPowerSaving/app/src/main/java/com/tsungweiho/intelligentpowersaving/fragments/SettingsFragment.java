@@ -83,10 +83,11 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         // Singleton classes
         alertDialogManager = AlertDialogManager.getInstance();
 
-        edName = (EditText) view.findViewById(R.id.fragment_settings_ed_name);
-        edEmail = (EditText) view.findViewById(R.id.fragment_settings_ed_email);
+        // Compile with SDK 26, no need to cast views
+        edName = view.findViewById(R.id.fragment_settings_ed_name);
+        edEmail = view.findViewById(R.id.fragment_settings_ed_email);
 
-        ivProfile = (ImageView) view.findViewById(R.id.fragment_settings_iv);
+        ivProfile = view.findViewById(R.id.fragment_settings_iv);
         ivProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,7 +95,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             }
         });
 
-        swEvent = (Switch) view.findViewById(R.id.fragment_settings_sw_event);
+        swEvent = view.findViewById(R.id.fragment_settings_sw_event);
         swEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {
@@ -108,7 +109,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             }
         });
 
-        swPublic = (Switch) view.findViewById(R.id.fragment_settings_sw_public);
+        swPublic = view.findViewById(R.id.fragment_settings_sw_public);
         swPublic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {

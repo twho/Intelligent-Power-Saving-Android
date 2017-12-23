@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentBuildingBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
-import com.tsungweiho.intelligentpowersaving.objects.MarkerView;
 import com.tsungweiho.intelligentpowersaving.utils.ChartUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
@@ -34,8 +32,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * Created by Tsung Wei Ho on 2017/2/18.
- * Updated by Tsung Wei Ho on 2017/11/9
+ * Created by Tsung Wei Ho on 2/18/2017.
+ * Updated by Tsung Wei Ho on 12/22/2017
  */
 
 public class BuildingFragment extends Fragment implements FragmentTags, BuildingConstants {
@@ -61,14 +59,16 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     private static int currentHour;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_building, container, false);
         view = binding.getRoot();
 
         context = MainActivity.getContext();
+
         this.buildingName = this.getArguments().getString(BUILDING_FRAGMENT_KEY);
+
         init();
+
         return view;
     }
 
@@ -149,14 +149,10 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         textView.setText(MainActivity.getContext().getString(R.string.use_dept) + " " + detail);
     }
 
-    @BindingAdapter({"bind:consumption"})
-    public static void loadTitle(TextView textView, String consumption) {
-        String energyInfo;
-        if (ENERGY_HIGH.equalsIgnoreCase(consumption.split(",")[0])) {
-            energyInfo = consumption.split(SEPARATOR_CONSUMPTION)[1] + "% " + MainActivity.getContext().getString(R.string.increase_weekly);
-        } else {
-            energyInfo = consumption.split(SEPARATOR_CONSUMPTION)[1] + "% " + MainActivity.getContext().getString(R.string.decrease_weekly);
-        }
+    @BindingAdapter({"bind:efficiency"})
+    public static void loadTitle(TextView textView, String efficiency) {
+        String energyInfo = efficiency.split(SEPARATOR_CONSUMPTION)[0] + "% " +
+                (Integer.valueOf(efficiency.split(",")[0]) > 0 ? MainActivity.getContext().getString(R.string.increase_weekly) : MainActivity.getContext().getString(R.string.decrease_weekly));
 
         // Get the data from yesterday
         int lastHour = currentHour - 2;
@@ -176,8 +172,8 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     private void setChartData() {
         // Dummy data: The first two data are building's energy efficiency, not hourly power consumption
-        for (int x = 2; x < currentHour + 2; x++) {
-            consumptionList.set(x - 2, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
+        for (int x = 0; x < currentHour; x++) {
+            consumptionList.set(x, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
         }
 
         // Setup chart and its data

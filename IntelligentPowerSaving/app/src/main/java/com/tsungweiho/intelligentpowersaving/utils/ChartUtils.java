@@ -19,9 +19,11 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
-import com.tsungweiho.intelligentpowersaving.objects.MarkerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Michael Ho on 2015/5/27.
@@ -37,9 +39,10 @@ public class ChartUtils implements BuildingConstants {
         return ourInstance;
     }
 
-    private ChartUtils() {}
+    private ChartUtils() {
+    }
 
-    public void setupLineChart(Context context, LineChart lineChart, ArrayList<String> stringArrayList){
+    public void setupLineChart(Context context, LineChart lineChart, ArrayList<String> stringArrayList) {
         // no description text
         lineChart.getDescription().setEnabled(false);
 
@@ -52,12 +55,6 @@ public class ChartUtils implements BuildingConstants {
 
         // if disabled, scaling can be done on x- and y-axis separately
         lineChart.setPinchZoom(true);
-
-        // create a custom MarkerView (extend MarkerView) and specify the layout
-        // to use for it
-        MarkerView mv = new MarkerView(context, R.layout.obj_marker_view);
-        mv.setChartView(lineChart); // For bounds control
-        lineChart.setMarker(mv); // Set the marker to the chart
 
         // x-axis limit line
         LimitLine llXAxis = new LimitLine(10f, "Index 10");
@@ -73,7 +70,9 @@ public class ChartUtils implements BuildingConstants {
 
         Typeface tf = Typeface.createFromAsset(context.getAssets(), "OpenSans-Regular.ttf");
 
-        LimitLine ll1 = new LimitLine(150f, "Upper Limit");
+        List<Integer> intList = convertStringArrToIntArr(stringArrayList);
+
+        LimitLine ll1 = new LimitLine(Collections.max(intList), "Max Consumption");
         ll1.setLineWidth(4f);
         ll1.enableDashedLine(10f, 10f, 0f);
         ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -82,7 +81,7 @@ public class ChartUtils implements BuildingConstants {
         ll1.setLineColor(context.getResources().getColor(R.color.green));
         ll1.setTypeface(tf);
 
-        LimitLine ll2 = new LimitLine(-30f, "Lower Limit");
+        LimitLine ll2 = new LimitLine(Collections.min(intList), "Min Consumption");
         ll2.setLineWidth(4f);
         ll2.enableDashedLine(10f, 10f, 0f);
         ll2.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
@@ -95,8 +94,8 @@ public class ChartUtils implements BuildingConstants {
         leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
         leftAxis.addLimitLine(ll1);
         leftAxis.addLimitLine(ll2);
-        leftAxis.setAxisMaximum(200f);
-        leftAxis.setAxisMinimum(-50f);
+        leftAxis.setAxisMaximum(Collections.max(intList)*1.1f);
+        leftAxis.setAxisMinimum(Collections.min(intList) == 0 ? -15f : 0f);
         leftAxis.setTextColor(Color.WHITE);
         //leftAxis.setYOffset(20f);
         leftAxis.enableGridDashedLine(10f, 10f, 0f);
@@ -127,6 +126,15 @@ public class ChartUtils implements BuildingConstants {
         // lineChart.invalidate();
     }
 
+    private  ArrayList<Integer> convertStringArrToIntArr(ArrayList<String> arrayList) {
+        ArrayList<Integer> numArraList = new ArrayList<>();
+
+        for (int i = 0; i < arrayList.size(); i++) {
+            numArraList.add(Integer.parseInt(arrayList.get(i)));
+        }
+        return numArraList;
+    }
+
     private void setChartData(Context context, LineChart lineChart, ArrayList<String> stringArrayList) {
 
         ArrayList<Entry> values = new ArrayList<Entry>();
@@ -138,7 +146,7 @@ public class ChartUtils implements BuildingConstants {
 
         LineDataSet set1;
 
-        if (null != lineChart.getData()  && lineChart.getData().getDataSetCount() > 0) {
+        if (null != lineChart.getData() && lineChart.getData().getDataSetCount() > 0) {
             set1 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
             set1.setValues(values);
             lineChart.getData().notifyDataChanged();
@@ -168,8 +176,7 @@ public class ChartUtils implements BuildingConstants {
                 // fill drawable only supported on api level 18 and above
                 Drawable drawable = ContextCompat.getDrawable(context, R.drawable.background_chart_line);
                 set1.setFillDrawable(drawable);
-            }
-            else {
+            } else {
                 set1.setFillColor(context.getResources().getColor(R.color.teal));
             }
 

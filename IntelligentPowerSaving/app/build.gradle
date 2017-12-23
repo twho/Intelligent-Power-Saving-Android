@@ -10,10 +10,10 @@ android {
     }
     defaultConfig {
         applicationId "com.tsungweiho.intelligentpowersaving"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 26
-        versionCode 16
-        versionName "1.1.0"
+        versionCode 17
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -44,13 +44,14 @@ dependencies {
     compile 'com.google.firebase:firebase-perf:11.8.0'
 
     // 3rd party APIs
-    compile 'com.isseiaoki:simplecropview:1.1.4'
+    compile 'com.isseiaoki:simplecropview:1.1.7'
     compile 'com.pubnub:pubnub-gson:4.5.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'id.zelory:compressor:1.0.4'
-    compile 'com.android.support:design:26.0.2'
+    compile 'id.zelory:compressor:2.1.0'
+    compile 'com.android.support:design:26.1.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton:butterknife:8.8.1'
+    compile 'com.yalantis:phoenix:1.2.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.github.AKiniyalocts:imgur-api:-SNAPSHOT'

@@ -15,6 +15,7 @@ public interface FragmentTags {
 
     // Extended Fragment
     String BUILDING_FRAGMENT = packageName + "BuildingFragment";
+    String BUILDING_CHART_FRAGMENT = packageName + "BuildingChartFragment";
     String BUILDING_FRAGMENT_KEY = packageName + "BuildingFragmentKey";
     String MESSAGE_FRAGMENT = packageName + "MessageFragment";
     String MESSAGE_FRAGMENT_KEY = packageName + "MessageFragmentKey";

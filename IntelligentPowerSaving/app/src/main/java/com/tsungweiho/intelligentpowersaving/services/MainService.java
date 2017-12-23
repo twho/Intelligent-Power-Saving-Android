@@ -26,7 +26,6 @@ import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
-import com.tsungweiho.intelligentpowersaving.tools.NotificationHelper;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import org.json.JSONException;
@@ -111,7 +110,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                 if (message.getMessage().toString().contains(FROM_WEB_MESSAGE_SEPARATOR)) {
                     String strMessage = message.getMessage().toString();
                     String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
-                    if (!messageDBHelper.checkIfExist(uniqueId)) {
+                    if (!messageDBHelper.isExist(uniqueId)) {
                         String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
                         String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
                         String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
@@ -120,8 +119,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                         Message newMessage = new Message(uniqueId, title, content, sender, time, inboxLabel);
                         messageDBHelper.insertDB(newMessage);
 
-                        InboxFragment inboxFragment = setUpInboxFragment();
-                        inboxFragment.refreshViewingInboxOnUiThread();
+                        setUpInboxFragment().refreshViewingInboxOnUiThread();
                     }
                 }
             }
@@ -135,7 +133,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
 
     private void insertDataToDB(JSONObject jObject) {
         Event event = getEventByJSONObj(jObject);
-        if (!eventDBHelper.checkIfExist(event.getUniqueId())) {
+        if (!eventDBHelper.isExist(event.getUniqueId())) {
             eventDBHelper.insertDB(event);
             if (EventFragment.ifFragmentActive) {
                 EventFragment eventFragment = (EventFragment) fm.findFragmentByTag(EVENT_FRAGMENT);
@@ -180,14 +178,12 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             String poster = jsonObject.getString(EVENT_POSTER);
             String time = jsonObject.getString(EVENT_TIME);
 
-            if (!messageDBHelper.checkIfExist(uniqueId)) {
+            if (!messageDBHelper.isExist(uniqueId)) {
                 Message message = new Message(uniqueId, detail, getString(R.string.event_reported_around) + " " + address, poster, time, getString(R.string.label_default) + uniqueId);
                 messageDBHelper.insertDB(message);
 
-                if (InboxFragment.ifFragmentActive) {
-                    InboxFragment inboxFragment = setUpInboxFragment();
-                    inboxFragment.refreshViewingFromService();
-                }
+                if (InboxFragment.ifFragmentActive)
+                    setUpInboxFragment().refreshViewingFromService();
             }
         } catch (JSONException e) {
             e.printStackTrace();

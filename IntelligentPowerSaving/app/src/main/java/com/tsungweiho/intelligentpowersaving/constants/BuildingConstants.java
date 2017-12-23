@@ -10,7 +10,6 @@ public interface BuildingConstants {
     String[] TIME_HOURS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "Noon", "1", "2", "3",
             "4", "5", "6", "7", "8", "9", "10", "11", "0"};
     String SEPARATOR_CONSUMPTION = ",";
-    String ENERGY_HIGH = "high";
 
     // If users follow the building
     String BUILDING_FOLLOW = "true";

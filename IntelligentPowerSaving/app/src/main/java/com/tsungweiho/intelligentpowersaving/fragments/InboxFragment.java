@@ -31,6 +31,7 @@ import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +39,8 @@ import java.util.Collections;
 
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Created by Michael Ho on 2015/4/15.
+ * Updated by Michael Ho on 2017/12/22.
  */
 
 public class InboxFragment extends Fragment implements DrawerListConstants, PubNubAPIConstants, DBConstants {
@@ -52,6 +53,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private LinearLayout llDrawer, llEditing;
     private TextView tvTitle, tvMail, tvNoMail;
     private ListView navList, lvMessages;
+    private PullToRefreshView pullToRefreshView;
     private ImageButton ibOptions, ibDelete, ibInboxFunction;
     private Button btnUnread;
     private ImageView ivDrawerPic;
@@ -70,6 +72,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private ArrayList<Boolean> messageSelectedList;
     private int MODE_VIEWING = 0;
     private int MODE_EDITING = 1;
+    private int REFRESH_DELAY = 2000;
     private String currentBox;
     private Boolean ifSelectedRead;
     private boolean ifShowUnread;
@@ -97,35 +100,49 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
         findViews();
 
-        setAllListeners();
+        setListeners();
     }
 
+    // Compile with SDK 26, no need to cast views
     private void findViews() {
         DrawerListAdapter drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
-        drawer = (DrawerLayout) view.findViewById(R.id.fragment_inbox_drawer_layout);
-        navList = (ListView) view.findViewById(R.id.fragment_inbox_drawer_lv);
+        drawer = view.findViewById(R.id.fragment_inbox_drawer_layout);
+        navList = view.findViewById(R.id.fragment_inbox_drawer_lv);
         navList.setAdapter(drawerListAdapter);
 
-        lvMessages = (ListView) view.findViewById(R.id.fragment_inbox_lv_message);
+        lvMessages = view.findViewById(R.id.fragment_inbox_lv_message);
+        pullToRefreshView = view.findViewById(R.id.fragment_inbox_pulltorefresh);
+        pullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pullToRefreshView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Get pubnub channel history
+                        pullToRefreshView.setRefreshing(false);
+                    }
+                }, REFRESH_DELAY);
+            }
+        });
 
-        tvMail = (TextView) view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
-        tvNoMail = (TextView) view.findViewById(R.id.fragmnet_inbox_tv_no_mail);
-        tvTitle = (TextView) view.findViewById(R.id.fragment_inbox_tv_title);
+        tvMail = view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
+        tvNoMail = view.findViewById(R.id.fragmnet_inbox_tv_no_mail);
+        tvTitle = view.findViewById(R.id.fragment_inbox_tv_title);
         tvTitle.setText(context.getString(R.string.inbox));
 
-        ibOptions = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_options);
-        ibInboxFunction = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_inbox_function);
-        ibDelete = (ImageButton) view.findViewById(R.id.fragment_inbox_ib_delete);
+        ibOptions = view.findViewById(R.id.fragment_inbox_ib_options);
+        ibInboxFunction = view.findViewById(R.id.fragment_inbox_ib_inbox_function);
+        ibDelete = view.findViewById(R.id.fragment_inbox_ib_delete);
 
-        btnUnread = (Button) view.findViewById(R.id.fragment_inbox_btn_unread);
+        btnUnread = view.findViewById(R.id.fragment_inbox_btn_unread);
 
-        llDrawer = (LinearLayout) view.findViewById(R.id.fragment_inbox_ll_drawer);
-        llEditing = (LinearLayout) view.findViewById(R.id.fragment_inbox_layout_editing);
+        llDrawer = view.findViewById(R.id.fragment_inbox_ll_drawer);
+        llEditing = view.findViewById(R.id.fragment_inbox_layout_editing);
 
-        ivDrawerPic = (ImageView) view.findViewById(R.id.fragment_inbox_drawer_iv);
+        ivDrawerPic = view.findViewById(R.id.fragment_inbox_drawer_iv);
     }
 
-    private void setAllListeners() {
+    private void setListeners() {
         ibOptions.setOnClickListener(inboxFragmentListener);
         navList.setOnItemClickListener(inboxFragmentListener);
         ibDelete.setOnClickListener(inboxFragmentListener);
@@ -349,11 +366,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         uiThread.start();
     }
 
-    public void refreshViewingFromService() {
-        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-    }
-
     private void makeDeleteToast(int count) {
         Toast.makeText(context, getString(R.string.delete_caption1) + " " + count + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
+    }
+
+    public void refreshViewingFromService() {
+        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
     }
 }

@@ -1,52 +1,200 @@
 {
-  "buildingList": [
-    {
-      "consumption": "low,27,110,112,110,110,115,110,120,131,198,215,220,223,252,240,270,272,260,230,220,167,150,151,125,113",
-      "detail": "Department of Electrical Engineering, College of Design",
-      "img_url": "http://i.imgur.com/4nYE4rPm.jpg",
-      "name": "Boat Building"
+  "ntustBuildingList" : {
+    "boat_building" : {
+      "consumption" : "110,112,110,110,115,110,120,131,198,215,220,223,252,240,270,272,260,230,220,167,150,151,125,113",
+      "detail" : "Department of Electrical Engineering, College of Design",
+      "efficiency" : "-27,-30,3",
+      "img_url" : "http://i.imgur.com/4nYE4rPm.jpg",
+      "name" : "Boat Building"
     },
-    {
-      "consumption": "low,13,107,117,113,113,116,113,119,151,219,236,250,243,273,259,300,295,280,250,240,177,160,155,120,118",
-      "detail": "College of Engineering",
-      "img_url": "http://i.imgur.com/aps0pG1m.png",
-      "name": "E1 Building"
+    "e1_building" : {
+      "consumption" : "107,117,113,113,116,113,119,151,219,236,250,243,273,259,300,295,280,250,240,177,160,155,120,118",
+      "detail" : "College of Engineering",
+      "efficiency" : "-13,-20,-7",
+      "img_url" : "http://i.imgur.com/aps0pG1m.png",
+      "name" : "E1 Building"
     },
-    {
-      "consumption": "low,6,107,115,110,116,117,112,129,147,215,230,245,240,264,254,295,290,280,245,235,170,155,150,115,113",
-      "detail": "College of Engineering",
-      "img_url": "http://i.imgur.com/rUZOYq8m.jpg",
-      "name": "E2 Building"
+    "e2_building" : {
+      "consumption" : "-6,107,115,110,116,117,112,129,147,215,230,245,240,264,254,295,290,280,245,235,170,155,150,115,113",
+      "detail" : "College of Engineering",
+      "efficiency" : "-6,-5,11",
+      "img_url" : "http://i.imgur.com/rUZOYq8m.jpg",
+      "name" : "E2 Building"
     },
-    {
-      "consumption": "high,10,117,125,120,123,122,122,138,152,220,238,255,250,275,262,300,302,290,255,246,178,163,161,125,119",
-      "detail": "College of Electrical Engineering and Computer Science",
-      "img_url": "http://i.imgur.com/NqMiPb9m.png",
-      "name": "EE Building"
+    "ee_building" : {
+      "consumption" : "117,125,120,123,122,122,138,152,220,238,255,250,275,262,300,302,290,255,246,178,163,161,125,119",
+      "detail" : "College of Electrical Engineering and Computer Science",
+      "efficiency" : "10,2,12",
+      "img_url" : "http://i.imgur.com/NqMiPb9m.png",
+      "name" : "EE Building"
     },
-    {
-      "consumption": "high,4,97,95,96,93,97,95,108,122,195,198,195,210,235,222,260,262,240,195,154,108,99,92,95,89",
-      "detail": "All students and faculties",
-      "img_url": "http://i.imgur.com/GHcYQ6tm.jpg",
-      "name": "Gym"
+    "gym" : {
+      "consumption" : "97,95,96,93,97,95,108,122,195,198,195,210,235,222,260,262,240,195,154,108,99,92,95,89",
+      "detail" : "All students and faculties",
+      "efficiency" : "4,-11,-16",
+      "img_url" : "http://i.imgur.com/GHcYQ6tm.jpg",
+      "name" : "Gym"
     },
-    {
-      "consumption": "low,20,127,125,126,123,127,130,148,162,235,239,237,260,275,269,300,312,280,235,184,138,129,122,125,119",
-      "detail": "All students and faculties",
-      "img_url": "http://i.imgur.com/du1JLnVm.jpg",
-      "name": "International Building"
+    "intl_building" : {
+      "consumption" : "127,125,126,123,127,130,148,162,235,239,237,260,275,269,300,312,280,235,184,138,129,122,125,119",
+      "detail" : "All students and faculties",
+      "efficiency" : "-20,-3,-7",
+      "img_url" : "http://i.imgur.com/du1JLnVm.jpg",
+      "name" : "International Building"
     },
-    {
-      "consumption": "high,16,117,120,120,119,122,125,143,152,225,231,231,254,265,259,295,307,272,225,174,127,123,117,120,115",
-      "detail": "All students and faculties",
-      "img_url": "http://i.imgur.com/bNzM9jTm.png",
-      "name": "T4 Building"
+    "t4_building" : {
+      "consumption" : "117,120,120,119,122,125,143,152,225,231,231,254,265,259,295,307,272,225,174,127,123,117,120,115",
+      "detail" : "All students and faculties",
+      "efficiency" : "16,10,19",
+      "img_url" : "http://i.imgur.com/bNzM9jTm.png",
+      "name" : "T4 Building"
     },
-    {
-      "consumption": "high,12,112,110,113,113,117,119,135,147,219,221,228,249,258,250,287,300,265,219,168,119,117,115,113,114",
-      "detail": "School of Management",
-      "img_url": "http://i.imgur.com/CtMfG4pm.jpg",
-      "name": "Yen-Yang Building"
+    "yy_building" : {
+      "consumption" : "112,110,113,113,117,119,135,147,219,221,228,249,258,250,287,300,265,219,168,119,117,115,113,114",
+      "detail" : "School of Management",
+      "efficiency" : "12,-4,5",
+      "img_url" : "http://i.imgur.com/CtMfG4pm.jpg",
+      "name" : "Yen-Yang Building"
     }
-  ]
+  },
+  "umCentralBuildingList" : {
+    "hill_audit" : {
+      "consumption" : "107,115,110,116,117,112,129,147,215,230,245,240,264,254,295,290,280,245,235,170,155,150,115,113",
+      "detail" : "Hill Auditorium is the largest performance venue on the University of Michigan campus, in Ann Arbor, Michigan.",
+      "efficiency" : "-6,-5,-2",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fhill_audit-min.jpg?alt=media&token=58efe155-4900-4c84-953a-51d095f47f6f",
+      "name" : "Hill Auditorium",
+      "photo_res" : "www.flickr.com/michaelgsmith"
+    },
+    "law_quad" : {
+      "consumption" : "107,117,113,113,116,113,119,151,219,236,250,243,273,259,300,295,280,250,240,177,160,155,120,118",
+      "detail" : "The law school of the University of Michigan, in Ann Arbor. Founded in 1859, the school offers Juris Doctor (JD), Master of Laws (LLM), and Doctor of Juridical Science (SJD) degree programs.",
+      "efficiency" : "-13,-15,-7",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Flaw_quad-min.jpg?alt=media&token=ff468f24-c3d7-46cd-a949-c78f01c5dff0",
+      "name" : "Law Quadrangle",
+      "photo_res" : "www.admitsee.com"
+    },
+    "mi_league" : {
+      "consumption" : "97,95,96,93,97,95,108,122,195,198,195,210,235,222,260,262,240,195,154,108,99,92,95,89",
+      "detail" : "The Michigan League provides the University community with elegant facilities and superb catering services, providing the perfect location and atmosphere for meetings and special events.",
+      "efficiency" : "4,-11,-16",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fmleague-min.jpg?alt=media&token=4eba9879-8515-49b1-8622-5e55be430d31",
+      "name" : "Michigan League",
+      "photo_res" : "University of Michigan website"
+    },
+    "mi_stadium" : {
+      "consumption" : "127,125,126,123,127,130,148,162,235,239,237,260,275,269,300,312,280,235,184,138,129,122,125,119",
+      "detail" : "Michigan Stadium is the football stadium for the University of Michigan in Ann Arbor, Michigan. It is the largest stadium in the United States, the second largest stadium in the world and the 34th largest sports venue.",
+      "efficiency" : "-20,-3,-7",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fmi_stadium-min.jpg?alt=media&token=dab3fce6-4fc5-4aab-8062-2b7b3e81dda4",
+      "name" : "Michigan Stadium",
+      "photo_res" : "Wikipedia"
+    },
+    "michigan_union" : {
+      "consumption" : "110,112,110,110,115,110,120,131,198,215,220,223,252,240,270,272,260,230,220,167,150,151,125,113",
+      "detail" : "The Michigan Union is a student union at the University of Michigan. It is located at the intersection of South State Street and South University Avenue in Ann Arbor, Michigan.",
+      "efficiency" : "-27,-30,3",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fmi_union.jpg?alt=media&token=98d0ea3f-ee4a-4327-9d6f-bc53f23de526",
+      "name" : "Michigan Union",
+      "photo_res" : "University of Michigan website"
+    },
+    "mofart" : {
+      "consumption" : "117,125,120,123,122,122,138,152,220,238,255,250,275,262,300,302,290,255,246,178,163,161,125,119",
+      "detail" : "The University of Michigan Museum of Art, or UMMA in Ann Arbor, Michigan with 94,000 sq ft is one of the largest university art museums in the USA.",
+      "efficiency" : "10,2,12",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fmofart-min.jpg?alt=media&token=b53d2091-1263-4bc9-a494-33e8c9888d2e",
+      "name" : "University of Michigan Museum of Art",
+      "photo_res" : "vacationidea.com"
+    },
+    "north_quad" : {
+      "consumption" : "107,115,110,116,117,112,129,147,215,230,245,240,264,254,295,290,280,245,235,170,155,150,115,113",
+      "detail" : "The University of Michigan School of Information or iSchool in Ann Arbor is a graduate school offering baccalaureate, magisterial, and doctoral degrees in informatics and information science.",
+      "efficiency" : "-6,-5,11",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fnq.jpg?alt=media&token=3ead1b44-9b79-470b-a700-0c39a6812d8b",
+      "name" : "North Quadrangle",
+      "photo_res" : "www.ramsa.com"
+    },
+    "rackham" : {
+      "consumption" : "117,120,120,119,122,125,143,152,225,231,231,254,265,259,295,307,272,225,174,127,123,117,120,115",
+      "detail" : "The Rackham Graduate School is the home of graduate education at the University of Michigan.",
+      "efficiency" : "16,10,19",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Frackham-min.jpg?alt=media&token=8edc5559-c074-45c4-b097-0825360b446b",
+      "name" : "Rackham Graduate School",
+      "photo_res" : "Rackham Graduate School website"
+    },
+    "shapiro" : {
+      "consumption" : "112,110,113,113,117,119,135,147,219,221,228,249,258,250,287,300,265,219,168,119,117,115,113,114",
+      "detail" : "The Shapiro Undergraduate Library (UgLi) provides services, spaces, and collections tailored to undergraduate students.",
+      "efficiency" : "12,-4,5",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingCentral%2Fshapiro-min.jpg?alt=media&token=47f01766-2f0d-4ac1-bb1c-693faeee3878",
+      "name" : "Shapiro Undergraduate Library",
+      "photo_res" : "www.flickr.com/michigan-engineering"
+    }
+  },
+  "umNorthBuildingList" : {
+    "bbb" : {
+      "consumption" : "117,125,129,136,137,145,149,167,235,250,275,270,294,279,315,317,310,268,255,190,175,170,135,122",
+      "detail" : "The Bob and Betty Beyster Building, completed in 2005 and built with alumni funds, is the home of CSE and a destination for events and gatherings on the U-M North Campus.",
+      "efficiency" : "-16,-15,2",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fbbb-min.jpg?alt=media&token=e35480db-e5c0-45fd-a100-f0ee45c99e22",
+      "name" : "Bob and Betty Beyster Building",
+      "photo_res" : "University of Michigan website"
+    },
+    "chrysler" : {
+      "consumption" : "107,105,106,102,107,105,118,132,204,209,205,222,255,237,275,277,255,210,169,128,109,102,105,99",
+      "detail" : "2121 Bonisteel Blvd, Ann Arbor, MI 48109",
+      "efficiency" : "12,-17,-15",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fchrysler.jpg?alt=media&token=6fb92b42-1afe-4192-beab-2e4cee322e27",
+      "name" : "Chrysler Center",
+      "photo_res" : "Wikimedia"
+    },
+    "duder" : {
+      "consumption" : "117,127,123,133,126,129,130,165,239,256,277,263,293,279,322,315,307,273,260,197,170,169,134,128",
+      "detail" : "The James and Anne Duderstadt Center, formerly known as the Media Union, opened in 1996 as a special place to provide faculty and students with the tools and collaborative space for creating the future.",
+      "efficiency" : "-7,-5,-7",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fduderstadt-min.jpg?alt=media&token=310c7489-a001-46f0-b8b7-7b3df2bba819",
+      "name" : "Duderstadt Center",
+      "photo_res" : "Wikimedia"
+    },
+    "me_building" : {
+      "consumption" : "147,156,151,157,152,153,168,182,250,268,295,290,315,302,341,347,334,290,276,208,193,181,153,142",
+      "detail" : "The Department of Mechanical Engineering (ME) at the University of Michigan is the top mechanical engineering programs with a nearly 150-year history and a strong, clear vision for the future.",
+      "efficiency" : "7,12,9",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fme_building-min.jpg?alt=media&token=8366f3b2-6327-46ee-9d21-ddeb77debdd4",
+      "name" : "University of Michigan Museum of Art",
+      "photo_res" : "University of Michigan website"
+    },
+    "ncrb" : {
+      "consumption" : "137,140,140,139,142,145,163,172,245,255,253,279,290,289,325,337,306,255,204,157,153,147,143,135",
+      "detail" : "Located on North Campus, the NCRB features everything you need in a fitness facility—swimming, weight training, cardio, athletic courts and more.",
+      "efficiency" : "7,11,18",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fncrb-min.jpg?alt=media&token=e4f371fb-2b91-440e-80a1-8e9f1bd2cdee",
+      "name" : "North Campus Recreational Building",
+      "photo_res" : "University of Michigan website"
+    },
+    "pierpont_com" : {
+      "consumption" : "110,113,120,130,145,167,179,201,199,235,260,253,252,280,293,302,317,250,240,179,153,161,122,111",
+      "detail" : "Pierpont Commons is the University of Michigan's student union on North Campus. Pierpont hosts a wide range of student services nestled between inviting lounges to relax and entertain.",
+      "efficiency" : "-13,-22,13",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fpierpont_com-min.jpg?alt=media&token=c7577519-72cd-41c7-8db5-927f306e701d",
+      "name" : "Pierpont Commons",
+      "photo_res" : "University of Michigan website"
+    },
+    "rhl_building" : {
+      "consumption" : "109,125,129,133,139,142,149,167,242,250,265,262,284,287,305,301,311,265,255,186,177,163,132,136",
+      "detail" : "The Lurie Nanofabrication Facility (LNF) is available, on a fee basis, for use by research groups from government, industry and universities.",
+      "efficiency" : "-16,-9,-10",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Frhl_building-min.jpg?alt=media&token=054ecd65-ca4e-4e72-9715-7a5be35599ac",
+      "name" : "Robert H. Lurie Nanofabrication Facility",
+      "photo_res" : "www.smithgroupjjr.com"
+    },
+    "stamps" : {
+      "consumption" : "142,140,141,139,143,145,163,177,250,254,253,275,290,284,315,327,295,250,199,158,149,139,135,129",
+      "detail" : "The Stamps School of Art & Design, officially the Penny W. Stamps School of Art & Design is the school of art and design at the University of Michigan located in Ann Arbor, Michigan.",
+      "efficiency" : "-23,-3,-7",
+      "img_url" : "https://firebasestorage.googleapis.com/v0/b/intelligent-power-saving.appspot.com/o/umBuildingNorth%2Fstamps-min.jpg?alt=media&token=9fa17645-d3c3-4167-a768-267d3c668470",
+      "name" : "Penny W. Stamps School of Art & Design",
+      "photo_res" : "Wikipedia"
+    }
+  }
 }

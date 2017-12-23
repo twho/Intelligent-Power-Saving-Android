@@ -66,12 +66,12 @@ public class ImageUtils {
         return Base64.encodeToString(ba, Base64.DEFAULT);
     }
 
-    public File getCompressedImgFile(File imgFile) {
+    public File getCompressedImgFile(File imgFile) throws IOException {
         File compressedImgFile = imgFile;
 
         // Compress
         if (compressedImgFile.length() > MAX_SIZE)
-            compressedImgFile = Compressor.getDefault(context).compressToFile(imgFile);
+            compressedImgFile = new Compressor(context).compressToFile(imgFile);
 
         return compressedImgFile;
     }
