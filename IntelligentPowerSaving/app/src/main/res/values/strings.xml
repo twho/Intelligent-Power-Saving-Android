@@ -50,13 +50,13 @@
     <string name="info_title">Real-time Information</string>
 
     <!--EventFragment-->
-    <string name="fragment_event_title">Event</string>
-    <string name="fragment_event_title_add">Add an event</string>
-    <string name="fragment_event_bottom">Long click to add new event on map</string>
+    <string name="fragment_event_title">FIXIT Event</string>
+    <string name="fragment_event_title_add">Add an FIXIT event</string>
+    <string name="fragment_event_bottom">Long click on map to add a new FIXIT event</string>
     <string name="fragment_event_bottom_add">Please enter an event and take a photo of it</string>
     <string name="fragment_event_btn_full_map">Full map</string>
     <string name="fragment_event_hint">Event, Building, Floor, etc.</string>
-    <string name="fragment_event_err_no_ed">Please enter at least one event name.</string>
+    <string name="fragment_event_err_no_ed">Please enter at least one item name.</string>
 
     <!--Imgur API-->
     <string name="notification_fail">Failed to upload image...</string>

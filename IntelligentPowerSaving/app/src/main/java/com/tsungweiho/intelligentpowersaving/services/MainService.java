@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
+import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -79,7 +80,11 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Set PubNub Listeners
-        PubNub pubnub = MainActivity.getPubNub();
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
+        pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
+        pnConfiguration.setSecure(false);
+        PubNub pubnub = new PubNub(pnConfiguration);
         pubnub.addListener(mainServiceListener);
 
         return Service.START_STICKY;

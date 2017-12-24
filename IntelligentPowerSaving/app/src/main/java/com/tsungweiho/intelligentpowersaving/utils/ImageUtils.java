@@ -13,6 +13,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
@@ -176,7 +177,13 @@ public class ImageUtils {
         paint.setDither(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawRoundRect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight(), radius, radius, paint);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            canvas.drawRoundRect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight(), radius, radius, paint);
+        } else {
+            canvas.drawRect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight(), paint);
+        }
+
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(finalBitmap, rect, rect, paint);
 

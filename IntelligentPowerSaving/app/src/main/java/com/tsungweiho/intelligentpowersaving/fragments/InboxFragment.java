@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -57,6 +58,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private ImageButton ibOptions, ibDelete, ibInboxFunction;
     private Button btnUnread;
     private ImageView ivDrawerPic;
+    private FloatingActionButton fabWrite;
 
     // Functions
     private Context context;
@@ -140,6 +142,8 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         llEditing = view.findViewById(R.id.fragment_inbox_layout_editing);
 
         ivDrawerPic = view.findViewById(R.id.fragment_inbox_drawer_iv);
+
+        fabWrite = view.findViewById(R.id.fragment_inbox_fab_write);
     }
 
     private void setListeners() {
@@ -148,6 +152,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         ibDelete.setOnClickListener(inboxFragmentListener);
         ibInboxFunction.setOnClickListener(inboxFragmentListener);
         btnUnread.setOnClickListener(inboxFragmentListener);
+        fabWrite.setOnClickListener(inboxFragmentListener);
     }
 
     @Override
@@ -310,6 +315,9 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     btnUnread.setText(ifShowUnread ? getString(R.string.unread) : getString(R.string.all_mails));
                     refreshViewingInbox(ifShowUnread ? messageDBHelper.getMessageListByLabel(currentBox) : messageDBHelper.getUnreadMessageListInBox(messageList));
                     ifShowUnread = !ifShowUnread;
+                    break;
+                case R.id.fragment_inbox_fab_write:
+
                     break;
             }
         }

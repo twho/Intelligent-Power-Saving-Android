@@ -44,12 +44,6 @@
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name=".BuildingInfoActivity"
-            android:isScrollContainer="true"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"/>
-
-        <activity
             android:name=".SplashActivity"
             android:isScrollContainer="true"
             android:screenOrientation="portrait">

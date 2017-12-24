@@ -173,6 +173,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     @Override
     public void onPause() {
         super.onPause();
+
         if (null != ivProfile.getDrawingCache()) {
             myAccountInfo.setImageUrl(ImageUtils.getInstance().encodeBase64ToString(ivProfile.getDrawingCache()));
         }
