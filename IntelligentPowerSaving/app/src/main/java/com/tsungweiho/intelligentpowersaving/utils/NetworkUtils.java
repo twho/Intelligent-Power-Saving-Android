@@ -40,7 +40,7 @@ public class NetworkUtils {
         new TaskCheckConnection().execute();
     }
 
-    private class TaskCheckConnection extends AsyncTask<String, Void, Boolean> {
+    private static class TaskCheckConnection extends AsyncTask<String, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(String... params) {
@@ -61,7 +61,7 @@ public class NetworkUtils {
         @Override
         protected void onPostExecute(Boolean result) {
             if (null != MainActivity.getContext())
-                ((MainActivity) MainActivity.getContext()).setIfShowErrorMessage(result);
+                ((MainActivity) MainActivity.getContext()).setConnectionMessage(result);
         }
     }
 }

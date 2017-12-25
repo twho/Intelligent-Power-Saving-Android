@@ -9,6 +9,7 @@
     android:weightSum="1">
 
     <TextView
+        style="@style/TitleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_main_space"
@@ -49,6 +50,7 @@
         android:padding="@dimen/activity_main_space">
 
         <Button
+            style="@style/Button"
             android:id="@+id/obj_dialog_crop_image_btn_crop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,7 +63,8 @@
             android:textColor="@color/light_red" />
 
         <Button
-            android:id="@+id/obj_dialog_crop_image_btn_cancel"
+            style="@style/Button"
+            android:id="@+id/obj_dialog_crop_image_btn_use"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_main_space"

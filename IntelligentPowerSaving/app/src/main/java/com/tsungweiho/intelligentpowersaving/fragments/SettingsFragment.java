@@ -1,8 +1,10 @@
 package com.tsungweiho.intelligentpowersaving.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -11,6 +13,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,16 +32,18 @@ import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentSettingsBinding;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
-import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
+import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/11/10.
+ * Created by Tsung Wei Ho on 4/15/2015.
+ * Updated by Tsung Wei Ho on 12/24/2017.
  */
 
 public class SettingsFragment extends Fragment implements FragmentTags, DBConstants, PubNubAPIConstants {
@@ -50,14 +56,17 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     private Switch swEvent, swPublic;
     private ImageView ivProfile;
     private EditText edName, edEmail;
+    private Dialog imgCropDialog;
 
     // Functions
     private Context context;
+    private SettingsFragmentListener settingsFragmentListener;
     private MyAccountInfo myAccountInfo;
     private FragmentSettingsBinding binding;
-    private AlertDialogManager alertDialogManager;
+    private AlertDialogManager alertDialogMgr;
+    private FirebaseManager firebaseMgr;
+    private ImageUtils imageUtils;
     private Bitmap bmpBuffer;
-    private String PREF_SEPARATOR = ",";
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -73,55 +82,34 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         view = binding.getRoot();
 
         context = MainActivity.getContext();
+
         init();
+
         return view;
     }
 
     private void init() {
         pubnub = MainActivity.getPubNub();
+        settingsFragmentListener = new SettingsFragmentListener();
+
 
         // Singleton classes
-        alertDialogManager = AlertDialogManager.getInstance();
+        alertDialogMgr = AlertDialogManager.getInstance();
+        firebaseMgr = FirebaseManager.getInstance();
+        imageUtils = ImageUtils.getInstance();
 
         // Compile with SDK 26, no need to cast views
         edName = view.findViewById(R.id.fragment_settings_ed_name);
         edEmail = view.findViewById(R.id.fragment_settings_ed_email);
 
         ivProfile = view.findViewById(R.id.fragment_settings_iv);
-        ivProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialogManager.showCameraDialog(SETTINGS_FRAGMENT);
-            }
-        });
+        ivProfile.setOnClickListener(settingsFragmentListener);
 
         swEvent = view.findViewById(R.id.fragment_settings_sw_event);
-        swEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {
-                if (ifChecked) {
-                    pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription("1," + myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1]);
-                } else {
-                    pubnub.unsubscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription("0," + myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1]);
-                }
-            }
-        });
+        swEvent.setOnCheckedChangeListener(settingsFragmentListener);
 
         swPublic = view.findViewById(R.id.fragment_settings_sw_public);
-        swPublic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean ifChecked) {
-                if (ifChecked) {
-                    pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0] + ",1");
-                } else {
-                    pubnub.unsubscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
-                    myAccountInfo.setSubscription(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0] + ",0");
-                }
-            }
-        });
+        swPublic.setOnCheckedChangeListener(settingsFragmentListener);
     }
 
     @Override
@@ -143,10 +131,52 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             }
 
             if (null != bmpBuffer) {
-                alertDialogManager.showCropImageDialog(ivProfile, bmpBuffer);
+                imgCropDialog = alertDialogMgr.showCropImageDialog(ivProfile, bmpBuffer);
+                imgCropDialog.setOnCancelListener(settingsFragmentListener);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private class SettingsFragmentListener implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DialogInterface.OnCancelListener {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.fragment_settings_iv:
+                    alertDialogMgr.showCameraDialog(SETTINGS_FRAGMENT);
+                    break;
+            }
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            switch (compoundButton.getId()) {
+                case R.id.fragment_settings_sw_event:
+                    setChannelSubscription(isChecked, 0);
+                    break;
+                case R.id.fragment_settings_sw_public:
+                    setChannelSubscription(isChecked, 1);
+                    break;
+            }
+        }
+
+        // Only handle image crop dialog
+        @Override
+        public void onCancel(DialogInterface dialogInterface) {
+//            firebaseMgr.uploadProfileImg(imageUtils.getFileFromBitmap(ivProfile.getDrawingCache()).getPath(), );
+        }
+    }
+
+    private void setChannelSubscription(Boolean isChecked, int index) {
+        Pair<String, String> channels = index == 0 ? new Pair<>(EVENT_CHANNEL, EVENT_CHANNEL_DELETED) : new Pair<>(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED);
+
+        if (isChecked) {
+            pubnub.subscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
+        } else {
+            pubnub.unsubscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
+        }
+
+        myAccountInfo.setSubscriptionBools(index, isChecked);
     }
 
     @BindingAdapter({"bind:userImage"})
@@ -162,12 +192,12 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     public void onResume() {
         super.onResume();
 
-        myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
+        myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
 
         // Bind data to UIs
         binding.setMyAccountInfo(myAccountInfo);
-        swEvent.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0].equalsIgnoreCase("1"));
-        swPublic.setChecked(myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1].equalsIgnoreCase("1"));
+        swEvent.setChecked(myAccountInfo.getSubscriptionBools()[0]);
+        swPublic.setChecked(myAccountInfo.getSubscriptionBools()[1]);
     }
 
     @Override
@@ -180,6 +210,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
         myAccountInfo.setName(edName.getText().toString());
         myAccountInfo.setEmail(edEmail.getText().toString());
-        SharedPreferencesManager.getInstance().saveMyAccountInfo(myAccountInfo);
+        PreferencesManager.getInstance().saveMyAccountInfo(myAccountInfo);
     }
 }

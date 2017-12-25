@@ -91,13 +91,13 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.obj_message_list_item, null);
             viewHolder = new ViewHolder();
-            viewHolder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.obj_message_list_item_view);
-            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.obj_message_list_item_iv);
-            viewHolder.tvSender = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_sender);
-            viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_title);
-            viewHolder.tvContent = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_content);
-            viewHolder.tvTime = (TextView) convertView.findViewById(R.id.obj_message_list_item_tv_time);
-            viewHolder.ibStar = (ImageButton) convertView.findViewById(R.id.obj_message_list_item_ib);
+            viewHolder.relativeLayout = convertView.findViewById(R.id.obj_message_list_item_view);
+            viewHolder.imageView = convertView.findViewById(R.id.obj_message_list_item_iv);
+            viewHolder.tvSender = convertView.findViewById(R.id.obj_message_list_item_tv_sender);
+            viewHolder.tvTitle = convertView.findViewById(R.id.obj_message_list_item_tv_title);
+            viewHolder.tvContent = convertView.findViewById(R.id.obj_message_list_item_tv_content);
+            viewHolder.tvTime = convertView.findViewById(R.id.obj_message_list_item_tv_time);
+            viewHolder.ibStar = convertView.findViewById(R.id.obj_message_list_item_ib);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

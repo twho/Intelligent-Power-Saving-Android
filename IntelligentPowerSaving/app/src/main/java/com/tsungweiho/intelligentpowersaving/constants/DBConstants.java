@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
  * Created by Tsung Wei Ho on 2/18/2017.
+ * Updated by Tsung Wei Ho on 12/24/2017.
  */
 
 public interface DBConstants {
@@ -18,8 +19,11 @@ public interface DBConstants {
     String LOCAL_BUILDING_JSON = "intelligent-power-saving-export.json";
     String JSON_ARRAY_NAME = "buildingList";
 
+    // Firebase Reference
+    String FDB_STORAGE_PROFILEPIC = "usrProfilePic";
+
     // For all databases
-    int VERSION = 6;
+    int VERSION = 4;
     String ID = "Id";
 
     // BuildingDBHelper
@@ -28,7 +32,7 @@ public interface DBConstants {
     String DB_BUILDING_EFFICIENCY = "BUILDING_EFFICIENCY";
     String DB_BUILDING_CONSUMPTION = "BUILDING_CONSUMPTION";
     String DB_BUILDING_IMG_URL = "BUILDING_IMG_URL";
-    String DB_BUILDING_IF_FOLLOW = "DB_BUILDING_IF_FOLLOW";
+    String DB_BUILDING_IS_FOLLOW = "DB_BUILDING_IF_FOLLOW";
 
     // EventDBHelper
     String DB_EVENT_UNID = "EVENT_UNID";
@@ -37,7 +41,7 @@ public interface DBConstants {
     String DB_EVENT_POSTER = "DB_EVENT_POSTER";
     String DB_EVENT_IMG = "EVENT_IMG";
     String DB_EVENT_TIME = "EVENT_TIME";
-    String DB_EVENT_IF_FIXED = "EVENT_IF_FIXED";
+    String DB_EVENT_IS_FIXED = "EVENT_IF_FIXED";
 
     // MessageDBHelper
     String DB_MESSAGE_UNID = "MESSAGE_UNID";

@@ -6,6 +6,7 @@
     <string name="testing_account">testing@ipowersaving.com</string>
     <string name="testing_name">iPS Testing Account</string>
     <string name="internet_error">Internet error</string>
+    <string name="auth_error">Authentication error</string>
     <string name="try_again">Try again</string>
 
     <!--MessageFragment-->
@@ -22,7 +23,7 @@
     <string name="delete_caption2">mail(s).</string>
 
     <!--InboxFragment-->
-    <string name="no_mail">No mail to show in this mailbox.</string>
+    <string name="no_mail">No mail in this mailbox.</string>
 
     <!--SettingsFragment-->
     <string name="fragment_settings_title">Settings</string>
@@ -35,8 +36,9 @@
     <string name="public_channels">Public channel</string>
 
     <!--HomeFragment-->
-    <string name="fragment_home_title">Energy Consumption Dashboard</string>
+    <string name="fragment_home_title">Dashboard</string>
     <string name="no_building">No building is followed.</string>
+    <string name="energy_eff_unit">\u0020%\u0020</string>
 
     <!--BuildingFragment-->
     <string name="follow_this">Follow this</string>
@@ -44,9 +46,9 @@
     <string name="chart_title">Daily Energy Consumption</string>
     <string name="chart_x_title">Hour</string>
     <string name="chart_y_title">Daily Energy Consumption (kWh)</string>
-    <string name="use_dept">Department using: </string>
-    <string name="consump_this_hour">Current consumption:</string>
-    <string name="consump_last_hour">Last hour consumption:</string>
+    <string name="use_dept">Department using:\u0020</string>
+    <string name="consump_this_hour">Current consumption:\u0020</string>
+    <string name="consump_last_hour">Last hour consumption:\u0020</string>
     <string name="info_title">Real-time Information</string>
 
     <!--EventFragment-->

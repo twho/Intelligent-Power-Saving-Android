@@ -1,8 +1,8 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
 /**
- * Created by MichaelHo on 2015/4/15.
- * Updated by MichaelHo on 2017/11/10.
+ * Created by MichaelHo on 4/15/2015.
+ * Updated by MichaelHo on 12/24/2017.
  */
 
 import android.Manifest;
@@ -32,6 +32,7 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
+// Singleton class
 public class AlertDialogManager implements BuildingConstants, FragmentTags {
 
     private static final AlertDialogManager ourInstance = new AlertDialogManager();
@@ -46,6 +47,11 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         this.context = MainActivity.getContext();
     }
 
+    /**
+     * Show general alert dialog with customizable title and message content
+     * @param title the title of the alert dialog
+     * @param message the message content in the alert dialog
+     */
     public void showAlertDialog(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK).create();
 
@@ -65,9 +71,13 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
     private static final int REQUEST_CODE_CAMERA = 1;
     private static final int REQUEST_CODE_IMAGE = 0;
 
-    public void showCameraDialog(final String fragmentCalledThis) {
+    /**
+     * Show photo selection dialog
+     * @param fragmentTag the tag of the fragment calls this method
+     */
+    public void showCameraDialog(final String fragmentTag) {
         FragmentManager fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-        final Fragment fragment = fm.findFragmentByTag(fragmentCalledThis);
+        final Fragment fragment = fm.findFragmentByTag(fragmentTag);
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
         dialog.setTitle(R.string.alert_dialog_manager_camera_title)
@@ -99,21 +109,26 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
                         }).show();
     }
 
-    public void showImageDialog(final String fragmentCalledThis, Bitmap bitmap) {
+    /**
+     * Show image dialog for user to report FIXIT event
+     * @param fragmentTag the tag of the fragment calls this method
+     * @param bitmap the bitmap of the image user wants to upload
+     */
+    public void showImageDialog(final String fragmentTag, Bitmap bitmap) {
         final Dialog dialog = new Dialog(context);
         LayoutInflater li = LayoutInflater.from(context);
         View dialogView = li.inflate(R.layout.obj_dialog_image, null);
 
-        Button btnTakeNew = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_retake);
+        Button btnTakeNew = dialogView.findViewById(R.id.obj_dialog_image_btn_retake);
         btnTakeNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                showCameraDialog(fragmentCalledThis);
+                showCameraDialog(fragmentTag);
             }
         });
 
-        Button btnCancel = (Button) dialogView.findViewById(R.id.obj_dialog_image_btn_cancel);
+        Button btnCancel = dialogView.findViewById(R.id.obj_dialog_image_btn_cancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,8 +136,8 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
             }
         });
 
-        final ImageView ivTouch = (ImageView) dialogView.findViewById(R.id.obj_dialog_image_iv_cover);
-        ImageViewTouch photoImgView = (ImageViewTouch) dialogView.findViewById(R.id.obj_dialog_image_iv);
+        final ImageView ivTouch = dialogView.findViewById(R.id.obj_dialog_image_iv_cover);
+        ImageViewTouch photoImgView = dialogView.findViewById(R.id.obj_dialog_image_iv);
         photoImgView.setImageBitmap(bitmap);
         photoImgView.setDisplayType(ImageViewTouchBase.DisplayType.NONE);
         photoImgView.setOnTouchListener(new View.OnTouchListener() {
@@ -137,32 +152,38 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         dialog.show();
     }
 
-    private boolean ifCropped = false;
+    private boolean isCropped = false;
 
-    public void showCropImageDialog(final ImageView imageView, final Bitmap bitmap) {
+    /**
+     * Show image editing dialog
+     * @param imageView the imageView to be set in UI
+     * @param bitmap the bitmap to be set to imageView
+     * @return the dialog created
+     */
+    public Dialog showCropImageDialog(final ImageView imageView, final Bitmap bitmap) {
         // Setup dialog view
         final Dialog dialog = new Dialog(context);
         LayoutInflater li = LayoutInflater.from(context);
         View dialogView = li.inflate(R.layout.obj_dialog_crop_image, null);
 
         // Setup cropped image view
-        final CropImageView cropImageView = (CropImageView) dialogView.findViewById(R.id.obj_dialog_crop_image_civ);
+        final CropImageView cropImageView = dialogView.findViewById(R.id.obj_dialog_crop_image_civ);
         cropImageView.setImageBitmap(bitmap);
         cropImageView.setEnabled(true);
 
-        final Button btnCrop = (Button) dialogView.findViewById(R.id.obj_dialog_crop_image_btn_crop);
+        final Button btnCrop = dialogView.findViewById(R.id.obj_dialog_crop_image_btn_crop);
         btnCrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cropImageView.setCropEnabled(ifCropped);
-                cropImageView.setImageBitmap(ifCropped ? bitmap : cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
-                btnCrop.setText(context.getString(ifCropped ? R.string.alert_dialog_manager_crop_img_crop : R.string.alert_dialog_manager_crop_img_revert));
-                ifCropped = !ifCropped;
+                cropImageView.setCropEnabled(isCropped);
+                cropImageView.setImageBitmap(isCropped ? bitmap : cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
+                btnCrop.setText(context.getString(isCropped ? R.string.alert_dialog_manager_crop_img_crop : R.string.alert_dialog_manager_crop_img_revert));
+                isCropped = !isCropped;
             }
         });
 
-        Button btnCancel = (Button) dialogView.findViewById(R.id.obj_dialog_crop_image_btn_cancel);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        Button btnUse = dialogView.findViewById(R.id.obj_dialog_crop_image_btn_use);
+        btnUse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 imageView.setImageBitmap(cropImageView.getCircularBitmap(cropImageView.getCroppedBitmap()));
@@ -173,5 +194,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
 
         dialog.setContentView(dialogView);
         dialog.show();
+
+        return dialog;
     }
 }

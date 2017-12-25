@@ -72,13 +72,14 @@ public class BuildingIcon extends View implements BuildingConstants {
         tvConsump = view.findViewById(R.id.obj_building_icon_tv_consumption);
         tvConsumpPercent = view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
 
+        // Use different colors to represent increase or decrease in energy consumption
         Boolean energyIncrease = Integer.valueOf(building.getEfficiency().split(",")[0]) > 0;
         tvConsump.setText(context.getString(energyIncrease ? R.string.increase_weekly : R.string.decrease_weekly));
         setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(energyIncrease ? R.color.light_red : R.color.green));
         ivIndicator.setImageDrawable(context.getResources().getDrawable(energyIncrease ? R.mipmap.ic_increase : R.mipmap.ic_decrease));
 
         AnimUtils.getInstance().setIconAnimToVisible(ivIndicator);
-        tvConsumpPercent.setText(building.getEfficiency().split(",")[0] + " %");
+        tvConsumpPercent.setText(Math.abs(Integer.valueOf(building.getEfficiency().split(",")[0])) + context.getResources().getString(R.string.energy_eff_unit));
     }
 
     private void setTextViewColor(TextView tvConsump, TextView tvConsumpPercent, int color) {

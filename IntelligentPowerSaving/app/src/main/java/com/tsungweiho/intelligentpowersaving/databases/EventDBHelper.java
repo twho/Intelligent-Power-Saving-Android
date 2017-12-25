@@ -39,7 +39,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
                 DB_EVENT_IMG + " TEXT," +
                 DB_EVENT_POSTER + " TEXT," +
                 DB_EVENT_TIME + " VARCHAR(30)," +
-                DB_EVENT_IF_FIXED + " VARCHAR(10)" + ");");
+                DB_EVENT_IS_FIXED + " VARCHAR(10)" + ");");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_EVENT_IMG, event.getImage());
         values.put(DB_EVENT_POSTER, event.getPoster());
         values.put(DB_EVENT_TIME, event.getTime());
-        values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
+        values.put(DB_EVENT_IS_FIXED, event.getIfFixed());
 
         long rowId = db.insert(TABLE_NAME, null, values);
 
@@ -90,7 +90,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_EVENT_IMG, event.getImage());
         values.put(DB_EVENT_POSTER, event.getPoster());
         values.put(DB_EVENT_TIME, event.getTime());
-        values.put(DB_EVENT_IF_FIXED, event.getIfFixed());
+        values.put(DB_EVENT_IS_FIXED, event.getIfFixed());
         String whereClause = DB_EVENT_UNID + "='" + event.getUniqueId() + "'";
 
         int count = db.update(TABLE_NAME, values, whereClause, null);
@@ -121,7 +121,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
 
     public Event getEventByUnId(String unId) {
         SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {DB_EVENT_UNID, DB_EVENT_DETAIL, DB_EVENT_POS, DB_EVENT_IMG, DB_EVENT_POSTER, DB_EVENT_TIME, DB_EVENT_IF_FIXED};
+        String[] columns = {DB_EVENT_UNID, DB_EVENT_DETAIL, DB_EVENT_POS, DB_EVENT_IMG, DB_EVENT_POSTER, DB_EVENT_TIME, DB_EVENT_IS_FIXED};
         String whereClause = DB_EVENT_UNID + " = ?;";
         String[] whereArgs = {unId};
         Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,

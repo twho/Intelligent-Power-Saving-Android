@@ -32,6 +32,7 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/TitleText"
                 android:id="@+id/obj_message_list_item_tv_sender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,6 +45,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                style="@style/Body1"
                 android:id="@+id/obj_message_list_item_tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,6 +58,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                style="@style/Body1"
                 android:id="@+id/obj_message_list_item_tv_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,6 +81,7 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/Caption"
             android:id="@+id/obj_message_list_item_tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

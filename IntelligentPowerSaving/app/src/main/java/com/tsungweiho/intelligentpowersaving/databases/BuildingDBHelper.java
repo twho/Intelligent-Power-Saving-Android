@@ -32,12 +32,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
     private void createDatabase(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                DB_BUILDING_NAME + " VARCHAR(15)," +
-                DB_BUILDING_DETAIL + " VARCHAR(30)," +
+                DB_BUILDING_NAME + " VARCHAR(30)," +
+                DB_BUILDING_DETAIL + " TEXT," +
                 DB_BUILDING_EFFICIENCY + " VARCHAR(10)," +
                 DB_BUILDING_CONSUMPTION + " INTEGER, " +
                 DB_BUILDING_IMG_URL + " TEXT," +
-                DB_BUILDING_IF_FOLLOW + " VARCHAR(10)" + ");");
+                DB_BUILDING_IS_FOLLOW + " VARCHAR(10)" + ");");
     }
 
     public Boolean isExist(String name) {
@@ -70,7 +70,7 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_BUILDING_EFFICIENCY, building.getEfficiency());
         values.put(DB_BUILDING_CONSUMPTION, building.getConsumption());
         values.put(DB_BUILDING_IMG_URL, building.getImageUrl());
-        values.put(DB_BUILDING_IF_FOLLOW, building.getIfFollow());
+        values.put(DB_BUILDING_IS_FOLLOW, building.getIfFollow());
 
         long rowId = db.insert(TABLE_NAME, null, values);
         db.close();
@@ -87,7 +87,7 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         values.put(DB_BUILDING_EFFICIENCY, building.getEfficiency());
         values.put(DB_BUILDING_CONSUMPTION, building.getConsumption());
         values.put(DB_BUILDING_IMG_URL, building.getImageUrl());
-        values.put(DB_BUILDING_IF_FOLLOW, building.getIfFollow());
+        values.put(DB_BUILDING_IS_FOLLOW, building.getIfFollow());
         String whereClause = DB_BUILDING_NAME + "='" + building.getName() + "'";
 
         return db.update(TABLE_NAME, values, whereClause, null);
@@ -111,13 +111,16 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
     public ArrayList<Building> getFollowedBuildingSet() {
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, DB_BUILDING_EFFICIENCY + " DESC");
+        // SQL query
+        String[] columns = {ID, DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_EFFICIENCY, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL, DB_BUILDING_IS_FOLLOW};
+        String whereClause = DB_BUILDING_IS_FOLLOW + " = ?;";
+        String[] whereArgs = {"true"};
+
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, DB_BUILDING_EFFICIENCY + " DESC");
         ArrayList<Building> buildingList = new ArrayList<>(cursor.getCount());
 
         while (cursor.moveToNext()) {
-            if (Boolean.parseBoolean(cursor.getString(5))) {
-                buildingList.add(getBuildingByCursor(cursor));
-            }
+            buildingList.add(getBuildingByCursor(cursor));
         }
         cursor.close();
         db.close();
@@ -127,11 +130,13 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
 
     public Building getBuildingByName(String buildingName) {
         SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {ID, DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_EFFICIENCY, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL, DB_BUILDING_IF_FOLLOW};
+
+        // SQL query
+        String[] columns = {ID, DB_BUILDING_NAME, DB_BUILDING_DETAIL, DB_BUILDING_EFFICIENCY, DB_BUILDING_CONSUMPTION, DB_BUILDING_IMG_URL, DB_BUILDING_IS_FOLLOW};
         String whereClause = DB_BUILDING_NAME + " = ?;";
         String[] whereArgs = {buildingName};
-        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs,
-                null, null, null);
+
+        Cursor cursor = db.query(TABLE_NAME, columns, whereClause, whereArgs, null, null, null);
 
         Building building = null;
         while (cursor.moveToNext()) {

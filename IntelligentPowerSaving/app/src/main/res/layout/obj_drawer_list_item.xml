@@ -20,6 +20,7 @@
             android:scaleY="@dimen/activity_main_top_bar_widget_scale" />
 
         <TextView
+            style="@style/SubheaderText"
             android:textScaleX="@dimen/activity_main_text_scale"
             android:scaleY="@dimen/activity_main_text_scale"
             android:id="@+id/obj_drawer_list_item_tv"

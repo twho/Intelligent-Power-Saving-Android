@@ -22,13 +22,13 @@
             android:orientation="horizontal">
 
             <TextView
+                style="@style/HeadlineText"
                 android:scaleX="@dimen/activity_main_top_bar_text_scale"
                 android:scaleY="@dimen/activity_main_top_bar_text_scale"
                 android:id="@+id/fragment_settings_tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:text="@string/fragment_settings_title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -67,9 +67,9 @@
                     app:userImage="@{myAccountInfo.imageUrl}" />
 
                 <TextView
+                    style="@style/Body1"
                     android:layout_width="@dimen/activity_main_single_row_btn_width"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/activity_main_space"
                     android:gravity="center"
                     android:padding="@dimen/activity_main_space"
                     android:scaleX="@dimen/activity_main_top_bar_widget_scale"
@@ -79,6 +79,7 @@
                     android:textColor="@color/colorTint" />
 
                 <TextView
+                    style="@style/TitleText"
                     android:layout_width="@dimen/activity_main_single_edittext_width"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_main_space"
@@ -88,6 +89,7 @@
                     android:textColor="@color/white" />
 
                 <EditText
+                    style="@style/Body1"
                     android:id="@+id/fragment_settings_ed_name"
                     android:layout_width="@dimen/activity_main_single_edittext_width"
                     android:layout_height="wrap_content"
@@ -102,6 +104,7 @@
                     android:textColor="@color/white" />
 
                 <TextView
+                    style="@style/TitleText"
                     android:layout_width="@dimen/activity_main_single_edittext_width"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_main_space"
@@ -111,6 +114,7 @@
                     android:textColor="@color/white" />
 
                 <EditText
+                    style="@style/Body1"
                     android:id="@+id/fragment_settings_ed_email"
                     android:layout_width="@dimen/activity_main_single_edittext_width"
                     android:layout_height="wrap_content"
@@ -125,6 +129,7 @@
                     android:textColor="@color/white" />
 
                 <TextView
+                    style="@style/TitleText"
                     android:layout_width="@dimen/activity_main_single_edittext_width"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/activity_main_space"
@@ -157,6 +162,7 @@
                             android:src="@mipmap/ic_event" />
 
                         <TextView
+                            style="@style/Body1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="left|center_vertical"
@@ -199,6 +205,7 @@
                             android:src="@mipmap/ic_mail" />
 
                         <TextView
+                            style="@style/Body1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_gravity="left|center_vertical"

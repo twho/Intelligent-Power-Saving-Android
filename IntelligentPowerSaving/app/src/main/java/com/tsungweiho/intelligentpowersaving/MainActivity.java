@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -32,7 +38,7 @@ import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
-import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
+import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.util.ArrayList;
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     // UI Widgets
     private FrameLayout flError;
     private ProgressBar pbError;
+    private TextView tvError;
 
     //screen info
     public static float screenWidth;
@@ -61,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     // PubNub Configuration
     public static PNConfiguration pnConfiguration;
     public static PubNub pubnub = null;
+
+    // Firebase
+    public FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +87,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         if (!PermissionManager.hasAllPermissions(MainActivity.this))
             ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
 
-        // View init
-        flError = (FrameLayout) findViewById(R.id.activity_main_fl_error);
-        pbError = (ProgressBar) findViewById(R.id.activity_main_pb_error);
-        Button btnConnect = (Button) findViewById(R.id.activity_main_btn_reconnect);
+        // Init views
+        // Compile with SDK 26, no need to cast views
+        flError = findViewById(R.id.activity_main_fl_error);
+        pbError = findViewById(R.id.activity_main_pb_error);
+        Button btnConnect = findViewById(R.id.activity_main_btn_reconnect);
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,13 +102,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             }
         });
 
+        tvError = findViewById(R.id.activity_main_tv_error);
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         float density = getResources().getDisplayMetrics().density;
         screenWidth = metrics.widthPixels / density;
         screenHeight = metrics.heightPixels / density;
 
-        // Pubnub init
+        // Init Pubnub
         pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
         pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
@@ -108,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         setActionbar();
     }
 
-    // Alleviate main thread work loading
+    // Alleviate workload of main thread
     private void setupServiceInThread() {
         new Thread(new Runnable() {
             public void run() {
@@ -129,13 +142,25 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
     }
 
-    public void setIfShowErrorMessage(boolean ifConnected) {
+    public void setConnectionMessage(boolean isConnected) {
         pbError.setVisibility(View.GONE);
-        if (ifConnected) {
+
+        if (!isConnected) {
             flError.setVisibility(View.GONE);
-        } else {
-            flError.setVisibility(View.VISIBLE);
+            tvError.setText(this.getResources().getString(R.string.internet_error));
+            return;
         }
+
+        if (null == firebaseAuth)
+            firebaseAuth = FirebaseAuth.getInstance();
+
+        firebaseAuth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                tvError.setText(context.getResources().getString(R.string.auth_error));
+                flError.setVisibility(task.isSuccessful() ? View.GONE : View.VISIBLE);
+            }
+        });
     }
 
     public static PubNub getPubNub() {
@@ -190,17 +215,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         super.onResume();
 
         // Check internet connection
-        networkUtils = new NetworkUtils();
+        if (null == networkUtils)
+            networkUtils = new NetworkUtils();
         networkUtils.checkNetworkConnection();
 
         // Read users preference
-        String PREF_SEPARATOR = ",";
-        MyAccountInfo myAccountInfo;
-
-        myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
-        if (myAccountInfo.getSubscription().split(PREF_SEPARATOR)[0].equalsIgnoreCase("1"))
+        MyAccountInfo myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
+        if (myAccountInfo.getSubscriptionBools()[0])
             pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
-        if (myAccountInfo.getSubscription().split(PREF_SEPARATOR)[1].equalsIgnoreCase("1"))
+        if (myAccountInfo.getSubscriptionBools()[1])
             pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
     }
 

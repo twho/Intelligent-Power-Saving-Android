@@ -30,6 +30,7 @@
             android:visibility="gone" />
 
         <TextView
+            style="@style/Body1"
             android:id="@+id/activity_main_tv_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,6 +43,7 @@
             android:textColor="@color/light_red" />
 
         <Button
+            style="@style/Button"
             android:id="@+id/activity_main_btn_reconnect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

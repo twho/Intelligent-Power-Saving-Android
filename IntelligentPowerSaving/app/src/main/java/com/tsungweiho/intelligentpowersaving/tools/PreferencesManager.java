@@ -8,13 +8,12 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
-import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 /**
  * Created by Tsung Wei Ho on 2017/2/28.
  */
 
-public class SharedPreferencesManager implements DBConstants {
+public class PreferencesManager implements DBConstants {
     private Context context;
     private SharedPreferences sharedPreferences;
 
@@ -27,13 +26,13 @@ public class SharedPreferencesManager implements DBConstants {
     // Home Fragment use
     private String CURRENT_DISPLAY_MODE = "CURRENT_DISPLAY_MODE";
 
-    private static final SharedPreferencesManager ourInstance = new SharedPreferencesManager();
+    private static final PreferencesManager ourInstance = new PreferencesManager();
 
-    public static SharedPreferencesManager getInstance() {
+    public static PreferencesManager getInstance() {
         return ourInstance;
     }
 
-    private SharedPreferencesManager() {
+    private PreferencesManager() {
         this.context = MainActivity.getContext();
         this.sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }

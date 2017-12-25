@@ -105,6 +105,7 @@ public class ImageUtils {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+
         return file;
     }
 

@@ -28,7 +28,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         networkUtils.checkNetworkConnection();
         if (!isConnected) {
             if (null != MainActivity.getContext())
-                ((MainActivity) MainActivity.getContext()).setIfShowErrorMessage(false);
+                ((MainActivity) MainActivity.getContext()).setConnectionMessage(false);
         }
     }
 }

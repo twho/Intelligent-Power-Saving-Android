@@ -24,7 +24,7 @@ import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
-import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
+import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 
 import org.json.JSONArray;
@@ -34,8 +34,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
@@ -119,7 +117,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         loadDataFromFDB();
 
         // Read current status
-        ifShowFollow = SharedPreferencesManager.getInstance().getIfShowFollowedBuilding();
+        ifShowFollow = PreferencesManager.getInstance().getIfShowFollowedBuilding();
         setupFollowingBuildings();
     }
 
@@ -239,6 +237,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         super.onPause();
 
         // Save current status
-        SharedPreferencesManager.getInstance().saveIfShowFollowedBuilding(ifShowFollow);
+        PreferencesManager.getInstance().saveIfShowFollowedBuilding(ifShowFollow);
     }
 }

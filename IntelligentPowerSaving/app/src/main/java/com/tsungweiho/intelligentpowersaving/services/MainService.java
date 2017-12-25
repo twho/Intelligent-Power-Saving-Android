@@ -50,6 +50,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private EventDBHelper eventDBHelper;
     private MessageDBHelper messageDBHelper;
     private TimeUtils timeUtils;
+    private static PubNub pubnub = null;
 
     @Nullable
     @Override
@@ -80,12 +81,10 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Set PubNub Listeners
-        PNConfiguration pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
-        pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
-        pnConfiguration.setSecure(false);
-        PubNub pubnub = new PubNub(pnConfiguration);
-        pubnub.addListener(mainServiceListener);
+        if (null != MainActivity.getContext()) {
+            pubnub = MainActivity.getPubNub();
+            pubnub.addListener(mainServiceListener);
+        }
 
         return Service.START_STICKY;
     }

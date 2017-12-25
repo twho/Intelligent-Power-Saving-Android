@@ -46,6 +46,7 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
@@ -77,7 +78,7 @@ import retrofit.client.Response;
  * Updated by Tsung Wei Ho on 2017/2/18.
  */
 
-public class EventFragment extends Fragment implements FragmentTags, PubNubAPIConstants, OnMapReadyCallback {
+public class EventFragment extends Fragment implements FragmentTags, BuildingConstants, PubNubAPIConstants, OnMapReadyCallback {
 
     private final String TAG = "EventFragment";
 
@@ -338,9 +339,8 @@ public class EventFragment extends Fragment implements FragmentTags, PubNubAPICo
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Limit the map to University of Michigan campus
-        bounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));
-        final LatLngBounds range = bounds;
-        googleMap.setLatLngBoundsForCameraTarget(range);
+        bounds = ntustBounds;
+        googleMap.setLatLngBoundsForCameraTarget(bounds);
 
         googleMap.setMinZoomPreference(initMapZoom);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).build();

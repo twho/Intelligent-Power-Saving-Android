@@ -28,10 +28,9 @@ import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
-import com.tsungweiho.intelligentpowersaving.tools.SharedPreferencesManager;
+import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
-import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
     // Functions
     private Context context;
-    private ImageUtils imageUtilities;
+    private ImageUtils imageUtils;
     private AnimUtils animUtils;
     private MessageDBHelper messageDBHelper;
     private InboxFragmentListener inboxFragmentListener;
@@ -96,7 +95,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
         // Singleton classes
         animUtils = AnimUtils.getInstance();
-        imageUtilities = ImageUtils.getInstance();
+        imageUtils = ImageUtils.getInstance();
 
         ifShowUnread = false;
 
@@ -162,12 +161,12 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         ifFragmentActive = true;
 
         // use the data already saved
-        MyAccountInfo myAccountInfo = SharedPreferencesManager.getInstance().getMyAccountInfo();
-        ivDrawerPic.setImageBitmap(imageUtilities.getRoundedCroppedBitmap(imageUtilities.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
+        MyAccountInfo myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
+        ivDrawerPic.setImageBitmap(imageUtils.getRoundedCroppedBitmap(imageUtils.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
-        currentBox = SharedPreferencesManager.getInstance().getCurrentMessagebox();
+        currentBox = PreferencesManager.getInstance().getCurrentMessagebox();
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
         messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
         initInbox(messageList);
@@ -259,7 +258,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         messageDBHelper.closeDB();
 
         // save which box the user is using
-        SharedPreferencesManager.getInstance().saveCurrentMessageBox(currentBox);
+        PreferencesManager.getInstance().saveCurrentMessageBox(currentBox);
     }
 
     private class InboxFragmentListener implements View.OnClickListener, AdapterView.OnItemClickListener {

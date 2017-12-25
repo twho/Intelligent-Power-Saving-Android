@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Updated by Tsung Wei Ho on 2017/12/23.
  */
 
 public class MessageFragment extends Fragment implements FragmentTags, DBConstants, PubNubAPIConstants {
@@ -49,7 +49,6 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     // Functions
     private FragmentMessageBinding binding;
-    private FragmentManager fm;
     private Context context;
     private ArrayList<String> messageInfo;
     private int position;
@@ -67,7 +66,9 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
         context = MainActivity.getContext();
         this.messageInfo = this.getArguments().getStringArrayList(MESSAGE_FRAGMENT_KEY);
+
         init();
+
         return view;
     }
 
@@ -80,6 +81,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_READ);
         this.position = Integer.parseInt(messageInfo.get(1));
         this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
+
         binding.setMessage(currentMessage);
 
         findViews();
@@ -88,14 +90,15 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         setAllListeners();
     }
 
+    // Compile with SDK 26, no need to cast views
     private void findViews() {
-        ibBack = (ImageButton) view.findViewById(R.id.fragment_message_ib_back);
-        ibDelete = (ImageButton) view.findViewById(R.id.fragment_message_ib_delete);
-        ibRead = (ImageButton) view.findViewById(R.id.fragment_message_ib_read);
-        ibStar = (ImageButton) view.findViewById(R.id.fragment_home_ib_following);
-        ivSender = (ImageView) view.findViewById(R.id.fragment_message_iv_sender);
-        imgLayout = (FrameLayout) view.findViewById(R.id.fragment_message_layout_img);
-        pbImg = (ProgressBar) view.findViewById(R.id.fragment_message_pb_img);
+        ibBack = view.findViewById(R.id.fragment_message_ib_back);
+        ibDelete = view.findViewById(R.id.fragment_message_ib_delete);
+        ibRead = view.findViewById(R.id.fragment_message_ib_read);
+        ibStar = view.findViewById(R.id.fragment_home_ib_following);
+        ivSender = view.findViewById(R.id.fragment_message_iv_sender);
+        imgLayout = view.findViewById(R.id.fragment_message_layout_img);
+        pbImg = view.findViewById(R.id.fragment_message_pb_img);
     }
 
     @BindingAdapter({"bind:inboxLabel"})
@@ -112,21 +115,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     }
 
     @BindingAdapter({"bind:star"})
-    public static void loadStar(final ImageButton imageButton, final String inboxLabel) {
-        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
-            imageButton.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_follow));
-        } else {
-            imageButton.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_unfollow));
-        }
+    public static void loadStar(final ImageButton ibStar, final String inboxLabel) {
+        ibStar.setImageDrawable(MainActivity.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
     }
 
     @BindingAdapter({"bind:time"})
-    public static void loadTime(final TextView textView, final String time) {
-        if (time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(TimeUtils.getInstance().getDate()))
-            textView.setText(time.split(SEPARATOR_MSG_LABEL)[1]);
-        else {
-            textView.setText(time.split(SEPARATOR_MSG_LABEL)[0]);
-        }
+    public static void loadTime(final TextView tvTime, final String time) {
+        tvTime.setText(time.split(SEPARATOR_MSG_LABEL)[time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(TimeUtils.getInstance().getDate()) ? 0 : 1]);
     }
 
     private void setAllListeners() {
@@ -184,14 +179,11 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     break;
                 case R.id.fragment_home_ib_following:
                     currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
-                    if (currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR)) {
-                        ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_unfollow));
-                        messageDBHelper.starMailByLabel(currentMessage, LABEL_MSG_UNSTAR);
-                    } else {
-                        ibStar.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_follow));
-                        messageDBHelper.starMailByLabel(currentMessage, LABEL_MSG_STAR);
-                    }
+                    Boolean isStarred = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
 
+                    // Set star label
+                    ibStar.setImageDrawable(context.getResources().getDrawable(isStarred ? R.mipmap.ic_unfollow : R.mipmap.ic_follow));
+                    messageDBHelper.starMailByLabel(currentMessage, isStarred ? LABEL_MSG_UNSTAR : LABEL_MSG_STAR);
                     break;
             }
         }

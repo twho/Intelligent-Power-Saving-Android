@@ -68,7 +68,7 @@ public class ChartUtils implements BuildingConstants {
         xAxis.setTextColor(Color.WHITE);
         //xAxis.addLimitLine(llXAxis); // add x-axis limit line
 
-        Typeface tf = Typeface.createFromAsset(context.getAssets(), "OpenSans-Regular.ttf");
+        Typeface tf = Typeface.createFromAsset(context.getAssets(), "Share-Regular.ttf");
 
         List<Integer> intList = convertStringArrToIntArr(stringArrayList);
 

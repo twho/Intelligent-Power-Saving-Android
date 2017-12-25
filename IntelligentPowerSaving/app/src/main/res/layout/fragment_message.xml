@@ -68,6 +68,7 @@
             android:layout_marginTop="@dimen/activity_main_space">
 
             <TextView
+                style="@style/TitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -75,6 +76,7 @@
                 android:layout_margin="@dimen/activity_main_space"
                 android:layout_toLeftOf="@+id/fragment_home_ib_following"
                 android:ellipsize="end"
+                android:gravity="center_vertical"
                 android:maxLines="2"
                 android:text="@{message.title}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -89,7 +91,7 @@
                 android:layout_margin="@dimen/activity_main_space"
                 android:background="@drawable/background_content_transparent_button"
                 android:src="@mipmap/ic_unfollow"
-                app:star="@{message.inboxLabel}"/>
+                app:star="@{message.inboxLabel}" />
         </RelativeLayout>
 
         <View
@@ -123,6 +125,7 @@
                     android:src="@mipmap/ic_preload_img" />
 
                 <TextView
+                    style="@style/TitleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -134,10 +137,13 @@
             </LinearLayout>
 
             <TextView
+                style="@style/Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/fragment_home_ib_following"
+                android:layout_below="@+id/fragment_home_ib_following"
                 android:layout_gravity="right|center_vertical"
-                android:layout_margin="@dimen/activity_main_space"
+                android:layout_marginTop="46dp"
                 android:padding="@dimen/activity_main_space"
                 android:text="@string/loading"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -159,6 +165,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/SubheaderText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
@@ -166,7 +173,6 @@
                     android:lineSpacingExtra="@dimen/activity_main_space"
                     android:padding="@dimen/activity_main_space"
                     android:text="@{message.content}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/white" />
 
                 <FrameLayout
@@ -185,7 +191,6 @@
                         android:padding="@dimen/activity_main_space"
                         android:scaleType="fitCenter"
                         app:inboxLabel="@{message.inboxLabel}" />
-
 
                     <ProgressBar
                         android:id="@+id/fragment_message_pb_img"
