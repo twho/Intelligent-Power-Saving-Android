@@ -1,9 +1,14 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
- * Created by Tsung Wei Ho on 2/20/2017.
+ * Interface for PubNub API usage
+ *
+ * This interface is used to store all constants used to make PubNub API calls.
+ *
+ * @author Tsung Wei Ho
+ * @version 0220.2017
+ * @since 1.0.0
  */
-
 public interface PubNubAPIConstants {
     // Project: Intelligent Power Saving
     // Pubnub keys

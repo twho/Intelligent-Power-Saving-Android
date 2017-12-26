@@ -1,18 +1,20 @@
 package com.tsungweiho.intelligentpowersaving.objects;
 
-import android.util.Log;
-
 /**
- * Created by Tsung Wei Ho on 12/22/2017.
+ * Object class to store user account information
+ *
+ * This class is used to store user account information
+ *
+ * @author Tsung Wei Ho
+ * @version 1222.2017
+ * @since 1.0.0
  */
-
 public class MyAccountInfo {
 
     private String email;
     private String name;
     private String imageUrl;
     private String subscription;
-    private String isRequestPermission;
 
     // Subscription format = 1,1 means subscribe to event and public channels
     public MyAccountInfo(String email, String name, String imageUrl, String subscription) {

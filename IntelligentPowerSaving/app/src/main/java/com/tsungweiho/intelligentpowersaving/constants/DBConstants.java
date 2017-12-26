@@ -1,10 +1,14 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
- * Created by Tsung Wei Ho on 2/18/2017.
- * Updated by Tsung Wei Ho on 12/24/2017.
+ * Interface that stores all constants used by database
+ *
+ * This interface is used to store and handle all constants used by database
+ *
+ * @author Tsung Wei Ho
+ * @version 1224.2017
+ * @since 1.0.0
  */
-
 public interface DBConstants {
 
     // Firebase

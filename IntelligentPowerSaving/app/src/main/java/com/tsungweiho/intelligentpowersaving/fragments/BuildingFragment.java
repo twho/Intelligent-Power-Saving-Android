@@ -6,9 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +32,14 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * Created by Tsung Wei Ho on 2/18/2017.
- * Updated by Tsung Wei Ho on 12/22/2017
+ * Fragment for showing building energy consumption information
+ *
+ * This fragment is the user interface that display real-time energy consumption with charts
+ *
+ * @author Tsung Wei Ho
+ * @version 1222.2017
+ * @since 1.0.0
  */
-
 public class BuildingFragment extends Fragment implements FragmentTags, BuildingConstants {
     private final String TAG = "BuildingFragment";
 
@@ -75,7 +76,9 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         return view;
     }
 
-    // Compile with SDK 26, no need to cast views
+    /**
+     * Init all classes needed in this fragment
+     */
     private void init() {
         buildingDBHelper = new BuildingDBHelper(context);
 
@@ -86,6 +89,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         building = buildingDBHelper.getBuildingByName(buildingName);
         binding.setBuilding(building);
 
+        // Compile with SDK 26, no need to cast views
         ivFollowIndicator = view.findViewById(R.id.fragment_building_iv_follow);
         ivIbFollow = view.findViewById(R.id.fragment_building_iv_ib_follow);
         tvIbFollow = view.findViewById(R.id.fragment_building_tv_ib_follow);
@@ -95,11 +99,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         ibFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Boolean.parseBoolean(building.getIfFollow())) {
-                    building.setIfFollow(BUILDING_NOT_FOLLOW);
-                } else {
-                    building.setIfFollow(BUILDING_FOLLOW);
-                }
+                building.setIfFollow(Boolean.parseBoolean(building.getIfFollow()) ? BUILDING_NOT_FOLLOW : BUILDING_FOLLOW);
                 setFollowButton(Boolean.parseBoolean(building.getIfFollow()));
             }
         });
@@ -122,6 +122,10 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         Collections.fill(consumptionList, "0");
     }
 
+    /**
+     * Setup follow button
+     * @param isFollow the boolean indicates if the building is followed by user
+     */
     private void setFollowButton(Boolean isFollow) {
         if (isFollow) {
             animUtils.setIconAnimToVisible(ivFollowIndicator);
@@ -135,14 +139,15 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
-        ImageUtils.getInstance().setRoundCornerImageViewFromUrl(url, imageView);
+        final ImageUtils imageUtils = ImageUtils.getInstance();
+        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
 
         // Auto refresh after 5 seconds.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ImageUtils.getInstance().setRoundCornerImageViewFromUrl(url, imageView);
+                imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
             }
         }, 5000);
     }

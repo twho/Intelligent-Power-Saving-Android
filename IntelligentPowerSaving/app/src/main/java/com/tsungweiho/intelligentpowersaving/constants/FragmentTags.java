@@ -1,9 +1,14 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
- * Created by Tsung Wei Ho on 2/18/2017.
+ * Interface that stores all fragment tags
+ *
+ * This interface is used to store all fragment tags, which is used by fragmentManager
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
 public interface FragmentTags {
     String packageName = "com.tsungweiho.intelligentpowersaving";
 
@@ -15,7 +20,6 @@ public interface FragmentTags {
 
     // Extended Fragment
     String BUILDING_FRAGMENT = packageName + "BuildingFragment";
-    String BUILDING_CHART_FRAGMENT = packageName + "BuildingChartFragment";
     String BUILDING_FRAGMENT_KEY = packageName + "BuildingFragmentKey";
     String MESSAGE_FRAGMENT = packageName + "MessageFragment";
     String MESSAGE_FRAGMENT_KEY = packageName + "MessageFragmentKey";

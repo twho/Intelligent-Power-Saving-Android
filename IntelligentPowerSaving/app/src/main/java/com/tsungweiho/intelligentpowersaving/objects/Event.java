@@ -12,16 +12,16 @@ public class Event {
     private String poster;
     private String image;
     private String time;
-    private String ifFixed;
+    private String isFixed;
 
-    public Event(String uniqueId, String detail, String position, String image, String poster, String time, String ifFixed) {
+    public Event(String uniqueId, String detail, String position, String image, String poster, String time, String isFixed) {
         this.uniqueId = uniqueId;
         this.detail = detail;
         this.position = position;
         this.image = image;
         this.poster = poster;
         this.time = time;
-        this.ifFixed = ifFixed;
+        this.isFixed = isFixed;
     }
 
     public Event(ArrayList<String> eventArray) {
@@ -31,7 +31,7 @@ public class Event {
         this.image = eventArray.get(3);
         this.poster = eventArray.get(4);
         this.time = eventArray.get(5);
-        this.ifFixed = eventArray.get(6);
+        this.isFixed = eventArray.get(6);
     }
 
     public String getUniqueId() {
@@ -83,10 +83,10 @@ public class Event {
     }
 
     public String getIfFixed() {
-        return ifFixed;
+        return isFixed;
     }
 
     public void setIfFixed(String ifFixed) {
-        this.ifFixed = ifFixed;
+        this.isFixed = ifFixed;
     }
 }

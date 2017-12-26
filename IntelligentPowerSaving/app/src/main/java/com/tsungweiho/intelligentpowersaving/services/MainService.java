@@ -103,8 +103,10 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             if (message.getChannel().equalsIgnoreCase(EVENT_CHANNEL) || message.getChannel().equalsIgnoreCase(EVENT_CHANNEL_DELETED)) {
                 try {
                     JSONObject jObject = new JSONObject(message.getMessage().toString());
+
                     // Save message to eventDB
                     insertDataToDB(jObject);
+
                     // Save message in messageDB
                     convertEventToMessage(jObject);
                 } catch (JSONException e) {

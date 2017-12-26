@@ -4,9 +4,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
- * Created by Tsung Wei Ho on 4/15/2015.
+ * Interface that stores all constants used by BuildingFragment
+ *
+ * This interface is used to store and handle all constants used by BuildingFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 1221.2017
+ * @since 1.0.0
  */
-
 public interface BuildingConstants {
     LatLngBounds umCentralBounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));
     LatLngBounds umNorthBounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));

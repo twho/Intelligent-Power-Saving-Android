@@ -34,6 +34,8 @@
     <string name="subscribed_channels">Subscribed channels</string>
     <string name="event_channels">Event channel</string>
     <string name="public_channels">Public channel</string>
+    <string name="upload_profilepic">Uploading...</string>
+    <string name="upload_profilepic_fail">Upload to upload image, <u>try again</u></string>
 
     <!--HomeFragment-->
     <string name="fragment_home_title">Dashboard</string>

@@ -37,18 +37,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-
 /**
- * Created by Michael Ho on 2015/4/15.
- * Updated by Michael Ho on 2017/12/22.
+ * Fragment for user to receive important messages from admin
+ *
+ * This fragment is the user interface that user can receive messages and can use as mailbox
+ *
+ * @author Tsung Wei Ho
+ * @version 1222.2017
+ * @since 1.0.0
  */
-
 public class InboxFragment extends Fragment implements DrawerListConstants, PubNubAPIConstants, DBConstants {
-
-    // Message Fragment View
-    private View view;
-
     // UI Views
+    private View view; // Message Fragment View
     private DrawerLayout drawer;
     private LinearLayout llDrawer, llEditing;
     private TextView tvTitle, tvMail, tvNoMail;
@@ -86,6 +86,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         context = MainActivity.getContext();
 
         init();
+
         return view;
     }
 
@@ -162,7 +163,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
         // use the data already saved
         MyAccountInfo myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
-        ivDrawerPic.setImageBitmap(imageUtils.getRoundedCroppedBitmap(imageUtils.decodeBase64ToBitmap(myAccountInfo.getImageUrl())));
+        imageUtils.setRoundedCornerImageViewFromUrl(myAccountInfo.getImageUrl(), ivDrawerPic, imageUtils.IMG_TYPE_PROFILE);
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox

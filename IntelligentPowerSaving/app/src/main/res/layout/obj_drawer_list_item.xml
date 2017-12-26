@@ -29,7 +29,6 @@
             android:layout_gravity="center_vertical"
             android:layout_margin="@dimen/activity_main_space"
             android:text="@string/loading"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
-
 /**
- * Created by mike on 2017/3/4.
+ * Activity serves as a launcher
+ *
+ * This activity is used as landing page for getting the app ready
+ *
+ * @author Tsung Wei Ho
+ * @version 0304.2017
+ * @since 1.0.0
  */
-
 public class SplashActivity extends Activity {
     private final int SPLASH_DISPLAY_LENGHT = 3000;
 

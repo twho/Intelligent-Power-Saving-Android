@@ -11,7 +11,9 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
@@ -21,9 +23,14 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
 
-import com.pubnub.api.PubNub;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -38,14 +45,17 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by Tsung Wei Ho on 4/15/2015.
- * Updated by Tsung Wei Ho on 12/24/2017.
+ * Fragment for user to set basic user information
+ * <p>
+ * This fragment is the user interface that user can set account information.
+ *
+ * @author Tsung Wei Ho
+ * @version 1224.2017
+ * @since 1.0.0
  */
-
 public class SettingsFragment extends Fragment implements FragmentTags, DBConstants, PubNubAPIConstants {
     private final String TAG = "SettingsFragment";
 
@@ -56,6 +66,8 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     private Switch swEvent, swPublic;
     private ImageView ivProfile;
     private EditText edName, edEmail;
+    private TextView tvProgress;
+    private ProgressBar progressBar;
     private Dialog imgCropDialog;
 
     // Functions
@@ -72,15 +84,13 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     public static final int REQUEST_CODE_CAMERA = 1;
     public static final int REQUEST_CODE_IMAGE = 0;
 
-    // PubNub
-    private PubNub pubnub;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
         view = binding.getRoot();
 
+        // Get access to main context
         context = MainActivity.getContext();
 
         init();
@@ -88,10 +98,11 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         return view;
     }
 
+    /**
+     * Init all classes needed in this fragment
+     */
     private void init() {
-        pubnub = MainActivity.getPubNub();
         settingsFragmentListener = new SettingsFragmentListener();
-
 
         // Singleton classes
         alertDialogMgr = AlertDialogManager.getInstance();
@@ -101,6 +112,9 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         // Compile with SDK 26, no need to cast views
         edName = view.findViewById(R.id.fragment_settings_ed_name);
         edEmail = view.findViewById(R.id.fragment_settings_ed_email);
+        tvProgress = view.findViewById(R.id.fragment_settings_tv_progress);
+        tvProgress.setOnClickListener(settingsFragmentListener);
+        progressBar = view.findViewById(R.id.fragment_settings_progressBar);
 
         ivProfile = view.findViewById(R.id.fragment_settings_iv);
         ivProfile.setOnClickListener(settingsFragmentListener);
@@ -132,18 +146,22 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
             if (null != bmpBuffer) {
                 imgCropDialog = alertDialogMgr.showCropImageDialog(ivProfile, bmpBuffer);
-                imgCropDialog.setOnCancelListener(settingsFragmentListener);
+                imgCropDialog.setOnDismissListener(settingsFragmentListener);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private class SettingsFragmentListener implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DialogInterface.OnCancelListener {
+    private class SettingsFragmentListener implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DialogInterface.OnDismissListener,
+            OnProgressListener<UploadTask.TaskSnapshot>, OnFailureListener, OnSuccessListener<UploadTask.TaskSnapshot> {
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_settings_iv:
                     alertDialogMgr.showCameraDialog(SETTINGS_FRAGMENT);
+                    break;
+                case R.id.fragment_settings_tv_progress:
+                    performUploadTask();
                     break;
             }
         }
@@ -162,36 +180,118 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
         // Only handle image crop dialog
         @Override
-        public void onCancel(DialogInterface dialogInterface) {
-//            firebaseMgr.uploadProfileImg(imageUtils.getFileFromBitmap(ivProfile.getDrawingCache()).getPath(), );
+        public void onDismiss(DialogInterface dialogInterface) {
+            performUploadTask();
+        }
+
+        /**
+         * Listen for state changes and completion of the upload.
+         *
+         * @param taskSnapshot the Firebase task item
+         */
+        @Override
+        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+            progressBar.setProgress((int) progress);
+
+            // String concatenation
+            StringBuilder strBuilder = new StringBuilder(String.valueOf(progress));
+            strBuilder.append("\n");
+            strBuilder.append(context.getResources().getString(R.string.upload_profilepic));
+
+            tvProgress.setText(strBuilder);
+            tvProgress.setTextColor(context.getResources().getColor(R.color.green));
+        }
+
+        /**
+         * Handle unsuccessful uploads
+         *
+         * @param exception the exception message
+         */
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            tvProgress.setClickable(true);
+            tvProgress.setText(context.getResources().getString(R.string.notification_fail));
+            tvProgress.setTextColor(context.getResources().getColor(R.color.light_red));
+        }
+
+        /**
+         * Handle successful uploads on complete
+         *
+         * @param taskSnapshot the Firebase task item
+         */
+        @Override
+        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+            Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+
+            // Store to local user preference
+            myAccountInfo.setImageUrl(downloadUrl.toString());
+            binding.setMyAccountInfo(myAccountInfo);
+
+            tvProgress.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
         }
     }
 
+    /**
+     * Get UI ready for upload task and add listeners to upload progress
+     */
+    private void performUploadTask() {
+        tvProgress.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+
+        UploadTask uploadTask = firebaseMgr.uploadProfileImg(imageUtils.getFileFromBitmap(ivProfile.getDrawingCache()).getPath());
+        uploadTask.addOnProgressListener(settingsFragmentListener).addOnFailureListener(settingsFragmentListener).addOnSuccessListener(settingsFragmentListener);
+    }
+
+    /**
+     * Set channel subscription information, which will be stored in user preference locally
+     *
+     * @param isChecked the boolean indicates if user check the checkbox
+     * @param index     the index of the subscribed channel
+     */
     private void setChannelSubscription(Boolean isChecked, int index) {
         Pair<String, String> channels = index == 0 ? new Pair<>(EVENT_CHANNEL, EVENT_CHANNEL_DELETED) : new Pair<>(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED);
 
         if (isChecked) {
-            pubnub.subscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
+            MainActivity.getPubNub().subscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
         } else {
-            pubnub.unsubscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
+            MainActivity.getPubNub().unsubscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
         }
 
         myAccountInfo.setSubscriptionBools(index, isChecked);
     }
 
+    /**
+     * Load user image to the profile imageView
+     *
+     * @param imageView the imageView to show user image
+     * @param url       the resource url of the user image
+     */
     @BindingAdapter({"bind:userImage"})
     public static void loadUserImage(final ImageView imageView, final String url) {
         if (url.equalsIgnoreCase("")) {
             imageView.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
-        } else {
-            imageView.setImageBitmap(ImageUtils.getInstance().getRoundedCroppedBitmap(ImageUtils.getInstance().decodeBase64ToBitmap(url)));
+            return;
         }
+
+        final ImageUtils imageUtils = ImageUtils.getInstance();
+        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_PROFILE);
+
+        // Auto refresh after 3 seconds.
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_PROFILE);
+            }
+        }, 3000);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        tvProgress.setClickable(false);
         myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
 
         // Bind data to UIs
@@ -203,10 +303,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     @Override
     public void onPause() {
         super.onPause();
-
-        if (null != ivProfile.getDrawingCache()) {
-            myAccountInfo.setImageUrl(ImageUtils.getInstance().encodeBase64ToString(ivProfile.getDrawingCache()));
-        }
 
         myAccountInfo.setName(edName.getText().toString());
         myAccountInfo.setEmail(edEmail.getText().toString());

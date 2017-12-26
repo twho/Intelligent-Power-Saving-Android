@@ -76,6 +76,12 @@
                     android:background="@color/colorPrimaryLTDark"
                     android:orientation="horizontal">
 
+                    <ImageView
+                        android:id="@+id/fragment_event_tv_marker_sender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/ic_preload_img" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -83,8 +89,8 @@
                         android:orientation="vertical">
 
                         <TextView
-                            style="@style/TitleText"
                             android:id="@+id/fragment_event_tv_marker_title"
+                            style="@style/TitleText"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
@@ -98,8 +104,8 @@
                             android:textColor="@color/white" />
 
                         <TextView
-                            style="@style/Body1"
                             android:id="@+id/fragment_event_tv_marker_poster"
+                            style="@style/Body1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center_vertical"
@@ -139,8 +145,8 @@
                 android:orientation="horizontal">
 
                 <Button
-                    style="@style/Button"
                     android:id="@+id/fragment_event_btn_full_map"
+                    style="@style/Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
@@ -152,8 +158,8 @@
                     android:textColor="@color/white" />
 
                 <TextView
-                    style="@style/HeadlineText"
                     android:id="@+id/fragment_event_title"
+                    style="@style/HeadlineText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -185,8 +191,8 @@
                 android:visibility="gone">
 
                 <EditText
-                    style="@style/Body1"
                     android:id="@+id/fragment_event_ed_event"
+                    style="@style/Body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_main_space"
@@ -198,7 +204,7 @@
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="@color/white"
-                    android:textColorHint="@color/colorTint"/>
+                    android:textColorHint="@color/colorTint" />
 
                 <FrameLayout
                     android:layout_width="wrap_content"
@@ -259,8 +265,8 @@
             </LinearLayout>
 
             <TextView
-                style="@style/Body1"
                 android:id="@+id/fragment_event_bottom"
+                style="@style/Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

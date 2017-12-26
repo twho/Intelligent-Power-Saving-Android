@@ -1,8 +1,6 @@
 package com.tsungweiho.intelligentpowersaving.utils;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -33,16 +31,19 @@ import java.util.Calendar;
 import id.zelory.compressor.Compressor;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/7.
+ * Class for performing image processing tasks
+ *
+ * This class is designed as a singleton class and is used to handle all image processing tasks within the app.
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
-// Singleton class
 public class ImageUtils {
 
-    private static Context context;
+    private Context context;
 
-    // unit KB
-    private static final int MAX_SIZE = (200) * 1024;
+    private static final int MAX_SIZE = (200) * 1024; // unit KB
 
     private static final ImageUtils ourInstance = new ImageUtils();
 
@@ -54,29 +55,54 @@ public class ImageUtils {
         this.context = MainActivity.getContext();
     }
 
-    public static Bitmap decodeBase64ToBitmap(String input) {
+    /**
+     * Decode base64 string to an image as bitmap
+     *
+     * @param input the base64 string
+     * @return the image as bitmap decoded from base64 string
+     */
+    public Bitmap decodeBase64ToBitmap(String input) {
         byte[] decodedByte = Base64.decode(input, 0);
         return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
-    public String encodeBase64ToString(Bitmap bitmapOrg) {
+    /**
+     * Encode bitmap to base64 format string
+     *
+     * @param bitmap the bitmap to be encoded to base64 string
+     * @return the base64 string encoded from bitmap
+     */
+    public String encodeBase64ToString(Bitmap bitmap) {
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 100, bao);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
         byte[] ba = bao.toByteArray();
 
         return Base64.encodeToString(ba, Base64.DEFAULT);
     }
 
+    /**
+     * Compress image file to specified size
+     *
+     * @param imgFile the image file to be compressed
+     * @return the compressed image
+     * @throws IOException the exception from reading or writing files
+     */
     public File getCompressedImgFile(File imgFile) throws IOException {
         File compressedImgFile = imgFile;
 
-        // Compress
+        // Compress the image if its size exceed specified max size
         if (compressedImgFile.length() > MAX_SIZE)
             compressedImgFile = new Compressor(context).compressToFile(imgFile);
 
         return compressedImgFile;
     }
 
+    /**
+     * Get file resource of selected bitmap
+     *
+     * @param bitmap the bitmap to get file resource from
+     * @return the file of the selected bitmap
+     */
     public File getFileFromBitmap(Bitmap bitmap) {
         if (null == bitmap)
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img);
@@ -109,7 +135,14 @@ public class ImageUtils {
         return file;
     }
 
-    public static Bitmap getOvalCroppedBitmap(Bitmap bitmap, int radius) {
+    /**
+     * Get oval cropped bitmap
+     *
+     * @param bitmap the bitmap to be edited
+     * @param radius the radius of the corner of the bitmap
+     * @return the bitmap after being cropped
+     */
+    public Bitmap getOvalCroppedBitmap(Bitmap bitmap, int radius) {
         Bitmap finalBitmap;
         if (bitmap.getWidth() != radius || bitmap.getHeight() != radius) {
             finalBitmap = Bitmap.createScaledBitmap(bitmap, radius, radius, false);
@@ -138,7 +171,13 @@ public class ImageUtils {
         return output;
     }
 
-    public static Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
+    /**
+     * Get rounded cropped bitmap
+     *
+     * @param bitmap the bitmap to be edited
+     * @return the bitmap after being cropped
+     */
+    public Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
         if (null == bitmap)
             return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_profile);
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
@@ -163,15 +202,20 @@ public class ImageUtils {
         return output;
     }
 
-    public static Bitmap getRoundedRectBitmap(Bitmap bitmap, int radius) {
-        Bitmap finalBitmap = bitmap;
-        Bitmap output = Bitmap.createBitmap(finalBitmap.getWidth(),
-                finalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+    /**
+     * Get bitmap with rounded corner
+     *
+     * @param bitmap the bitmap to be edited
+     * @param radius the corner radius to be set to the bitmap
+     * @return the bitmap after being edited
+     */
+    private Bitmap getRoundedRectBitmap(Bitmap bitmap, int radius) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
         final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, finalBitmap.getWidth(),
-                finalBitmap.getHeight());
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
@@ -180,24 +224,46 @@ public class ImageUtils {
         paint.setColor(Color.parseColor("#BAB399"));
 
         if (Build.VERSION.SDK_INT >= 21) {
-            canvas.drawRoundRect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight(), radius, radius, paint);
+            canvas.drawRoundRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), radius, radius, paint);
         } else {
-            canvas.drawRect(0, 0, finalBitmap.getWidth(), finalBitmap.getHeight(), paint);
+            canvas.drawRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), paint);
         }
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(finalBitmap, rect, rect, paint);
+        canvas.drawBitmap(bitmap, rect, rect, paint);
 
         return output;
     }
 
-    public static void setRoundCornerImageViewFromUrl(String url, final ImageView imageView) {
+    // Different types of image will have different editing style
+    public final int IMG_TYPE_BUILDING = 0;
+    public final int IMG_TYPE_PROFILE = 1;
+
+    /**
+     * Set rounded-corner image from web resource using Picasso library
+     *
+     * @param url the url of the image resource
+     * @param imageView the imageView to be set
+     * @param imgType the type of image
+     */
+    public void setRoundedCornerImageViewFromUrl(String url, final ImageView imageView, final int imgType) {
 
         if (!"".equalsIgnoreCase(url)) {
             Picasso.with(context).load(url).resize((int) context.getResources().getDimension(R.dimen.activity_main_img_size), (int) context.getResources().getDimension(R.dimen.activity_main_img_size)).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    imageView.setImageBitmap(getRoundedRectBitmap(bitmap, bitmap.getWidth() / 15));
+                    switch (imgType) {
+                        case IMG_TYPE_BUILDING:
+                            imageView.setImageBitmap(getRoundedRectBitmap(bitmap, bitmap.getWidth() / 15));
+                            break;
+                        case IMG_TYPE_PROFILE:
+                            imageView.setImageBitmap(getRoundedCroppedBitmap(bitmap));
+                            break;
+                        default:
+                            imageView.setImageBitmap(getRoundedCroppedBitmap(bitmap));
+                            break;
+                    }
+
                 }
 
                 @Override
@@ -215,7 +281,14 @@ public class ImageUtils {
         }
     }
 
-    public static void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar progressBar) {
+    /**
+     * Set image from web resource using Picasso library
+     *
+     * @param url the url of the image resource
+     * @param imageView the imageView to be set
+     * @param progressBar the progressBar shown before image finishes loading
+     */
+    public void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar progressBar) {
 
         progressBar.animate();
         progressBar.setVisibility(View.VISIBLE);

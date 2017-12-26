@@ -74,10 +74,14 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Fragment for user to report FIXIT event
+ *
+ * This fragment is the user interface that user can use to report events.
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
 public class EventFragment extends Fragment implements FragmentTags, BuildingConstants, PubNubAPIConstants, OnMapReadyCallback {
 
     private final String TAG = "EventFragment";
@@ -487,13 +491,14 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         @Override
         public void success(ImageResponse imageResponse, Response response) {
             tempImgFile.delete();
+
             pubnub.publish().message(new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
                     clickedLatLng.longitude, imageResponse.data.link, getString(R.string.testing_name), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override
                         public void onResponse(PNPublishResult result, PNStatus status) {
-                            // handle publish result, status always present, result if successful
+                            // TODO handle publish result, status always present, result if successful
                             // status.isError to see if error happened
                         }
                     });
