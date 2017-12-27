@@ -79,7 +79,7 @@ public class BuildingIcon extends View implements BuildingConstants {
         setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(energyIncrease ? R.color.light_red : R.color.green));
         ivIndicator.setImageDrawable(context.getResources().getDrawable(energyIncrease ? R.mipmap.ic_increase : R.mipmap.ic_decrease));
 
-        AnimUtils.getInstance().setIconAnimToVisible(ivIndicator);
+        AnimUtils.getInstance().fadeinToVisible(ivIndicator, AnimUtils.getInstance().FAST_ANIM_DURATION);
         tvConsumpPercent.setText(Math.abs(Integer.valueOf(building.getEfficiency().split(",")[0])) + context.getResources().getString(R.string.energy_eff_unit));
     }
 

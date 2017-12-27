@@ -53,7 +53,7 @@ import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
-import com.tsungweiho.intelligentpowersaving.objects.Upload;
+import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
@@ -109,7 +109,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private AlertDialogManager alertDialogMgr;
     private EventFragmentListener eventFragmentListener;
     private FragmentEventBinding binding;
-    private Upload upload;
+    private ImgurUpload imgurUpload;
     private File tempImgFile;
     private Thread uiThread;
     private static Handler handler;
@@ -205,7 +205,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                         pbTopBar.setVisibility(View.VISIBLE);
                         tempImgFile = imageUtils.getFileFromBitmap(bmpBuffer);
                         createUpload(tempImgFile);
-                        new UploadService(context).Execute(upload, new UiCallback());
+                        new UploadService(context).Execute(imgurUpload, new UiCallback());
                     }
                     break;
                 case R.id.fragment_event_ib_cancel:
@@ -229,8 +229,8 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
 
         @Override
         public void onMapLongClick(LatLng latLng) {
-            animUtils.setflAnimToVisible(flTopBarAddEvent);
-            animUtils.setllAnimToVisible(llTopBarAddEvent);
+            animUtils.fadeinToVisible(flTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
+            animUtils.fadeinToVisible(llTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
 
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
@@ -250,7 +250,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                 clickedLatLng = latLng;
 
             if (ifMarkerViewUp) {
-                animUtils.setllSlideDown(llMarkerInfo);
+                animUtils.slideDown(llMarkerInfo, animUtils.FAST_ANIM_DURATION);
                 ifMarkerViewUp = false;
             }
         }
@@ -261,7 +261,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
             binding.executePendingBindings();
-            animUtils.setllSlideUp(llMarkerInfo);
+            animUtils.slideUpToVisible(llMarkerInfo, animUtils.FAST_ANIM_DURATION);
             ifMarkerViewUp = true;
             return false;
         }
@@ -316,18 +316,19 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             }
 
             if (null != bmpBuffer)
-                animUtils.setIconAnimToVisible(ivAddIcon);
+                animUtils.fadeinToVisible(ivAddIcon, animUtils.FAST_ANIM_DURATION);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Create Imgur upload task
+     *
+     * @param image the image to be uploaded to Imgur
+     */
     private void createUpload(File image) {
-        upload = new Upload();
-
         try {
-            upload.image = imageUtils.getCompressedImgFile(image);
-            upload.title = edEvent.getText().toString();
-            upload.description = edEvent.getText().toString();
+            imgurUpload = new ImgurUpload(imageUtils.getCompressedImgFile(image), edEvent.getText().toString(), edEvent.getText().toString(), "");
         } catch (IOException e) {
             e.printStackTrace();
             alertDialogMgr.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.notification_fail));
@@ -378,7 +379,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             @Override
             public void run() {
                 llOpen.setVisibility(View.GONE);
-                animUtils.setMapAnimToVisible(mapView);
+                animUtils.fadeinToVisible(mapView, animUtils.FAST_ANIM_DURATION);
             }
         }, 2000);
     }
@@ -471,7 +472,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         mapView.onPause();
     }
 
-    public void setAllMarkerOnUiThread() {
+    public void setMarkersOnUiThread() {
         uiThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -511,7 +512,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         public void failure(RetrofitError error) {
             //Assume we have no connection, since error is null
             if (error != null) {
-                Log.d(TAG, "Upload error: " + error.getMessage());
+                Log.d(TAG, "ImgurUpload error: " + error.getMessage());
             }
         }
 

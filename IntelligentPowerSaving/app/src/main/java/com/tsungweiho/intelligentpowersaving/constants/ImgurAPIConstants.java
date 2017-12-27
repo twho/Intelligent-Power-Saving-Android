@@ -28,7 +28,7 @@ public interface ImgurAPIConstants {
     boolean LOGGING = false;
 
     /**
-     * Upload image to imgur website
+     * ImgurUpload image to imgur website
      *
      * @param auth        #Type of authorization for upload
      * @param title       #Title of image

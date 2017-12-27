@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.tsungweiho.intelligentpowersaving.constants.ImgurAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
-import com.tsungweiho.intelligentpowersaving.objects.Upload;
+import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.lang.ref.WeakReference;
@@ -30,7 +30,7 @@ public class UploadService implements ImgurAPIConstants {
         this.context = new WeakReference<>(context);
     }
 
-    public void Execute(Upload upload, Callback<ImageResponse> callback) {
+    public void Execute(ImgurUpload imgurUpload, Callback<ImageResponse> callback) {
         final Callback<ImageResponse> cb = callback;
 
         if (!NetworkUtils.isConnected(context.get())) {
@@ -46,11 +46,11 @@ public class UploadService implements ImgurAPIConstants {
 
         restAdapter.create(ImgurAPIConstants.class).postImage(
                 IMGUR_POST_CLIENT_ID,
-                upload.title,
-                upload.description,
-                upload.albumId,
+                imgurUpload.getTitle(),
+                imgurUpload.getDescription(),
+                imgurUpload.getAlbumId(),
                 null,
-                new TypedFile("image/*", upload.image),
+                new TypedFile("image/*", imgurUpload.image),
                 new Callback<ImageResponse>() {
                     @Override
                     public void success(ImageResponse imageResponse, Response response) {

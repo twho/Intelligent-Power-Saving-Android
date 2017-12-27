@@ -128,7 +128,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
      */
     private void setFollowButton(Boolean isFollow) {
         if (isFollow) {
-            animUtils.setIconAnimToVisible(ivFollowIndicator);
+            animUtils.fadeinToVisible(ivFollowIndicator, animUtils.FAST_ANIM_DURATION);
         } else {
             ivFollowIndicator.setVisibility(View.GONE);
         }
@@ -191,7 +191,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         }
 
         // Setup chart and its data
-        chartUtils.setupLineChart(context, lineChart, consumptionList);
+        chartUtils.setupLineChart(lineChart, consumptionList);
     }
 
     @Override

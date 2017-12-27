@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 
@@ -33,15 +34,13 @@ import id.zelory.compressor.Compressor;
 /**
  * Class for performing image processing tasks
  *
- * This class is designed as a singleton class and is used to handle all image processing tasks within the app.
+ * This singleton class is designed as a singleton class and is used to handle all image processing tasks within the app.
  *
  * @author Tsung Wei Ho
  * @version 0218.2017
  * @since 1.0.0
  */
 public class ImageUtils {
-
-    private Context context;
 
     private static final int MAX_SIZE = (200) * 1024; // unit KB
 
@@ -51,8 +50,15 @@ public class ImageUtils {
         return ourInstance;
     }
 
-    private ImageUtils() {
-        this.context = MainActivity.getContext();
+    private ImageUtils() {}
+
+    /**
+     * Get application context for chart use
+     *
+     * @return application context
+     */
+    private Context getContext() {
+        return IntelligentPowerSaving.getContext();
     }
 
     /**
@@ -92,7 +98,7 @@ public class ImageUtils {
 
         // Compress the image if its size exceed specified max size
         if (compressedImgFile.length() > MAX_SIZE)
-            compressedImgFile = new Compressor(context).compressToFile(imgFile);
+            compressedImgFile = new Compressor(getContext()).compressToFile(imgFile);
 
         return compressedImgFile;
     }
@@ -105,9 +111,9 @@ public class ImageUtils {
      */
     public File getFileFromBitmap(Bitmap bitmap) {
         if (null == bitmap)
-            bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img);
+            bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_preload_img);
 
-        File file = new File(context.getCacheDir(), String.valueOf(Calendar.getInstance().getTimeInMillis()));
+        File file = new File(getContext().getCacheDir(), String.valueOf(Calendar.getInstance().getTimeInMillis()));
 
         try {
             file.createNewFile();
@@ -179,7 +185,7 @@ public class ImageUtils {
      */
     public Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
         if (null == bitmap)
-            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_profile);
+            return BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_preload_profile);
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
                 bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
@@ -249,7 +255,7 @@ public class ImageUtils {
     public void setRoundedCornerImageViewFromUrl(String url, final ImageView imageView, final int imgType) {
 
         if (!"".equalsIgnoreCase(url)) {
-            Picasso.with(context).load(url).resize((int) context.getResources().getDimension(R.dimen.activity_main_img_size), (int) context.getResources().getDimension(R.dimen.activity_main_img_size)).into(new Target() {
+            Picasso.with(getContext()).load(url).resize((int) getContext().getResources().getDimension(R.dimen.activity_main_img_size), (int) getContext().getResources().getDimension(R.dimen.activity_main_img_size)).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     switch (imgType) {
@@ -277,7 +283,7 @@ public class ImageUtils {
                 }
             });
         } else {
-            imageView.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_preload_img));
+            imageView.setImageDrawable(getContext().getResources().getDrawable(R.mipmap.ic_preload_img));
         }
     }
 
@@ -294,7 +300,7 @@ public class ImageUtils {
         progressBar.setVisibility(View.VISIBLE);
 
         if (!"".equalsIgnoreCase(url)) {
-            Picasso.with(context).load(url).into(new Target() {
+            Picasso.with(getContext()).load(url).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     imageView.invalidate();
@@ -314,7 +320,7 @@ public class ImageUtils {
                 }
             });
         } else {
-            imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_preload_img));
+            imageView.setImageBitmap(BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.ic_preload_img));
             progressBar.clearAnimation();
             progressBar.setVisibility(View.GONE);
         }

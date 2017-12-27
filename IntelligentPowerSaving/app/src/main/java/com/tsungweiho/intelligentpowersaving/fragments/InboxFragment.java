@@ -173,7 +173,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         initInbox(messageList);
 
         lvMessages.setAdapter(messageListAdapter);
-        animUtils.setlvAnimToVisible(lvMessages);
+        animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
 
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
         tvNoMail.setVisibility(messageList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
@@ -348,7 +348,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     ibInboxFunction.setImageDrawable(context.getResources().getDrawable(currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) ? R.mipmap.ic_move_back : R.mipmap.ic_unread));
 
                     refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-                    animUtils.setlvAnimToVisible(lvMessages);
+                    animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
                     super.onDrawerClosed(drawerView);
                 }
             });

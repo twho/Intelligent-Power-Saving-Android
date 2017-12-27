@@ -36,10 +36,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Fragment for user to view overview of building energy consumption
+ *
+ * This fragment is the user interface that user can view building energy consumption information.
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
 public class HomeFragment extends Fragment implements DBConstants, BuildingConstants {
 
     private final String TAG = "HomeFragment";
@@ -77,7 +81,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         gridLayout = view.findViewById(R.id.fragment_home_grid_layout);
         llProgress = view.findViewById(R.id.fragment_home_progress_layout);
         tvNoBuilding = view.findViewById(R.id.fragmnet_home_tv_no_building);
-        animUtils.setllAnimToVisible(llProgress);
+        animUtils.fadeinToVisible(llProgress, animUtils.FAST_ANIM_DURATION);
 
         ibFollowing = view.findViewById(R.id.fragment_home_ib_following);
         ibFollowing.setOnClickListener(new View.OnClickListener() {
@@ -167,7 +171,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
 
         llProgress.setVisibility(View.GONE);
         setupFollowingBuildings();
-        animUtils.setglAnimToVisible(gridLayout);
+        animUtils.fadeinToVisible(gridLayout, animUtils.MID_ANIM_DURATION);
     }
 
     private void refreshBuildingIcons(ArrayList<Building> buildingList) {

@@ -16,7 +16,7 @@ import java.net.URL;
 
 /**
  * Created by AKiniyalocts on 1/15/15.
- * <p>
+ *
  * Basic network utils
  */
 public class NetworkUtils {

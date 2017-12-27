@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
-import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -37,9 +36,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by Tsung Wei Ho on 3/2/2017.
+ * Service in background to subscribe to PubNub channels
+ *
+ * This service is always running in background to receive pushed messages once user open the app.
+ *
+ * @author Tsung Wei Ho
+ * @version 0302.2017
+ * @since 1.0.0
  */
-
 public class MainService extends Service implements PubNubAPIConstants, FragmentTags, DBConstants {
     private String TAG = "MainService";
 
@@ -93,8 +97,15 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
 
         @Override
         public void status(PubNub pubnub, PNStatus status) {
-            if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
-                // TODO connectivity
+            switch (status.getCategory()) {
+                case PNTimeoutCategory:
+                    // TODO connectivity
+                    break;
+                case PNDisconnectedCategory:
+                    // TODO connectivity
+                    break;
+                case PNUnknownCategory:
+                    break;
             }
         }
 
@@ -146,7 +157,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                 if (null == eventFragment)
                     eventFragment = new EventFragment();
 
-                eventFragment.setAllMarkerOnUiThread();
+                eventFragment.setMarkersOnUiThread();
             }
         }
     }
