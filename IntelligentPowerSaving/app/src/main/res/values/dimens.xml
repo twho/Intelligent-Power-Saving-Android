@@ -10,6 +10,7 @@
     <dimen name="activity_main_img_size_padding">6dp</dimen>
     <dimen name="activity_main_notification_icon_size">20dp</dimen>
     <dimen name="activity_main_min_img_size">30dp</dimen>
+    <dimen name="activity_main_icon_size">45dp</dimen>
     <dimen name="activity_main_single_edittext_width">240dp</dimen>
     <item name="activity_main_widget_scale" format="float" type="dimen">0.75</item>
     <item name="activity_main_top_bar_text_scale" format="float" type="dimen">0.9</item>

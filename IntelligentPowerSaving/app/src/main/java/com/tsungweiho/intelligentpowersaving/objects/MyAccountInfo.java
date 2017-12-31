@@ -11,17 +11,27 @@ package com.tsungweiho.intelligentpowersaving.objects;
  */
 public class MyAccountInfo {
 
+    private String uid;
     private String email;
     private String name;
     private String imageUrl;
     private String subscription;
 
     // Subscription format = 1,1 means subscribe to event and public channels
-    public MyAccountInfo(String email, String name, String imageUrl, String subscription) {
+    public MyAccountInfo(String uid, String email, String name, String imageUrl, String subscription) {
+        this.uid = uid;
         this.email = email;
         this.name = name;
         this.imageUrl = imageUrl;
         this.subscription = subscription;
+    }
+
+    public String getUid() {
+        return this.uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getEmail() {

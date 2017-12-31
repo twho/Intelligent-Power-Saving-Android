@@ -44,6 +44,7 @@ import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -54,10 +55,12 @@ import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
+import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import org.json.JSONException;
@@ -75,7 +78,7 @@ import retrofit.client.Response;
 
 /**
  * Fragment for user to report FIXIT event
- *
+ * <p>
  * This fragment is the user interface that user can use to report events.
  *
  * @author Tsung Wei Ho
@@ -94,7 +97,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private LinearLayout llTopBarAddEvent, llMarkerInfo, llOpen;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
-    private ImageView ivAddIcon, ivMarker;
+    private ImageView ivAddIcon, ivMarker, ivPoster;
     private ImageButton ibAdd, ibCancel, ibCamera;
     private static ProgressBar pbMarker, pbTopBar;
     private Button btnFullMap;
@@ -102,7 +105,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     // Functions
     private Context context;
     private EventDBHelper eventDBHelper;
-    private ArrayList<Event> eventList;
     private static ImageUtils imageUtils;
     private AnimUtils animUtils;
     private TimeUtils timeUtils;
@@ -111,8 +113,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private FragmentEventBinding binding;
     private ImgurUpload imgurUpload;
     private File tempImgFile;
-    private Thread uiThread;
-    private static Handler handler;
+    private static Handler imgHandler, posterImgHandler;
     private static Runnable runnable;
 
     // Google map
@@ -121,7 +122,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private LatLngBounds bounds;
     private LatLng clickedLatLng;
     private HashMap<Marker, Event> mapMarkers;
-    private Marker currentAddedMarker;
     private boolean ifMarkerViewUp = false;
     private boolean lockLocation = false;
     private Float initMapZoom = 16.0f;
@@ -133,7 +133,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
 
     // PubNub
     private PubNub pubnub = null;
-    public static boolean ifFragmentActive;
+    public static boolean isActive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -141,12 +141,18 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         view = binding.getRoot();
 
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
+
         init(savedInstanceState);
 
         return view;
     }
 
+    /**
+     * Initialize objects needed in this fragment
+     *
+     * @param savedInstanceState the bundled information needed for creating map view
+     */
     private void init(Bundle savedInstanceState) {
         eventFragmentListener = new EventFragmentListener();
         eventDBHelper = new EventDBHelper(context);
@@ -181,6 +187,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         btnFullMap = view.findViewById(R.id.fragment_event_btn_full_map);
         ivAddIcon = view.findViewById(R.id.fragment_event_add_icon);
         ivMarker = view.findViewById(R.id.fragment_event_iv_marker_img);
+        ivPoster = view.findViewById(R.id.fragment_event_iv_marker_poster);
         pbMarker = view.findViewById(R.id.fragment_event_pb_marker_img);
         pbTopBar = view.findViewById(R.id.fragment_event_pb);
     }
@@ -192,6 +199,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         btnFullMap.setOnClickListener(eventFragmentListener);
     }
 
+    /**
+     * All listeners used in EventFragment
+     */
     private class EventFragmentListener implements View.OnClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
         @Override
@@ -241,7 +251,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             // Add a temporary marker
             MarkerOptions markerOpt = new MarkerOptions().position(clickedLatLng);
             markerOpt.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            currentAddedMarker = googleMap.addMarker(markerOpt);
         }
 
         @Override
@@ -267,14 +276,20 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         }
     }
 
+    /**
+     * Load marker image to marker imageView
+     *
+     * @param imageView the imageView of clicked marker
+     * @param url       the url resource to load image from
+     */
     @BindingAdapter({"bind:image"})
     public static void loadImage(final ImageView imageView, final String url) {
         ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
 
-        if (null != handler)
-            handler.removeCallbacks(runnable);
+        if (null != imgHandler)
+            imgHandler.removeCallbacks(runnable);
 
-        handler = new Handler();
+        imgHandler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -282,21 +297,52 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             }
         };
 
-        handler.postDelayed(runnable, 5000);
+        imgHandler.postDelayed(runnable, 5000);
     }
 
+    @BindingAdapter({"bind:posterImg"})
+    public static void loadPosterImg(final ImageView imageView, final String url) {
+        ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+
+        if (null != posterImgHandler)
+            posterImgHandler.removeCallbacks(runnable);
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+            }
+        };
+
+
+        new Handler().postDelayed(runnable, 5000);
+    }
+
+    /**
+     * Set add FIXIT event view invisible and alternate text shown
+     */
     private void dismissAddView() {
         flTopBarAddEvent.setVisibility(View.GONE);
         llTopBarAddEvent.setVisibility(View.GONE);
+        ivAddIcon.setVisibility(View.GONE);
+
         tvTitle.setText(context.getString(R.string.fragment_event_title));
         tvBottom.setText(context.getString(R.string.fragment_event_bottom));
         edEvent.setText("");
-        ivAddIcon.setVisibility(View.GONE);
+
         bmpBuffer = null;
-        closeKeyboard(context, edEvent.getWindowToken());
         lockLocation = false;
+
+        closeKeyboard(context, edEvent.getWindowToken());
     }
 
+    /**
+     * Get image data after user selects from resources
+     *
+     * @param requestCode indicates how resources map to specified resources
+     * @param resultCode  indicates which resources did user choose image from
+     * @param data        the image data use chose
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -335,12 +381,22 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         }
     }
 
+    /**
+     * Initialize Google map view
+     *
+     * @param savedInstanceState the bundled information needed for creating map view
+     */
     private void initMap(Bundle savedInstanceState) {
         mapView = view.findViewById(R.id.fragment_event_map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     }
 
+    /**
+     * Configure Google map once it finishes loading
+     *
+     * @param googleMap the Google map to be configured
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Limit the map to University of Michigan campus
@@ -370,11 +426,13 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         this.googleMap = googleMap;
         getEventChannelHistory();
 
-        // Switch view after 2 seconds
-        switchToMapView();
+        switchToMainView();
     }
 
-    private void switchToMapView() {
+    /**
+     * Switch to main event view after 2 seconds
+     */
+    private void switchToMainView() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -384,8 +442,11 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         }, 2000);
     }
 
+    /**
+     * Add all markers on the map
+     */
     private void setAllMarkers() {
-        eventList = eventDBHelper.getAllEventList();
+        ArrayList<Event> eventList = eventDBHelper.getAllEventList();
         mapMarkers = new HashMap<>();
 
         googleMap.clear();
@@ -408,6 +469,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         googleMap.setOnMarkerClickListener(eventFragmentListener);
     }
 
+    //TODO　move below code to JsonParser class
     private void getEventChannelHistory() {
         pubnub.history().channel(EVENT_CHANNEL).count(100)
                 .async(new PNCallback<PNHistoryResult>() {
@@ -444,9 +506,10 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             String position = jsonObject.getString(EVENT_POS);
             String image = jsonObject.getString(EVENT_IMG);
             String poster = jsonObject.getString(EVENT_POSTER);
+            String posterImg = jsonObject.getString(EVENT_POSTERIMG);
             String time = jsonObject.getString(EVENT_TIME);
-            String ifFixed = jsonObject.getString(EVENT_IF_FIXED);
-            event = new Event(uniqueId, detail, position, image, poster, time, ifFixed);
+            String isFixed = jsonObject.getString(EVENT_IF_FIXED);
+            event = new Event(uniqueId, detail, position, image, poster, posterImg, time, isFixed);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -458,14 +521,14 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         super.onResume();
 
         mapView.onResume();
-        ifFragmentActive = true;
+        isActive = true;
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        ifFragmentActive = false;
+        isActive = false;
 
         // Clean memory
         eventDBHelper.closeDB();
@@ -473,18 +536,17 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     }
 
     public void setMarkersOnUiThread() {
-        uiThread = new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                ((MainActivity) MainActivity.getContext()).runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         setAllMarkers();
                     }
                 });
             }
-        });
-        uiThread.start();
+        }).start();
     }
 
     private class UiCallback implements Callback<ImageResponse> {
@@ -493,8 +555,10 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         public void success(ImageResponse imageResponse, Response response) {
             tempImgFile.delete();
 
+            MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
+
             pubnub.publish().message(new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, getString(R.string.testing_name), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
+                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getImageUrl(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override

@@ -6,6 +6,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 
 import java.io.File;
 
@@ -21,13 +22,21 @@ import java.io.File;
 public class FirebaseManager implements DBConstants {
     private String TAG = "FirebaseManager";
 
-    private static final FirebaseManager ourInstance = new FirebaseManager();
+    private static final FirebaseManager instance = new FirebaseManager();
 
     public static FirebaseManager getInstance() {
-        return ourInstance;
+        return instance;
     }
 
     private FirebaseManager() {}
+
+    public void registerAccount(){
+
+    }
+
+    public void signIn(){
+
+    }
 
     /**
      * Upload profile image to Firebase storage
@@ -44,10 +53,7 @@ public class FirebaseManager implements DBConstants {
         StorageReference usrProfilePicRef = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC);
 
         // Upload file and metadata to the path 'usrProfilePic/[displayName].jpg'
-        UploadTask uploadTask = usrProfilePicRef.child(PreferencesManager.getInstance().getMyAccountInfo().getName() + "/"
-                + imgFile.getLastPathSegment()).putFile(imgFile, metadata);
-
-
-        return uploadTask;
+        return usrProfilePicRef.child(SharedPrefsUtils.getInstance().getMyAccountInfo().getName() + "/"
+                + SharedPrefsUtils.getInstance().getMyAccountInfo().getUid()).putFile(imgFile, metadata);
     }
 }

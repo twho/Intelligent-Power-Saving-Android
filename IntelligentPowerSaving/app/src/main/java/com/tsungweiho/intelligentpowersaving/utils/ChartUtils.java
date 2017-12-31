@@ -159,11 +159,11 @@ public class ChartUtils implements BuildingConstants {
     }
 
     /**
+     * Load data to line chart UI
      *
-     *
-     * @param context
-     * @param lineChart
-     * @param stringArrayList
+     * @param context the context to get resources in app
+     * @param lineChart the lineChart UI to load data to
+     * @param stringArrayList the String arrayList that consists of data
      */
     private void setLineChartData(Context context, LineChart lineChart, ArrayList<String> stringArrayList) {
 

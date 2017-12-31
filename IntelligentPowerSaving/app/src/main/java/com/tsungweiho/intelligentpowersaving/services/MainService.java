@@ -11,10 +11,10 @@ import android.support.v4.app.FragmentManager;
 
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -73,9 +73,8 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private void init() {
         mainServiceListener = new MainServiceListener();
 
-        if (null != MainActivity.getContext()) {
+        if (null != MainActivity.getContext())
             fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-        }
 
         eventDBHelper = new EventDBHelper(context);
         messageDBHelper = new MessageDBHelper(context);
@@ -128,6 +127,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                     String strMessage = message.getMessage().toString();
                     String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
                     if (!messageDBHelper.isExist(uniqueId)) {
+                        // TODO move below code to JsonParser class
                         String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
                         String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
                         String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
@@ -148,11 +148,12 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         }
     }
 
+    // TODO move below code to JsonParser class
     private void insertDataToDB(JSONObject jObject) {
         Event event = getEventByJSONObj(jObject);
         if (!eventDBHelper.isExist(event.getUniqueId())) {
             eventDBHelper.insertDB(event);
-            if (EventFragment.ifFragmentActive) {
+            if (EventFragment.isActive) {
                 EventFragment eventFragment = (EventFragment) fm.findFragmentByTag(EVENT_FRAGMENT);
                 if (null == eventFragment)
                     eventFragment = new EventFragment();
@@ -170,9 +171,11 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             String position = jsonObject.getString(EVENT_POS);
             String image = jsonObject.getString(EVENT_IMG);
             String poster = jsonObject.getString(EVENT_POSTER);
+            String posterImg = jsonObject.getString(EVENT_POSTERIMG);
             String time = jsonObject.getString(EVENT_TIME);
-            String ifFixed = jsonObject.getString(EVENT_IF_FIXED);
-            event = new Event(uniqueId, detail, position, image, poster, time, ifFixed);
+            String isFixed = jsonObject.getString(EVENT_IF_FIXED);
+
+            event = new Event(uniqueId, detail, position, image, poster, posterImg, time, isFixed);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -193,13 +196,14 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             String detail = jsonObject.getString(EVENT_DETAIL);
             String address = getAddressByPosition(jsonObject.getString(EVENT_POS));
             String poster = jsonObject.getString(EVENT_POSTER);
+            String posterImg = jsonObject.getString(EVENT_POSTERIMG);
             String time = jsonObject.getString(EVENT_TIME);
 
             if (!messageDBHelper.isExist(uniqueId)) {
-                Message message = new Message(uniqueId, detail, getString(R.string.event_reported_around) + " " + address, poster, time, getString(R.string.label_default) + uniqueId);
+                Message message = new Message(uniqueId, detail, getString(R.string.event_reported_around) + " " + address, poster, time, getString(R.string.label_default) + posterImg);
                 messageDBHelper.insertDB(message);
 
-                if (InboxFragment.ifFragmentActive)
+                if (InboxFragment.isActive)
                     setUpInboxFragment().refreshViewingFromService();
             }
         } catch (JSONException e) {

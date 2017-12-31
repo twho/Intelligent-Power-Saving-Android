@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -64,7 +65,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
         view = binding.getRoot();
 
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
         this.messageInfo = this.getArguments().getStringArrayList(MESSAGE_FRAGMENT_KEY);
 
         init();
@@ -101,13 +102,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         pbImg = view.findViewById(R.id.fragment_message_pb_img);
     }
 
-    @BindingAdapter({"bind:inboxLabel"})
-    public static void loadImage(final ImageView imageView, final String inboxLabel) {
-        if (inboxLabel.split(SEPARATOR_MSG_LABEL)[3].matches(".*\\d+.*")) {
+    @BindingAdapter({"bind:eventImg", "bind:inboxLabel"})
+    public static void loadImage(ImageView imageView, String uniqueId, String inboxLabel) {
+        if (inboxLabel.split(",")[3].matches(".*\\d+.*")) {
             imgLayout.setVisibility(View.VISIBLE);
-            EventDBHelper eventDBHelper = new EventDBHelper(MainActivity.getContext());
+            EventDBHelper eventDBHelper = new EventDBHelper(IntelligentPowerSaving.getContext());
 
-            String url = eventDBHelper.getEventByUnId(inboxLabel.split(SEPARATOR_MSG_LABEL)[3]).getImage();
+            String url = eventDBHelper.getEventByUnId(uniqueId).getImage();
             ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbImg);
         } else {
             imgLayout.setVisibility(View.GONE);
@@ -116,7 +117,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     @BindingAdapter({"bind:star"})
     public static void loadStar(final ImageButton ibStar, final String inboxLabel) {
-        ibStar.setImageDrawable(MainActivity.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
+        ibStar.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
     }
 
     @BindingAdapter({"bind:time"})
@@ -131,6 +132,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         ibStar.setOnClickListener(messageFragmentListener);
     }
 
+    // TODO duplicate function in MessageListAdapter
     private void setImageViewByLabel(String label, ImageView imageView) {
         Drawable drawable;
         switch (label) {
@@ -160,7 +162,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_message_ib_back:
-                    ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
+                    ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
                     break;
                 case R.id.fragment_message_ib_delete:
                     messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
@@ -170,12 +172,12 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                         binding.setMessage(currentMessage);
                         position = position + 1;
                     } else {
-                        ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
+                        ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
                     }
                     break;
                 case R.id.fragment_message_ib_read:
                     messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
-                    ((MainActivity) MainActivity.getContext()).setFragment(INBOX_FRAGMENT);
+                    ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
                     break;
                 case R.id.fragment_home_ib_following:
                     currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));

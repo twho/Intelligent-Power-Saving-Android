@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 
 import org.json.JSONObject;

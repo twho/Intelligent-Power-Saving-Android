@@ -3,7 +3,13 @@ package com.tsungweiho.intelligentpowersaving.objects;
 import java.util.ArrayList;
 
 /**
- * Created by Tsung Wei Ho on 2015/5/23.
+ * Object class to store FIXIT event information
+ *
+ * This class is used to store FIXIT event information used in EventFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 1229.2017
+ * @since 1.0.0
  */
 public class Event {
     private String uniqueId;
@@ -12,9 +18,10 @@ public class Event {
     private String poster;
     private String image;
     private String time;
+    private String posterImg;
     private String isFixed;
 
-    public Event(String uniqueId, String detail, String position, String image, String poster, String time, String isFixed) {
+    public Event(String uniqueId, String detail, String position, String image, String poster, String posterImg, String time, String isFixed) {
         this.uniqueId = uniqueId;
         this.detail = detail;
         this.position = position;
@@ -22,6 +29,7 @@ public class Event {
         this.poster = poster;
         this.time = time;
         this.isFixed = isFixed;
+        this.posterImg = posterImg;
     }
 
     public Event(ArrayList<String> eventArray) {
@@ -74,19 +82,27 @@ public class Event {
         this.poster = poster;
     }
 
+    public String getPosterImg() {
+        return posterImg;
+    }
+
+    public void setPosterImg(String posterImg) {
+        this.posterImg = posterImg;
+    }
+
     public String getTime() {
         return time;
     }
 
-    public void setTime(String[] pos) {
+    public void setTime(String time) {
         this.time = time;
     }
 
-    public String getIfFixed() {
+    public String getIsFixed() {
         return isFixed;
     }
 
-    public void setIfFixed(String ifFixed) {
+    public void setIsFixed(String ifFixed) {
         this.isFixed = ifFixed;
     }
 }

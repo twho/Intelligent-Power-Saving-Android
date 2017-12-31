@@ -27,7 +27,7 @@ public interface DBConstants {
     String FDB_STORAGE_PROFILEPIC = "usrProfilePic";
 
     // For all databases
-    int VERSION = 4;
+    int VERSION = 5;
     String ID = "Id";
 
     // BuildingDBHelper
@@ -43,6 +43,7 @@ public interface DBConstants {
     String DB_EVENT_DETAIL = "EVENT_DETAIL";
     String DB_EVENT_POS = "EVENT_POS";
     String DB_EVENT_POSTER = "DB_EVENT_POSTER";
+    String DB_EVENT_POSTERIMG = "DB_EVENT_POSTERIMG";
     String DB_EVENT_IMG = "EVENT_IMG";
     String DB_EVENT_TIME = "EVENT_TIME";
     String DB_EVENT_IS_FIXED = "EVENT_IF_FIXED";

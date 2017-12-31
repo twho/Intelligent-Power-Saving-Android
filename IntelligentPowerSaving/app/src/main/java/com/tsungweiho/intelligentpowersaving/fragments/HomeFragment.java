@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -24,7 +25,7 @@ import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
-import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 
 import org.json.JSONArray;
@@ -67,7 +68,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
         init();
         return view;
     }
@@ -121,7 +122,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         loadDataFromFDB();
 
         // Read current status
-        ifShowFollow = PreferencesManager.getInstance().getIfShowFollowedBuilding();
+        ifShowFollow = SharedPrefsUtils.getInstance().getIfShowFollowedBuilding();
         setupFollowingBuildings();
     }
 
@@ -186,7 +187,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             buildingIcon.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) MainActivity.getContext()).setBuildingFragment(finalBuilding);
+                    ((MainActivity) getActivity()).setBuildingFragment(finalBuilding);
                 }
             });
             gridLayout.addView(buildingIcon.getView());
@@ -241,6 +242,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         super.onPause();
 
         // Save current status
-        PreferencesManager.getInstance().saveIfShowFollowedBuilding(ifShowFollow);
+        SharedPrefsUtils.getInstance().saveIfShowFollowedBuilding(ifShowFollow);
     }
 }

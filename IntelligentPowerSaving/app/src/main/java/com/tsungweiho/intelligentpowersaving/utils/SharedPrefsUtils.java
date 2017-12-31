@@ -1,20 +1,26 @@
-package com.tsungweiho.intelligentpowersaving.tools;
+package com.tsungweiho.intelligentpowersaving.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.tsungweiho.intelligentpowersaving.MainActivity;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 
-/**
- * Created by Tsung Wei Ho on 2017/2/28.
- */
+import java.util.UUID;
 
-public class PreferencesManager implements DBConstants {
-    private Context context;
+/**
+ * Class for managing share preference in the app
+ *
+ * This singleton class is used to manage share preferences and local stored information in the app
+ *
+ * @author Tsung Wei Ho
+ * @version 0228.2017
+ * @since 1.0.0
+ */
+public class SharedPrefsUtils implements DBConstants {
     private SharedPreferences sharedPreferences;
 
     // MyAccountInfo
@@ -26,15 +32,23 @@ public class PreferencesManager implements DBConstants {
     // Home Fragment use
     private String CURRENT_DISPLAY_MODE = "CURRENT_DISPLAY_MODE";
 
-    private static final PreferencesManager ourInstance = new PreferencesManager();
+    private static final SharedPrefsUtils instance = new SharedPrefsUtils();
 
-    public static PreferencesManager getInstance() {
-        return ourInstance;
+    public static SharedPrefsUtils getInstance() {
+        return instance;
     }
 
-    private PreferencesManager() {
-        this.context = MainActivity.getContext();
-        this.sharedPreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+    private SharedPrefsUtils() {
+        this.sharedPreferences = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Get application context for animation use
+     *
+     * @return application context
+     */
+    private Context getContext() {
+        return IntelligentPowerSaving.getContext();
     }
 
     public void saveMyAccountInfo(MyAccountInfo myAccountInfo) {
@@ -47,7 +61,7 @@ public class PreferencesManager implements DBConstants {
 
     public MyAccountInfo getMyAccountInfo() {
         Gson gson = new Gson();
-        String defaultAccount = gson.toJson(new MyAccountInfo(context.getString(R.string.testing_account), context.getString(R.string.testing_name), "", "1,1"));
+        String defaultAccount = gson.toJson(new MyAccountInfo(UUID.randomUUID().toString(), getContext().getString(R.string.testing_account), getContext().getString(R.string.testing_name), "", "1,1"));
         String json = sharedPreferences.getString(PREF_USER_ACCOUNT, defaultAccount);
         return gson.fromJson(json, MyAccountInfo.class);
     }

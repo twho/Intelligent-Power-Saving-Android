@@ -12,9 +12,14 @@ import com.tsungweiho.intelligentpowersaving.objects.Building;
 import java.util.ArrayList;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/18.
+ * Class for handling building database read and write operations
+ *
+ * This class is used to read and write building data objects in database
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
 public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
 
     private static final String TABLE_NAME = "building_details";
@@ -61,6 +66,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         onCreate(db);
     }
 
+    /**
+     * Insert new instance to database
+     *
+     * @param building the building object to be inserted
+     * @return the result of inserting building object
+     */
     public long insertDB(Building building) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -78,6 +89,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         return rowId;
     }
 
+    /**
+     * Update existing instance in database
+     *
+     * @param building the building object to be updated
+     * @return the row count of updated building objects
+     */
     public int updateDB(Building building) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -93,21 +110,31 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         return db.update(TABLE_NAME, values, whereClause, null);
     }
 
+    /**
+     * Get all building objects in database
+     *
+     * @return arrayList that contains all building objects
+     */
     public ArrayList<Building> getAllBuildingSet() {
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, DB_BUILDING_EFFICIENCY + " DESC");
         ArrayList<Building> buildingList = new ArrayList<>(cursor.getCount());
 
-        while (cursor.moveToNext()) {
+        while (cursor.moveToNext())
             buildingList.add(getBuildingByCursor(cursor));
-        }
+
         cursor.close();
         db.close();
 
         return buildingList;
     }
 
+    /**
+     * Get the building that followed by user
+     *
+     * @return arrayList that contains building objects followed by user
+     */
     public ArrayList<Building> getFollowedBuildingSet() {
         SQLiteDatabase db = getReadableDatabase();
 
@@ -128,6 +155,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         return buildingList;
     }
 
+    /**
+     * Get building object by its name
+     *
+     * @param buildingName the name of the building
+     * @return the building object with specified building name
+     */
     public Building getBuildingByName(String buildingName) {
         SQLiteDatabase db = getReadableDatabase();
 
@@ -149,6 +182,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         return building;
     }
 
+    /**
+     * Get building from a cursor
+     *
+     * @param cursor the cursor of query result
+     * @return the building object from input cursor
+     */
     private Building getBuildingByCursor(Cursor cursor) {
         String name = cursor.getString(1);
         String detail = cursor.getString(2);

@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -67,7 +68,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_building, container, false);
         view = binding.getRoot();
 
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
 
         this.buildingName = this.getArguments().getString(BUILDING_FRAGMENT_KEY);
 
@@ -112,7 +113,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) MainActivity.getContext()).setFragment(HOME_FRAGMENT);
+                ((MainActivity) getActivity()).setFragment(HOME_FRAGMENT);
             }
         });
 
@@ -154,22 +155,23 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     @BindingAdapter({"bind:detail"})
     public static void loadDetail(TextView textView, String detail) {
-        textView.setText(MainActivity.getContext().getString(R.string.use_dept) + detail);
+        textView.setText(IntelligentPowerSaving.getContext().getString(R.string.use_dept) + detail);
     }
 
     @BindingAdapter({"bind:efficiency"})
     public static void loadTitle(TextView textView, String efficiency) {
-        String energyInfo = Math.abs(Integer.valueOf(efficiency.split(SEPARATOR_CONSUMPTION)[0])) + MainActivity.getContext().getResources().getString(R.string.energy_eff_unit) +
-                (Integer.valueOf(efficiency.split(",")[0]) > 0 ? MainActivity.getContext().getString(R.string.increase_weekly) : MainActivity.getContext().getString(R.string.decrease_weekly));
+        String energyInfo = Math.abs(Integer.valueOf(efficiency.split(SEPARATOR_CONSUMPTION)[0])) + IntelligentPowerSaving.getContext().getResources().getString(R.string.energy_eff_unit) +
+                (Integer.valueOf(efficiency.split(",")[0]) > 0 ?
+                        IntelligentPowerSaving.getContext().getString(R.string.increase_weekly) : IntelligentPowerSaving.getContext().getString(R.string.decrease_weekly));
 
         // Get the data from yesterday
         int lastHour = currentHour - 2;
         lastHour += lastHour < 0 ? 24 : 0;
 
-        StringBuilder strBuilder = new StringBuilder(MainActivity.getContext().getString(R.string.consump_this_hour));
+        StringBuilder strBuilder = new StringBuilder(IntelligentPowerSaving.getContext().getString(R.string.consump_this_hour));
         strBuilder.append(consumptionList.get(currentHour - 1));
         strBuilder.append(BUILDING_UNIT);
-        strBuilder.append(MainActivity.getContext().getString(R.string.consump_last_hour));
+        strBuilder.append(IntelligentPowerSaving.getContext().getString(R.string.consump_last_hour));
         strBuilder.append(consumptionList.get(lastHour));
         strBuilder.append(BUILDING_UNIT);
         strBuilder.append(energyInfo);

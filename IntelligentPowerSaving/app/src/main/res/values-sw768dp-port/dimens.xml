@@ -11,6 +11,7 @@
     <dimen name="activity_main_img_size_padding">10dp</dimen>
     <dimen name="activity_main_small_icon_size">48dp</dimen>
     <dimen name="activity_main_min_img_size">50dp</dimen>
+    <dimen name="activity_main_icon_size">55dp</dimen>
     <dimen name="activity_main_single_edittext_width">320dp</dimen>
     <item name="activity_main_widget_scale" format="float" type="dimen">1.5</item>
     <item name="activity_main_top_bar_text_scale" format="float" type="dimen">1</item>

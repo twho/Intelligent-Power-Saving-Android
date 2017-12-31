@@ -38,19 +38,27 @@ import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
-import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Activity as main user interface
+ *
+ * This activity is the user interface that provide most of the app functions.
+ *
+ * @author Tsung Wei Ho
+ * @version 1222.2017
+ * @since 1.0.0
+ */
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener, FragmentTags, DBConstants, PubNubAPIConstants {
 
     private String TAG = "MainActivity";
 
-    public static Context context;
-
     // functions
+    private static Context context;
     private NetworkUtils networkUtils;
     private String[] mainTabList = {HOME_FRAGMENT, EVENT_FRAGMENT, INBOX_FRAGMENT, SETTINGS_FRAGMENT};
 
@@ -123,6 +131,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         setActionbar();
     }
 
+    public static Context getContext(){
+        return context;
+    }
+
     // Alleviate workload of main thread
     private void setupServiceInThread() {
         new Thread(new Runnable() {
@@ -159,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         firebaseAuth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                tvError.setText(context.getResources().getString(R.string.auth_error));
+                tvError.setText(MainActivity.this.getResources().getString(R.string.auth_error));
                 flError.setVisibility(task.isSuccessful() ? View.GONE : View.VISIBLE);
             }
         });
@@ -222,16 +234,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         networkUtils.checkNetworkConnection();
 
         // Read users preference
-        MyAccountInfo myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
+        MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         if (myAccountInfo.getSubscriptionBools()[0])
             pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
         if (myAccountInfo.getSubscriptionBools()[1])
             pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
-    }
-
-
-    public static Context getContext() {
-        return context;
     }
 
     @Override

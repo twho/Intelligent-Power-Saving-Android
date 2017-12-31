@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +30,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -40,7 +40,7 @@ import com.tsungweiho.intelligentpowersaving.databinding.FragmentSettingsBinding
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
-import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
@@ -68,7 +68,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     private EditText edName, edEmail;
     private TextView tvProgress;
     private ProgressBar progressBar;
-    private Dialog imgCropDialog;
 
     // Functions
     private Context context;
@@ -91,7 +90,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         view = binding.getRoot();
 
         // Get access to main context
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
 
         init();
 
@@ -145,7 +144,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             }
 
             if (null != bmpBuffer) {
-                imgCropDialog = alertDialogMgr.showCropImageDialog(ivProfile, bmpBuffer);
+                Dialog imgCropDialog = alertDialogMgr.showCropImageDialog(ivProfile, bmpBuffer);
                 imgCropDialog.setOnDismissListener(settingsFragmentListener);
             }
         }
@@ -271,7 +270,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     @BindingAdapter({"bind:userImage"})
     public static void loadUserImage(final ImageView imageView, final String url) {
         if (url.equalsIgnoreCase("")) {
-            imageView.setImageDrawable(MainActivity.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+            imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
             return;
         }
 
@@ -292,7 +291,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         super.onResume();
 
         tvProgress.setClickable(false);
-        myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
+        myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
 
         // Bind data to UIs
         binding.setMyAccountInfo(myAccountInfo);
@@ -306,6 +305,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
 
         myAccountInfo.setName(edName.getText().toString());
         myAccountInfo.setEmail(edEmail.getText().toString());
-        PreferencesManager.getInstance().saveMyAccountInfo(myAccountInfo);
+        SharedPrefsUtils.getInstance().saveMyAccountInfo(myAccountInfo);
     }
 }

@@ -6,6 +6,7 @@ import com.tsungweiho.intelligentpowersaving.constants.ImgurAPIConstants;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
+import com.tsungweiho.intelligentpowersaving.utils.NotificationHelper;
 
 import java.lang.ref.WeakReference;
 

@@ -20,15 +20,15 @@
             android:scaleY="@dimen/activity_main_top_bar_widget_scale" />
 
         <TextView
-            style="@style/SubheaderText"
-            android:textScaleX="@dimen/activity_main_text_scale"
-            android:scaleY="@dimen/activity_main_text_scale"
             android:id="@+id/obj_drawer_list_item_tv"
+            style="@style/SubheaderText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_margin="@dimen/activity_main_space"
+            android:scaleY="@dimen/activity_main_text_scale"
             android:text="@string/loading"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textScaleX="@dimen/activity_main_text_scale" />
     </LinearLayout>
 </LinearLayout>

@@ -12,10 +12,14 @@ import android.widget.TextView;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/2/18.
+ * Class for setting side menu in InboxFragment
+ *
+ * This class is the user interface of side menu in InboxFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 0218.2017
+ * @since 1.0.0
  */
-
 public class DrawerListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;

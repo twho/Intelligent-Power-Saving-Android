@@ -28,8 +28,9 @@ public interface PubNubAPIConstants {
     String EVENT_POS = "position";
     String EVENT_IMG = "image";
     String EVENT_POSTER = "poster";
+    String EVENT_POSTERIMG = "posterImg";
     String EVENT_TIME = "time";
-    String EVENT_IF_FIXED = "time";
+    String EVENT_IF_FIXED = "isFixed";
 
     // Message from web Params
     String FROM_WEB_MESSAGE_SEPARATOR = "IPSFROMWEB";

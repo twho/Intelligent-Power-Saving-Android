@@ -190,7 +190,8 @@
                         android:background="@color/semi_gray"
                         android:padding="@dimen/activity_main_space"
                         android:scaleType="fitCenter"
-                        app:inboxLabel="@{message.inboxLabel}" />
+                        app:eventImg="@{message.uniqueId}"
+                        app:inboxLabel="@{message.inboxLabel}"/>
 
                     <ProgressBar
                         android:id="@+id/fragment_message_pb_img"

@@ -1,6 +1,8 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
+import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
@@ -13,22 +15,29 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
+import com.tsungweiho.intelligentpowersaving.databinding.ObjMessageListItemBinding;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
+import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
 
 /**
- * Created by Tsung Wei Ho on 4/15/2015.
- * Updated by Tsung Wei Ho on 12/26/2017.
+ * Class in background to subscribe to PubNub channels
+ *
+ * This class is the user interface of mail overview in InboxFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 1228.2017
+ * @since 1.0.0
  */
-
 public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstants, DBConstants, FragmentTags {
     private Context context;
 
@@ -37,7 +46,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
     private int mode;
 
     // functions
-    private TimeUtils timeUtils;
     private FragmentManager fm;
 
     public MessageListAdapter(Context context, ArrayList<Message> messageList, ArrayList<Boolean> messageSelectedList, int mode) {
@@ -45,7 +53,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         this.messageList = messageList;
         this.messageSelectedList = messageSelectedList;
         this.mode = mode;
-        timeUtils = TimeUtils.getInstance();
     }
 
     public void setMessageList(ArrayList<Message> messageList) {
@@ -86,38 +93,30 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         final ViewHolder viewHolder;
         final int newOrderPosition = getCount() - position - 1;
 
-        LayoutInflater layoutInflater = LayoutInflater.from(context);
-
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.obj_message_list_item, null);
-            viewHolder = new ViewHolder();
+            ObjMessageListItemBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.obj_message_list_item, parent, false);
+
+            viewHolder = new ViewHolder(itemBinding);
+            convertView = viewHolder.view;
+
+            viewHolder.imageView = convertView.findViewById(R.id.obj_message_list_item_iv);
             viewHolder.relativeLayout = convertView.findViewById(R.id.obj_message_list_item_view);
             viewHolder.imageView = convertView.findViewById(R.id.obj_message_list_item_iv);
-            viewHolder.tvSender = convertView.findViewById(R.id.obj_message_list_item_tv_sender);
-            viewHolder.tvTitle = convertView.findViewById(R.id.obj_message_list_item_tv_title);
-            viewHolder.tvContent = convertView.findViewById(R.id.obj_message_list_item_tv_content);
-            viewHolder.tvTime = convertView.findViewById(R.id.obj_message_list_item_tv_time);
             viewHolder.ibStar = convertView.findViewById(R.id.obj_message_list_item_ib);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        ArrayList<TextView> tvSet = new ArrayList<TextView>() {{
-            add(viewHolder.tvTitle);
-            add(viewHolder.tvContent);
-            add(viewHolder.tvSender);
-            add(viewHolder.tvTime);
-        }};
-
         final Message message = messageList.get(newOrderPosition);
-        viewHolder.tvSender.setText(message.getSender());
-        viewHolder.tvTitle.setText(message.getTitle());
-        viewHolder.tvContent.setText(message.getContent());
+        viewHolder.binding.setMessage(message);
+
+        setImageView(viewHolder.imageView, message.getInboxLabel());
 
         // Set star icon
         boolean isStarred = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
-        viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(isStarred ? R.mipmap.ic_unfollow : R.mipmap.ic_follow));
+        viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(isStarred ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
 
         viewHolder.ibStar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,16 +132,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 inboxFragment.markMailStar(newOrderPosition, isStarred);
             }
         });
-
-        // Check if in the same day to determine how to show the time
-        viewHolder.tvTime.setText(message.getTime().split(SEPARATOR_MSG_LABEL)[message.getTime().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(timeUtils.getDate()) ? 1 : 0]);
-
-        // Set read message as gray, unread message as white bold
-        for (int i = 0; i < tvSet.size(); i++) {
-            Boolean isRead = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ);
-            tvSet.get(i).setTextColor(context.getResources().getColor(isRead ? R.color.colorTint : R.color.white));
-            tvSet.get(i).setTypeface(tvSet.get(i).getTypeface(), isRead ? Typeface.NORMAL : Typeface.BOLD);
-        }
 
         int MODE_VIEWING = 0;
         int MODE_EDITING = 1;
@@ -177,7 +166,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 }
             });
 
-            setImageViewByLabel(message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], viewHolder.imageView);
         } else if (mode == MODE_EDITING) {
             viewHolder.imageView.setClickable(false);
             viewHolder.relativeLayout.setOnLongClickListener(null);
@@ -206,43 +194,89 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
     private class ViewHolder {
         RelativeLayout relativeLayout;
         ImageView imageView;
-        TextView tvSender;
-        TextView tvTitle;
-        TextView tvContent;
-        TextView tvTime;
         ImageButton ibStar;
+
+        View view;
+        ObjMessageListItemBinding binding;
+
+        ViewHolder(ObjMessageListItemBinding binding) {
+            this.view = binding.getRoot();
+            this.binding = binding;
+        }
     }
 
     /**
      * Set the icon of the mail sender or resource
-     * @param label the label of the mail
-     * @param imageView the icon of the mail sender or resource
+     *
+     * @param imageView  the icon of the mail sender or resource
+     * @param inboxLabel the label of the mail
      */
-    private void setImageViewByLabel(String label, ImageView imageView) {
-        Drawable drawable;
+    private void setImageView(ImageView imageView, String inboxLabel){
+        Context context = IntelligentPowerSaving.getContext();
+        String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
+
         switch (label) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_announcement);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_teal));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_announcement, R.drawable.background_circle_teal);
                 break;
             case MESSAGE_LABEL_WARNING:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_warning);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_yellow));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_warning, R.drawable.background_circle_yellow);
                 break;
             case MESSAGE_LABEL_EMERGENCY:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_emergency);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_red));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_event);
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(label, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
-        imageView.setImageDrawable(drawable);
+    }
+
+    private void setAdminSenderIcon(ImageView imageView, int icon, int background){
+        imageView.setImageDrawable(context.getResources().getDrawable(icon));
+        imageView.setBackground(context.getResources().getDrawable(background));
+    }
+
+    @BindingAdapter({"bind:sender", "bind:inboxLabel"})
+    public static void setSender(TextView textView, String sender, String inboxLabel) {
+        setTextView(textView, sender, inboxLabel);
+    }
+
+    @BindingAdapter({"bind:title", "bind:inboxLabel"})
+    public static void setTitle(TextView textView, String title, String inboxLabel) {
+        setTextView(textView, title, inboxLabel);
+    }
+
+    @BindingAdapter({"bind:content", "bind:inboxLabel"})
+    public static void setContent(TextView textView, String content, String inboxLabel) {
+        setTextView(textView, content, inboxLabel);
+    }
+
+    @BindingAdapter({"bind:time", "bind:inboxLabel"})
+    public static void setTime(TextView textView, String time, String inboxLabel) {
+        // Check if in the same day to determine how to show the time
+        setTextView(textView, time.split(SEPARATOR_MSG_LABEL)[time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(TimeUtils.getInstance().getDate()) ? 1 : 0], inboxLabel);
+    }
+
+    /**
+     * Set textView UI for each message list item
+     *
+     * @param textView the textView to be styled and set
+     * @param text the text content
+     * @param label the label for styling the textView
+     */
+    private static void setTextView(TextView textView, String text, String label){
+        Boolean isRead = label.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ);
+        textView.setText(text);
+
+        // Set read message as gray, unread message as white bold
+        textView.setTextColor(IntelligentPowerSaving.getContext().getResources().getColor(isRead ? R.color.colorTint : R.color.white));
+        textView.setTypeface(textView.getTypeface(), isRead ? Typeface.NORMAL : Typeface.BOLD);
     }
 
     /**
      * Start editing mode, which includes delete or mark as read
+     *
      * @param position the position of the mail user clicked
      */
     private void startEditingMode(int position) {
@@ -255,6 +289,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
 
     /**
      * Change the mail sender icon to checkbox views
+     *
      * @param select the boolean indicates if the mail is selected
      * @param ivIcon the sender icon to be set to checkbox view
      */
@@ -262,8 +297,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         ivIcon.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_label_check));
         ivIcon.setBackground(context.getResources().getDrawable(R.drawable.background_circle_colorprimary));
 
-        if (select) {
+        if (select)
             ivIcon.setBackground(context.getResources().getDrawable(R.drawable.background_circle_colortint));
-        }
     }
 }

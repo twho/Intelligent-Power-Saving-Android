@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.tsungweiho.intelligentpowersaving.MainActivity;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DrawerListConstants;
@@ -28,7 +28,7 @@ import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
-import com.tsungweiho.intelligentpowersaving.tools.PreferencesManager;
+import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.yalantis.phoenix.PullToRefreshView;
@@ -77,13 +77,13 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private String currentBox;
     private Boolean ifSelectedRead;
     private boolean ifShowUnread;
-    public static boolean ifFragmentActive;
+    public static boolean isActive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_inbox, container, false);
-        context = MainActivity.getContext();
+        context = IntelligentPowerSaving.getContext();
 
         init();
 
@@ -159,15 +159,15 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     public void onResume() {
         super.onResume();
 
-        ifFragmentActive = true;
+        isActive = true;
 
         // use the data already saved
-        MyAccountInfo myAccountInfo = PreferencesManager.getInstance().getMyAccountInfo();
+        MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         imageUtils.setRoundedCornerImageViewFromUrl(myAccountInfo.getImageUrl(), ivDrawerPic, imageUtils.IMG_TYPE_PROFILE);
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
-        currentBox = PreferencesManager.getInstance().getCurrentMessagebox();
+        currentBox = SharedPrefsUtils.getInstance().getCurrentMessagebox();
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
         messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
         initInbox(messageList);
@@ -221,8 +221,8 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         setIfSelectedRead(messageList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
     }
 
-    public void markMailStar(int position, boolean ifStar) {
-        String strStar = ifStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR;
+    public void markMailStar(int position, boolean isStar) {
+        String strStar = isStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR;
 
         messageDBHelper.starMailByLabel(messageList.get(position), strStar);
         messageList = messageDBHelper.getMessageListByLabel(currentBox);
@@ -253,13 +253,13 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     public void onPause() {
         super.onPause();
 
-        ifFragmentActive = false;
+        isActive = false;
 
         // Clean memory
         messageDBHelper.closeDB();
 
         // save which box the user is using
-        PreferencesManager.getInstance().saveCurrentMessageBox(currentBox);
+        SharedPrefsUtils.getInstance().saveCurrentMessageBox(currentBox);
     }
 
     private class InboxFragmentListener implements View.OnClickListener, AdapterView.OnItemClickListener {
@@ -349,6 +349,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
                     refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
                     animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
+
                     super.onDrawerClosed(drawerView);
                 }
             });
