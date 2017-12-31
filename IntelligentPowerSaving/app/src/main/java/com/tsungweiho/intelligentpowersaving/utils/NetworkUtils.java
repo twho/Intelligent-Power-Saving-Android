@@ -37,6 +37,9 @@ public class NetworkUtils {
         return false;
     }
 
+    /**
+     * Check internet connection
+     */
     public void checkNetworkConnection() {
         new TaskCheckConnection().execute();
     }

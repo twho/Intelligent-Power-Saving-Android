@@ -37,6 +37,7 @@ import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.services.MainService;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
@@ -77,9 +78,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static PNConfiguration pnConfiguration;
     public static PubNub pubnub = null;
 
-    // Firebase
-    public FirebaseAuth firebaseAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         init();
     }
 
+    /**
+     * Init functions and UIs in the app
+     */
     private void init() {
         fragmentManager = getSupportFragmentManager();
 
@@ -97,10 +98,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         if (!PermissionManager.hasAllPermissions(MainActivity.this))
             ActivityCompat.requestPermissions(this, PermissionManager.permissions, PermissionManager.PERMISSION_ALL);
 
-        // Init views
-        // Compile with SDK 26, no need to cast views
+        // Init views, compile with SDK 26, no need to cast views
         flError = findViewById(R.id.activity_main_fl_error);
         pbError = findViewById(R.id.activity_main_pb_error);
+
         Button btnConnect = findViewById(R.id.activity_main_btn_reconnect);
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,22 +132,24 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         setActionbar();
     }
 
-    public static Context getContext(){
+    /**
+     * Get the context of MainActivity
+     *
+     * @return the context of MainActivity
+     */
+    public static Context getContext() {
         return context;
     }
 
-    // Alleviate workload of main thread
+    /**
+     * Start service in separate thread to reduce workload of main thread
+     */
     private void setupServiceInThread() {
         new Thread(new Runnable() {
             public void run() {
-                startService();
+                startService(new Intent(MainActivity.this, MainService.class));
             }
         }).start();
-    }
-
-    private void startService() {
-        Intent intent = new Intent(MainActivity.this, MainService.class);
-        startService(intent);
     }
 
     @Override
@@ -165,10 +168,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             return;
         }
 
-        if (null == firebaseAuth)
-            firebaseAuth = FirebaseAuth.getInstance();
-
-        firebaseAuth.signInWithEmailAndPassword(SYSTEM_ACCOUNT, SYSTEM_PWD).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        // Sign in Firebase using system account and pwd
+        FirebaseManager.getInstance().signInSystemAccount(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 tvError.setText(MainActivity.this.getResources().getString(R.string.auth_error));
@@ -177,10 +178,18 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         });
     }
 
+    /**
+     * Get PubNub used in app-wide
+     *
+     * @return the PubNub object used in the app
+     */
     public static PubNub getPubNub() {
         return pubnub;
     }
 
+    /**
+     * Set up action bar for different screen sizes
+     */
     private void setActionbar() {
         actionBar = getSupportActionBar();
         if (null == actionBar)
@@ -198,24 +207,17 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         }
     }
 
+    /**
+     * Add action bar tab to main UI
+     *
+     * @param fragmentTag the fragment tag of action bar tab
+     * @param index the order of action bar tab to be shown
+     */
     private void addTab(String fragmentTag, int index) {
         android.support.v7.app.ActionBar.Tab tab = actionBar.newTab().setTabListener(this);
 
         // All icons are from Android Studio with padding 25%
-        switch (fragmentTag) {
-            case HOME_FRAGMENT:
-                tab.setIcon(R.mipmap.ic_home_unclick);
-                break;
-            case EVENT_FRAGMENT:
-                tab.setIcon(R.mipmap.ic_event_unclick);
-                break;
-            case INBOX_FRAGMENT:
-                tab.setIcon(R.mipmap.ic_mail_unclick);
-                break;
-            case SETTINGS_FRAGMENT:
-                tab.setIcon(R.mipmap.ic_settings_unclick);
-                break;
-        }
+        tab.setIcon(inactiveIcons[mainFragments.indexOf(fragmentTag)]);
 
         if (fragmentTag.equalsIgnoreCase(HOME_FRAGMENT)) {
             actionBar.addTab(tab);
@@ -243,56 +245,44 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        switch (tab.getPosition()) {
-            case 0:
-                setFragment(HOME_FRAGMENT);
-                tab.setIcon(R.mipmap.ic_home);
-                break;
-            case 1:
-                setFragment(EVENT_FRAGMENT);
-                tab.setIcon(R.mipmap.ic_event);
-                break;
-            case 2:
-                setFragment(INBOX_FRAGMENT);
-                tab.setIcon(R.mipmap.ic_mail);
-                break;
-            case 3:
-                setFragment(SETTINGS_FRAGMENT);
-                tab.setIcon(R.mipmap.ic_settings);
-                break;
-        }
-
+        tab.setIcon(activeIcons[tab.getPosition()]);
+        setFragment(mainFragments.get(tab.getPosition()));
     }
 
+    /**
+     * Set fragment by its tag
+     *
+     * @param fragmentTag the fragment tag of the fragment to be set
+     */
     public void setFragment(String fragmentTag) {
-        Fragment fragment = null;
+        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 
-        switch (fragmentTag) {
-            case HOME_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(HOME_FRAGMENT);
-                if (null == fragment)
+        // Instantiate fragment if it cannot be found in stack
+        if (null == fragment) {
+            switch (fragmentTag) {
+                case HOME_FRAGMENT:
                     fragment = new HomeFragment();
-                break;
-            case EVENT_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(EVENT_FRAGMENT);
-                if (null == fragment)
+                    break;
+                case EVENT_FRAGMENT:
                     fragment = new EventFragment();
-                break;
-            case INBOX_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(INBOX_FRAGMENT);
-                if (null == fragment)
+                    break;
+                case INBOX_FRAGMENT:
                     fragment = new InboxFragment();
-                break;
-            case SETTINGS_FRAGMENT:
-                fragment = fragmentManager.findFragmentByTag(SETTINGS_FRAGMENT);
-                if (null == fragment)
+                    break;
+                case SETTINGS_FRAGMENT:
                     fragment = new SettingsFragment();
-                break;
+                    break;
+            }
         }
 
         startReplaceFragment(fragment, fragmentTag);
     }
 
+    /**
+     * Set up BuildingFragment
+     *
+     * @param building the building object to be shown in BuildingFragment
+     */
     public void setBuildingFragment(Building building) {
         Bundle bundle = new Bundle();
         bundle.putString(BUILDING_FRAGMENT_KEY, building.getName());
@@ -303,18 +293,31 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
     }
 
+    /**
+     * Set up MessageFragment
+     *
+     * @param message the message object to be shown in MessageFragment
+     * @param position the position of the message list item clicked by user
+     */
     public void setMessageFragment(Message message, int position) {
         Bundle bundle = new Bundle();
         ArrayList<String> messageInfo = new ArrayList<>(2);
         messageInfo.add(message.getUniqueId());
         messageInfo.add(position + "");
         bundle.putStringArrayList(MESSAGE_FRAGMENT_KEY, messageInfo);
+
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
 
         startReplaceFragment(messageFragment, MESSAGE_FRAGMENT);
     }
 
+    /**
+     * Start replacing current fragment
+     *
+     * @param fragment the fragment to be set active
+     * @param fragmentTag the fragment tag of active fragment
+     */
     private void startReplaceFragment(Fragment fragment, String fragmentTag) {
         try {
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager()
@@ -327,20 +330,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        switch (tab.getPosition()) {
-            case 0:
-                tab.setIcon(R.mipmap.ic_home_unclick);
-                break;
-            case 1:
-                tab.setIcon(R.mipmap.ic_event_unclick);
-                break;
-            case 2:
-                tab.setIcon(R.mipmap.ic_mail_unclick);
-                break;
-            case 3:
-                tab.setIcon(R.mipmap.ic_settings_unclick);
-                break;
-        }
+        tab.setIcon(inactiveIcons[tab.getPosition()]);
     }
 
     @Override
@@ -351,13 +341,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     protected void onDestroy() {
         super.onDestroy();
 
-        // clean background listeners
-        stopService();
+        // Clean background listeners
+        stopService(new Intent(MainActivity.this, MainService.class));
         pubnub.destroy();
-    }
-
-    private void stopService() {
-        Intent intent = new Intent(MainActivity.this, MainService.class);
-        stopService(intent);
+        FirebaseManager.getInstance().signOutSystemAccount();
     }
 }

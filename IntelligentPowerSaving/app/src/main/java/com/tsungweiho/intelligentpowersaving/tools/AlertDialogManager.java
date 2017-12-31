@@ -184,6 +184,9 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         cropImageView.setImageBitmap(bitmap);
         cropImageView.setEnabled(true);
 
+        // Reset flag
+        isCropped = false;
+
         final Button btnCrop = dialogView.findViewById(R.id.obj_dialog_crop_image_btn_crop);
         btnCrop.setOnClickListener(new View.OnClickListener() {
             @Override

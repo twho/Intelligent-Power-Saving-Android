@@ -1,5 +1,9 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
+import com.tsungweiho.intelligentpowersaving.R;
+
+import java.util.ArrayList;
+
 /**
  * Interface that stores all fragment tags
  *
@@ -23,4 +27,16 @@ public interface FragmentTags {
     String BUILDING_FRAGMENT_KEY = packageName + "BuildingFragmentKey";
     String MESSAGE_FRAGMENT = packageName + "MessageFragment";
     String MESSAGE_FRAGMENT_KEY = packageName + "MessageFragmentKey";
+
+    // Icons of fragments
+    int[] activeIcons = {R.mipmap.ic_home, R.mipmap.ic_event, R.mipmap.ic_mail, R.mipmap.ic_settings};
+    int[] inactiveIcons = {R.mipmap.ic_home_unclick, R.mipmap.ic_event_unclick, R.mipmap.ic_mail_unclick, R.mipmap.ic_settings_unclick};
+
+    // Fragment order
+    ArrayList<String> mainFragments = new ArrayList<String>() {{
+        add(HOME_FRAGMENT);
+        add(EVENT_FRAGMENT);
+        add(INBOX_FRAGMENT);
+        add(SETTINGS_FRAGMENT);
+    }};
 }
