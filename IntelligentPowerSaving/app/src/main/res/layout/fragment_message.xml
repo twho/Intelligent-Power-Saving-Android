@@ -98,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/activity_main_img_frame"
             android:layout_margin="@dimen/activity_half_horizontal_margin"
-            android:background="@color/colorPrimaryLTDark"></View>
+            android:background="@color/colorPrimaryLTDark"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -115,8 +115,8 @@
 
                 <ImageView
                     android:id="@+id/fragment_message_iv_sender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/activity_main_icon_size"
+                    android:layout_height="@dimen/activity_main_icon_size"
                     android:layout_gravity="left|center_vertical"
                     android:layout_margin="@dimen/activity_main_space"
                     android:background="@drawable/background_circle_lightred"

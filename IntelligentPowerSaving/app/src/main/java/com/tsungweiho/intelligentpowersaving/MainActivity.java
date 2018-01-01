@@ -235,8 +235,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         networkUtils.checkNetworkConnection();
 
         // Check if user preference exists
-        if (null == SharedPrefsUtils.getInstance().getMyAccountInfo())
-            SharedPrefsUtils.getInstance().initMyAccountInfo();
+        SharedPrefsUtils.getInstance().initMyAccountInfo();
 
         // Read users preference
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();

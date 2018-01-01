@@ -52,10 +52,15 @@ public class SharedPrefsUtils implements DBConstants {
         return IntelligentPowerSaving.getContext();
     }
 
+    /**
+     * Init user preference
+     */
     public void initMyAccountInfo(){
-        synchronized (this) {
-            String uid = null == UUID.randomUUID() ? TimeUtils.getInstance().getTimeMillies() : UUID.randomUUID().toString();
-            saveMyAccountInfo(new MyAccountInfo(uid, getContext().getString(R.string.testing_account), getContext().getString(R.string.testing_name), "", "1,1"));
+        if (null == getMyAccountInfo()) {
+            synchronized (this) {
+                String uid = null == UUID.randomUUID() ? TimeUtils.getInstance().getTimeMillies() : UUID.randomUUID().toString();
+                saveMyAccountInfo(new MyAccountInfo(uid, getContext().getString(R.string.testing_account), getContext().getString(R.string.testing_name), "", "1,1"));
+            }
         }
     }
 

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -16,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
@@ -26,6 +30,7 @@ import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentMessageBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
@@ -87,7 +92,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
         findViews();
 
-        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
+        setImageView(ivSender, currentMessage.getSender(), currentMessage.getInboxLabel());
         setAllListeners();
     }
 
@@ -133,27 +138,50 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     }
 
     // TODO duplicate function in MessageListAdapter
-    private void setImageViewByLabel(String label, ImageView imageView) {
-        Drawable drawable;
+    /**
+     * Set the icon of the mail sender or resource
+     *
+     * @param imageView  the icon of the mail sender or resource
+     * @param inboxLabel the label of the mail
+     */
+    private void setImageView(ImageView imageView, String sender, String inboxLabel){
+        Context context = IntelligentPowerSaving.getContext();
+        String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
+
         switch (label) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_announcement);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_teal));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_announcement, R.drawable.background_circle_teal);
                 break;
             case MESSAGE_LABEL_WARNING:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_warning);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_yellow));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_warning, R.drawable.background_circle_yellow);
                 break;
             case MESSAGE_LABEL_EMERGENCY:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_emergency);
-                imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_red));
+                setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                drawable = context.getResources().getDrawable(R.mipmap.ic_label_event);
+                loadImgFromFirebase(sender, label, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
-        imageView.setImageDrawable(drawable);
+    }
+
+    private void loadImgFromFirebase(String poster, String imgUrl, final ImageView imageView){
+        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+            }
+        });
+    }
+
+    private void setAdminSenderIcon(ImageView imageView, int icon, int background){
+        imageView.setImageDrawable(context.getResources().getDrawable(icon));
+        imageView.setBackground(context.getResources().getDrawable(background));
     }
 
     private class MessageFragmentListener implements View.OnClickListener {
@@ -168,7 +196,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
                     if (position + 1 < messageDBHelper.getMessageListByLabel(currentBox).size()) {
                         currentMessage = messageDBHelper.getMessageListByLabel(currentBox).get(position + 1);
-                        setImageViewByLabel(currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[3], ivSender);
+                        setImageView(ivSender, currentMessage.getSender(), currentMessage.getInboxLabel());
                         binding.setMessage(currentMessage);
                         position = position + 1;
                     } else {
