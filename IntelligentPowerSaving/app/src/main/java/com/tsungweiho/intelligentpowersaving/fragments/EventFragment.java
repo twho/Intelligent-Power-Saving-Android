@@ -62,6 +62,7 @@ import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
+import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
@@ -135,7 +136,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private Bitmap bmpBuffer = null;
 
     // PubNub
-    private PubNub pubnub = null;
+    private PubNubHelper pubNubHelper;
     public static boolean isActive;
 
     @Override
@@ -159,13 +160,13 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private void init(Bundle savedInstanceState) {
         eventFragmentListener = new EventFragmentListener();
         eventDBHelper = new EventDBHelper(context);
-        pubnub = MainActivity.getPubNub();
 
         // Singleton classes
         timeUtils = TimeUtils.getInstance();
         animUtils = AnimUtils.getInstance();
         alertDialogMgr = AlertDialogManager.getInstance();
         imageUtils = ImageUtils.getInstance();
+        pubNubHelper = PubNubHelper.getInstance();
 
         findViews();
         setAllListeners();
@@ -229,9 +230,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                     closeKeyboard(context, edEvent.getWindowToken());
 
                     if (null == bmpBuffer)
-                        alertDialogMgr.showCameraDialog(EVENT_FRAGMENT);
+                        alertDialogMgr.showCameraDialog(MainFragment.EVENT.toString());
                     else
-                        alertDialogMgr.showImageDialog(EVENT_FRAGMENT, bmpBuffer);
+                        alertDialogMgr.showImageDialog(MainFragment.EVENT.toString(), bmpBuffer);
                     break;
                 case R.id.fragment_event_btn_full_map:
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).zoom(initMapZoom).build();
@@ -432,26 +433,12 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     }
 
     private void getEventChannelHistory() {
-        pubnub.history().channel(EVENT_CHANNEL).count(100)
-                .async(new PNCallback<PNHistoryResult>() {
-                    @Override
-                    public void onResponse(PNHistoryResult result, PNStatus status) {
-                        try {
-                            if (null != result) {
-                                eventDBHelper.deleteAllDB();
-                                for (int index = 0; index < result.getMessages().size(); index++) {
-                                    Event event = JsonParser.getInstance().getEventByJSONObj(new JSONObject(String.valueOf(result.getMessages().get(index).getEntry())));
-
-                                    if (!eventDBHelper.isExist(event.getUniqueId()))
-                                        eventDBHelper.insertDB(event);
-                                }
-                                setMarkersOnUiThread();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+        pubNubHelper.getChannelHistory(MainActivity.getPubNub(), ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
+            @Override
+            public void onTaskCompleted() {
+                setMarkersOnUiThread();
+            }
+        });
     }
 
     /**
@@ -524,17 +511,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             tempImgFile.delete();
 
             MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
+            pubNubHelper.publishEvent(MainActivity.getPubNub(), new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
+                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"));
 
-            pubnub.publish().message(new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
-                    .channel(EVENT_CHANNEL)
-                    .async(new PNCallback<PNPublishResult>() {
-                        @Override
-                        public void onResponse(PNPublishResult result, PNStatus status) {
-                            // TODO handle publish result, status always present, result if successful
-                            // status.isError to see if error happened
-                        }
-                    });
             pbTopBar.clearAnimation();
             pbTopBar.setVisibility(View.GONE);
             dismissAddView();

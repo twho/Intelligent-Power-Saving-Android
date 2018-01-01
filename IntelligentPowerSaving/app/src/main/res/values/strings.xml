@@ -83,4 +83,5 @@
     <string name="alert_dialog_manager_img_use_this">Use this</string>
     <string name="alert_dialog_manager_crop_img_crop">Crop</string>
     <string name="alert_dialog_manager_crop_img_revert">Revert</string>
+    <string name="alert_dialog_manager_fail_publish">Fail to publish this event. Please try again.</string>
 </resources>

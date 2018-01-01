@@ -40,12 +40,14 @@ import com.tsungweiho.intelligentpowersaving.databinding.FragmentSettingsBinding
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
+import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Fragment for user to set basic user information
@@ -76,6 +78,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     private FragmentSettingsBinding binding;
     private AlertDialogManager alertDialogMgr;
     private FirebaseManager firebaseMgr;
+    private PubNubHelper pubNubHelper;
     private ImageUtils imageUtils;
     private Bitmap bmpBuffer;
 
@@ -107,6 +110,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         alertDialogMgr = AlertDialogManager.getInstance();
         firebaseMgr = FirebaseManager.getInstance();
         imageUtils = ImageUtils.getInstance();
+        pubNubHelper = PubNubHelper.getInstance();
 
         // Compile with SDK 26, no need to cast views
         edName = view.findViewById(R.id.fragment_settings_ed_name);
@@ -157,7 +161,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_settings_iv:
-                    alertDialogMgr.showCameraDialog(SETTINGS_FRAGMENT);
+                    alertDialogMgr.showCameraDialog(MainFragment.SETTINGS.toString());
                     break;
                 case R.id.fragment_settings_tv_progress:
                     performUploadTask();
@@ -250,13 +254,12 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
      * @param index     the index of the subscribed channel
      */
     private void setChannelSubscription(Boolean isChecked, int index) {
-        Pair<String, String> channels = index == 0 ? new Pair<>(EVENT_CHANNEL, EVENT_CHANNEL_DELETED) : new Pair<>(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED);
+        ActiveChannels channels = index == 0 ? ActiveChannels.EVENT : ActiveChannels.MESSAGE;
 
-        if (isChecked) {
-            MainActivity.getPubNub().subscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
-        } else {
-            MainActivity.getPubNub().unsubscribe().channels(Arrays.asList(channels.first, channels.second)).execute();
-        }
+        if (isChecked)
+            pubNubHelper.subscribeToChannels(MainActivity.getPubNub(), channels);
+        else
+            pubNubHelper.unsubscribeToChannels(MainActivity.getPubNub(), channels);
 
         myAccountInfo.setSubscriptionBools(index, isChecked);
     }

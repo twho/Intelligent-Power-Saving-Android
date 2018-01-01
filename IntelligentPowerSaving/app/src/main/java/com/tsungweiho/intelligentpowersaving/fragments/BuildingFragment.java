@@ -113,7 +113,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         ibBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).setFragment(HOME_FRAGMENT);
+                ((MainActivity) getActivity()).setFragment(MainFragment.HOME);
             }
         });
 

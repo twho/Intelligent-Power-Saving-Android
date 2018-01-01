@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
@@ -38,11 +37,11 @@ import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.services.MainService;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.tools.PermissionManager;
+import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Activity as main user interface
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     // functions
     private static Context context;
     private NetworkUtils networkUtils;
-    private String[] mainTabList = {HOME_FRAGMENT, EVENT_FRAGMENT, INBOX_FRAGMENT, SETTINGS_FRAGMENT};
 
     // UI Widgets
     private FrameLayout flError;
@@ -74,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     private FragmentManager fragmentManager;
 
     // PubNub Configuration
-    public static PNConfiguration pnConfiguration;
+    private PubNubHelper pubNubHelper;
     public static PubNub pubnub = null;
 
     @Override
@@ -121,11 +119,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         screenHeight = metrics.heightPixels / density;
 
         // Init Pubnub
-        pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
-        pnConfiguration.setPublishKey(PUBNUB_PUBLISH_KEY);
-        pnConfiguration.setSecure(false);
-        pubnub = new PubNub(pnConfiguration);
+        pubNubHelper = PubNubHelper.getInstance();
+        pubnub = pubNubHelper.initPubNub();
         setupServiceInThread();
 
         setActionbar();
@@ -201,8 +196,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         if (screenHeight >= 800)
             actionBar.setDisplayShowTitleEnabled(true);
 
-        for (int index = 0; index < mainTabList.length; index++) {
-            addTab(mainTabList[index], index);
+        for (int index = 0; index < mainFragments.size(); index++) {
+            addTab(mainFragments.get(index), index);
         }
     }
 
@@ -212,13 +207,13 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
      * @param fragmentTag the fragment tag of action bar tab
      * @param index the order of action bar tab to be shown
      */
-    private void addTab(String fragmentTag, int index) {
+    private void addTab(MainFragment fragmentTag, int index) {
         android.support.v7.app.ActionBar.Tab tab = actionBar.newTab().setTabListener(this);
 
         // All icons are from Android Studio with padding 25%
         tab.setIcon(inactiveIcons[mainFragments.indexOf(fragmentTag)]);
 
-        if (fragmentTag.equalsIgnoreCase(HOME_FRAGMENT)) {
+        if (fragmentTag == MainFragment.HOME) {
             actionBar.addTab(tab);
         } else {
             actionBar.addTab(tab, index, false);
@@ -240,9 +235,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         // Read users preference
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         if (myAccountInfo.getSubscriptionBools()[0])
-            pubnub.subscribe().channels(Arrays.asList(EVENT_CHANNEL, EVENT_CHANNEL_DELETED)).execute();
+            pubNubHelper.subscribeToChannels(pubnub, ActiveChannels.EVENT);
         if (myAccountInfo.getSubscriptionBools()[1])
-            pubnub.subscribe().channels(Arrays.asList(MESSAGE_CHANNEL, MESSAGE_CHANNEL_DELETED)).execute();
+            pubNubHelper.subscribeToChannels(pubnub, ActiveChannels.MESSAGE);
     }
 
     @Override
@@ -256,28 +251,28 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
      *
      * @param fragmentTag the fragment tag of the fragment to be set
      */
-    public void setFragment(String fragmentTag) {
-        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
+    public void setFragment(MainFragment fragmentTag) {
+        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag.toString());
 
         // Instantiate fragment if it cannot be found in stack
         if (null == fragment) {
             switch (fragmentTag) {
-                case HOME_FRAGMENT:
+                case HOME:
                     fragment = new HomeFragment();
                     break;
-                case EVENT_FRAGMENT:
+                case EVENT:
                     fragment = new EventFragment();
                     break;
-                case INBOX_FRAGMENT:
+                case INBOX:
                     fragment = new InboxFragment();
                     break;
-                case SETTINGS_FRAGMENT:
+                case SETTINGS:
                     fragment = new SettingsFragment();
                     break;
             }
         }
 
-        startReplaceFragment(fragment, fragmentTag);
+        startReplaceFragment(fragment, fragmentTag.toString(), false);
     }
 
     /**
@@ -292,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         BuildingFragment buildingFragment = new BuildingFragment();
         buildingFragment.setArguments(bundle);
 
-        startReplaceFragment(buildingFragment, BUILDING_FRAGMENT);
+        startReplaceFragment(buildingFragment, ChildFragment.BUILDING.toString(), true);
     }
 
     /**
@@ -311,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
 
-        startReplaceFragment(messageFragment, MESSAGE_FRAGMENT);
+        startReplaceFragment(messageFragment, ChildFragment.MESSAGE.toString(), true);
     }
 
     /**
@@ -319,11 +314,16 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
      *
      * @param fragment the fragment to be set active
      * @param fragmentTag the fragment tag of active fragment
+     * @param animate show animation in fragment transition
      */
-    private void startReplaceFragment(Fragment fragment, String fragmentTag) {
+    private void startReplaceFragment(Fragment fragment, String fragmentTag, boolean animate) {
         try {
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction();
+
+            if (animate)
+                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+
             transaction.replace(R.id.activity_main_frameLayout, fragment, fragmentTag).addToBackStack(fragmentTag).commit();
         } catch (Exception e) {
             Log.e(TAG, e.toString());

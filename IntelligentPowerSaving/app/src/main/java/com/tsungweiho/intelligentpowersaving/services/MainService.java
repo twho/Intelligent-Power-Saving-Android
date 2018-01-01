@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.pubnub.api.PubNub;
@@ -22,7 +23,9 @@ import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
+import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
+import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +36,7 @@ import java.util.Locale;
 
 /**
  * Service in background to subscribe to PubNub channels
- *
+ * <p>
  * This service is always running in background to receive pushed messages once user open the app.
  *
  * @author Tsung Wei Ho
@@ -49,6 +52,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private FragmentManager fm;
     private EventDBHelper eventDBHelper;
     private MessageDBHelper messageDBHelper;
+    private PubNubHelper pubNubHelper;
     private JsonParser jsonParser;
     private static PubNub pubnub = null;
 
@@ -66,6 +70,9 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         init();
     }
 
+    /**
+     * Init functions needed in MainService
+     */
     private void init() {
         mainServiceListener = new MainServiceListener();
 
@@ -74,7 +81,10 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
 
         eventDBHelper = new EventDBHelper(context);
         messageDBHelper = new MessageDBHelper(context);
+
+        // Singleton class
         jsonParser = JsonParser.getInstance();
+        pubNubHelper = PubNubHelper.getInstance();
     }
 
     @Override
@@ -86,34 +96,30 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         }
 
         getEventChannelHistory();
+        getMessageChannelHistory();
 
         return Service.START_STICKY;
     }
 
     private void getEventChannelHistory() {
-        pubnub.history().channel(EVENT_CHANNEL).count(100)
-                .async(new PNCallback<PNHistoryResult>() {
-                    @Override
-                    public void onResponse(PNHistoryResult result, PNStatus status) {
-                        try {
-                            if (null != result) {
-                                eventDBHelper.deleteAllDB();
-                                for (int index = 0; index < result.getMessages().size(); index++) {
-                                    JSONObject jObject = new JSONObject(String.valueOf(result.getMessages().get(index).getEntry()));
-                                    Event event = JsonParser.getInstance().getEventByJSONObj(jObject);
+        pubNubHelper.getChannelHistory(pubnub, ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
+            @Override
+            public void onTaskCompleted() {
+                if (EventFragment.isActive)
+                    ((EventFragment) setUpFragment(MainFragment.EVENT)).setMarkersOnUiThread();
+            }
+        });
+    }
 
-                                    if (!eventDBHelper.isExist(event.getUniqueId()))
-                                        eventDBHelper.insertDB(event);
-
-                                    if (!messageDBHelper.isExist(event.getUniqueId()))
-                                        messageDBHelper.insertDB(JsonParser.getInstance().convertEventToMessage(jObject));
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+    private void getMessageChannelHistory() {
+        pubNubHelper.getChannelHistory(pubnub, ActiveChannels.MESSAGE, new PubNubHelper.OnTaskCompleted() {
+            @Override
+            public void onTaskCompleted() {
+                // Do tasks related to UI
+                if (InboxFragment.isActive)
+                    ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingFromService();
+            }
+        });
     }
 
     private class MainServiceListener extends SubscribeCallback {
@@ -134,35 +140,42 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
 
         @Override
         public void message(PubNub pubnub, PNMessageResult message) {
-            if (message.getChannel().equalsIgnoreCase(EVENT_CHANNEL) || message.getChannel().equalsIgnoreCase(EVENT_CHANNEL_DELETED)) {
+            if (message.getChannel().equalsIgnoreCase(ActiveChannels.EVENT.toString())
+                    || message.getChannel().equalsIgnoreCase(ActiveChannels.EVENT_DELETED.toString())) {
                 try {
                     JSONObject jObject = new JSONObject(message.getMessage().toString());
 
                     // Save message to eventDB
-                    insertDataToDB(jObject);
+                    Event event = jsonParser.getEventByJSONObj(jObject);
+                    if (!eventDBHelper.isExist(event.getUniqueId())){
+                        eventDBHelper.insertDB(event);
+
+                        if (EventFragment.isActive)
+                            ((EventFragment) setUpFragment(MainFragment.EVENT)).setMarkersOnUiThread();
+                    }
+
 
                     // Save message in messageDB
-                    String uniqueId = jObject.getString(EVENT_UNID);
-                    if (!messageDBHelper.isExist(uniqueId)) {
+                    if (!messageDBHelper.isExist(event.getUniqueId())) {
                         messageDBHelper.insertDB(jsonParser.convertEventToMessage(jObject));
 
                         if (InboxFragment.isActive)
-                            setUpInboxFragment().refreshViewingFromService();
+                            ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingFromService();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            } else if (message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL) || message.getChannel().equalsIgnoreCase(MESSAGE_CHANNEL_DELETED)) {
+            } else if (message.getChannel().equalsIgnoreCase(ActiveChannels.MESSAGE.toString())
+                    || message.getChannel().equalsIgnoreCase(ActiveChannels.MESSAGE_DELETED.toString())) {
                 if (message.getMessage().toString().contains(FROM_WEB_MESSAGE_SEPARATOR)) {
                     String strMessage = message.getMessage().toString();
                     String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
 
-                    if (!messageDBHelper.isExist(uniqueId)) {
-                        messageDBHelper.insertDB(jsonParser.getMessageByString(strMessage));
+                    if (!messageDBHelper.isExist(uniqueId))
+                        messageDBHelper.insertDB(JsonParser.getInstance().getMessageByString(strMessage));
 
-                        if (InboxFragment.isActive)
-                            setUpInboxFragment().refreshViewingInboxOnUiThread();
-                    }
+                    if (InboxFragment.isActive)
+                        ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingInboxOnUiThread();
                 }
             }
         }
@@ -173,27 +186,21 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         }
     }
 
-    private void insertDataToDB(JSONObject jObject) {
-        Event event = jsonParser.getEventByJSONObj(jObject);
+    private Fragment setUpFragment(MainFragment fragment) {
+        Fragment existingFragment = fm.findFragmentByTag(MainFragment.INBOX.toString());
 
-        if (!eventDBHelper.isExist(event.getUniqueId())) {
-            eventDBHelper.insertDB(event);
-            if (EventFragment.isActive) {
-                EventFragment eventFragment = (EventFragment) fm.findFragmentByTag(EVENT_FRAGMENT);
-                if (null == eventFragment)
-                    eventFragment = new EventFragment();
-
-                eventFragment.setMarkersOnUiThread();
-            }
+        switch (fragment) {
+            case INBOX:
+                if (null == existingFragment)
+                    return new InboxFragment();
+                break;
+            case EVENT:
+                if (null == existingFragment)
+                    return new EventFragment();
+                break;
         }
-    }
 
-    private InboxFragment setUpInboxFragment() {
-        InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
-        if (null == inboxFragment)
-            inboxFragment = new InboxFragment();
-
-        return inboxFragment;
+        return existingFragment;
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.tsungweiho.intelligentpowersaving.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Interface for PubNub API usage
- *
+ * <p>
  * This interface is used to store all constants used to make PubNub API calls.
  *
  * @author Tsung Wei Ho
@@ -17,10 +20,30 @@ public interface PubNubAPIConstants {
 
     // PubNub channels
     String CHANNEL_VERSION = "1";
-    String EVENT_CHANNEL = "event_channel_" + CHANNEL_VERSION;
-    String EVENT_CHANNEL_DELETED = "event_channel_" + CHANNEL_VERSION + "_deleted";
-    String MESSAGE_CHANNEL = "message_channel_" + CHANNEL_VERSION;
-    String MESSAGE_CHANNEL_DELETED = "message_channel_" + CHANNEL_VERSION + "_deleted";
+
+    enum ActiveChannels {
+        EVENT("event_channel_" + CHANNEL_VERSION),
+        MESSAGE("message_channel_" + CHANNEL_VERSION),
+        EVENT_DELETED("event_channel_" + CHANNEL_VERSION + "_deleted"),
+        MESSAGE_DELETED("message_channel_" + CHANNEL_VERSION + "_deleted");
+
+        private final String text;
+
+        /**
+         * @param text the String text to set to enum items
+         */
+        ActiveChannels(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
+    List<String> EVENT_CHANNEL_SET = Arrays.asList(ActiveChannels.EVENT.toString(), ActiveChannels.EVENT_DELETED.toString());
+    List<String> MESSAGE_CHANNEL_SET = Arrays.asList(ActiveChannels.MESSAGE.toString(), ActiveChannels.MESSAGE_DELETED.toString());
 
     // Event Params
     String EVENT_UNID = "uniqueId";

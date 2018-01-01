@@ -137,7 +137,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 if (null == fm)
                     fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
-                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
                 inboxFragment.markMailStar(newOrderPosition, isStarred);
             }
         });
@@ -183,7 +183,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                     if (null == fm)
                         fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
-                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
                     inboxFragment.setIndexSelected(newOrderPosition, !messageSelectedList.get(newOrderPosition));
                 }
             });
@@ -303,7 +303,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         if (null == fm)
             fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
-        InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(INBOX_FRAGMENT);
+        InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
         inboxFragment.initEditingInbox(position, messageList);
     }
 

@@ -114,7 +114,6 @@ public class ChartUtils implements BuildingConstants {
         leftAxis.setAxisMaximum(Collections.max(intList)*1.1f);
         leftAxis.setAxisMinimum(Collections.min(intList) - 20f);
         leftAxis.setTextColor(Color.WHITE);
-        //leftAxis.setYOffset(20f);
         leftAxis.enableGridDashedLine(10f, 10f, 0f);
         leftAxis.setDrawZeroLine(false);
 

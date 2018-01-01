@@ -190,7 +190,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_message_ib_back:
-                    ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
+                    ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_message_ib_delete:
                     messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
@@ -200,12 +200,12 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                         binding.setMessage(currentMessage);
                         position = position + 1;
                     } else {
-                        ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
+                        ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     }
                     break;
                 case R.id.fragment_message_ib_read:
                     messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
-                    ((MainActivity) getActivity()).setFragment(INBOX_FRAGMENT);
+                    ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_home_ib_following:
                     currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
