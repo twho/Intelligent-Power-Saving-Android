@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -234,6 +233,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         if (null == networkUtils)
             networkUtils = new NetworkUtils();
         networkUtils.checkNetworkConnection();
+
+        // Check if user preference exists
+        if (null == SharedPrefsUtils.getInstance().getMyAccountInfo())
+            SharedPrefsUtils.getInstance().initMyAccountInfo();
 
         // Read users preference
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();

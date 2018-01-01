@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -316,7 +317,6 @@ public class ImageUtils {
 
                 @Override
                 public void onPrepareLoad(Drawable placeHolderDrawable) {
-
                 }
             });
         } else {

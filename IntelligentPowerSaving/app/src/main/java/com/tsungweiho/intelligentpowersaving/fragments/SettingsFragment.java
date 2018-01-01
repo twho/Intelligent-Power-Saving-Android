@@ -274,16 +274,9 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             return;
         }
 
+        imageView.invalidate();
         final ImageUtils imageUtils = ImageUtils.getInstance();
         imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_PROFILE);
-
-        // Auto refresh after 3 seconds.
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_PROFILE);
-            }
-        }, 3000);
     }
 
     @Override

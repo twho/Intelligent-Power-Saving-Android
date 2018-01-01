@@ -250,6 +250,14 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         db.delete(TABLE_NAME, whereClause, whereArgs);
     }
 
+    /**
+     * Delete event database
+     */
+    public void deleteAllDB() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_NAME);
+    }
+
     public void closeDB() {
         SQLiteDatabase db = getWritableDatabase();
         db.close();

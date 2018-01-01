@@ -80,15 +80,17 @@
                         android:id="@+id/fragment_event_iv_marker_poster"
                         android:layout_width="@dimen/activity_main_icon_size"
                         android:layout_height="@dimen/activity_main_icon_size"
-                        android:padding="@dimen/activity_main_space"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/activity_main_space"
+                        android:padding="@dimen/activity_main_space"
                         android:src="@mipmap/ic_preload_img"
+                        app:poster="@{event.poster}"
                         app:posterImg="@{event.posterImg}" />
 
                     <LinearLayout
-                        android:layout_gravity="center_vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:orientation="vertical">
 

@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
@@ -51,18 +52,28 @@ public class SharedPrefsUtils implements DBConstants {
         return IntelligentPowerSaving.getContext();
     }
 
+    public void initMyAccountInfo(){
+        synchronized (this) {
+            String uid = null == UUID.randomUUID() ? TimeUtils.getInstance().getTimeMillies() : UUID.randomUUID().toString();
+            saveMyAccountInfo(new MyAccountInfo(uid, getContext().getString(R.string.testing_account), getContext().getString(R.string.testing_name), "", "1,1"));
+        }
+    }
+
     public void saveMyAccountInfo(MyAccountInfo myAccountInfo) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String savedAccount = gson.toJson(myAccountInfo);
-        prefsEditor.putString(PREF_USER_ACCOUNT, savedAccount);
-        prefsEditor.apply();
+
+        synchronized (this) {
+            prefsEditor.putString(PREF_USER_ACCOUNT, savedAccount);
+            prefsEditor.apply();
+        }
     }
 
     public MyAccountInfo getMyAccountInfo() {
         Gson gson = new Gson();
-        String defaultAccount = gson.toJson(new MyAccountInfo(UUID.randomUUID().toString(), getContext().getString(R.string.testing_account), getContext().getString(R.string.testing_name), "", "1,1"));
-        String json = sharedPreferences.getString(PREF_USER_ACCOUNT, defaultAccount);
+        String json = sharedPreferences.getString(PREF_USER_ACCOUNT, null);
+
         return gson.fromJson(json, MyAccountInfo.class);
     }
 

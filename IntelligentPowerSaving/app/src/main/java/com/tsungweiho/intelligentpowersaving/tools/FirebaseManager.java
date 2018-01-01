@@ -1,34 +1,39 @@
 package com.tsungweiho.intelligentpowersaving.tools;
 
+import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.tsungweiho.intelligentpowersaving.MainActivity;
-import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 
 import java.io.File;
 
 /**
  * Class for performing Firebase tasks
- * <p>
+ *
  * This class is used to perform different kinds of Firebase tasks.
  *
  * @author Tsung Wei Ho
  * @version 1223.2017
  * @since 2.0.0
  */
-public class FirebaseManager implements DBConstants {
+public class FirebaseManager implements DBConstants, BuildingConstants {
     private String TAG = "FirebaseManager";
 
     private static final FirebaseManager instance = new FirebaseManager();
@@ -40,6 +45,15 @@ public class FirebaseManager implements DBConstants {
     private FirebaseAuth firebaseAuth;
 
     private FirebaseManager() {
+    }
+
+    /**
+     * Get application context for animation use
+     *
+     * @return application context
+     */
+    private Context getContext() {
+        return IntelligentPowerSaving.getContext();
     }
 
     /**
@@ -64,6 +78,21 @@ public class FirebaseManager implements DBConstants {
         firebaseAuth.signOut();
     }
 
+    public void loadBuildings(ValueEventListener valueEventListener){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(BUILDING_DB);
+        databaseReference.addValueEventListener(valueEventListener);
+    }
+
+    public Building loadBuildingBySnapshot(DataSnapshot buildingSnapshot){
+        String name = buildingSnapshot.child(FDB_NAME).getValue() + "";
+        String efficiency = buildingSnapshot.child(FDB_EFFICIENCY).getValue() + "";
+        String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue() + "";
+        String detail = buildingSnapshot.child(FDB_DETAIL).getValue() + "";
+        String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue() + "";
+
+        return new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW);
+    }
+
     /**
      * Upload profile image to Firebase storage
      *
@@ -78,12 +107,20 @@ public class FirebaseManager implements DBConstants {
 
         StorageReference usrProfilePicRef = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC);
 
-        // Upload file and metadata to the path 'usrProfilePic/[displayName].jpg'
-        return usrProfilePicRef.child(SharedPrefsUtils.getInstance().getMyAccountInfo().getName() + "/"
-                + SharedPrefsUtils.getInstance().getMyAccountInfo().getUid()).putFile(imgFile, metadata);
+        // Upload file and metadata to the path 'usrProfilePic/[uid].jpg'
+        return usrProfilePicRef.child(SharedPrefsUtils.getInstance().getMyAccountInfo().getName() + "/" + SharedPrefsUtils.getInstance().getMyAccountInfo().getUid()).putFile(imgFile, metadata);
     }
 
-    public void downloadProfileImg(){
+    /**
+     * Download user profile image from Firebase
+     *
+     * @param imgUrl is the user name plus user uid in the format of [userName]/[uid]
+     * @param successListener success event listener for UI callback
+     * @param failureListener failure event listener for UI callback
+     */
+    public void downloadProfileImg(String imgUrl, OnSuccessListener<Uri> successListener, OnFailureListener failureListener){
+        StorageReference load = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC).child(imgUrl);
 
+        load.getDownloadUrl().addOnSuccessListener(successListener).addOnFailureListener(failureListener);
     }
 }

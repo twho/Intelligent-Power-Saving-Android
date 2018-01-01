@@ -25,6 +25,7 @@ import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 
@@ -62,6 +63,7 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
     private Context context;
     private AnimUtils animUtils;
     private BuildingDBHelper buildingDBHelper;
+    private ArrayList<Building> buildingList;
     private boolean ifShowFollow = false;
 
     @Override
@@ -133,29 +135,25 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         if (null == buildingDBHelper)
             buildingDBHelper = new BuildingDBHelper(context);
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(BUILDING_DB);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        buildingList = new ArrayList<>(); // Instantiate building arrayList
+
+        FirebaseManager.getInstance().loadBuildings(new ValueEventListener() {
             Building building = null;
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot buildingSnapshot : dataSnapshot.getChildren()) {
-                    String name = buildingSnapshot.child(FDB_NAME).getValue() + "";
-                    String efficiency = buildingSnapshot.child(FDB_EFFICIENCY).getValue() + "";
-                    String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue() + "";
+                    building = FirebaseManager.getInstance().loadBuildingBySnapshot(buildingSnapshot);
 
-                    if (!buildingDBHelper.isExist(name)) {
-                        String detail = buildingSnapshot.child(FDB_DETAIL).getValue() + "";
-                        String imgUrl = buildingSnapshot.child(FDB_IMGURL).getValue() + "";
-                        building = new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW);
+                    if (!buildingDBHelper.isExist(building.getName())) {
                         buildingDBHelper.insertDB(building);
                     } else {
-                        building = buildingDBHelper.getBuildingByName(name);
-                        building.setConsumption(consumption);
-                        building.setEfficiency(efficiency);
+                        building.setIfFollow(buildingDBHelper.getBuildingByName(building.getName()).getIfFollow());
                         buildingDBHelper.updateDB(building);
                     }
                 }
+
+                buildingList = buildingDBHelper.getAllBuildingSet();
             }
 
             @Override
@@ -163,8 +161,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
                 Log.d(TAG, databaseError.toString());
             }
         });
-
-        ArrayList<Building> buildingList = buildingDBHelper.getAllBuildingSet();
 
         // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)

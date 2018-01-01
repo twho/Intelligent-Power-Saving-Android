@@ -5,7 +5,10 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
@@ -112,7 +117,11 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
         final Message message = messageList.get(newOrderPosition);
         viewHolder.binding.setMessage(message);
 
-        setImageView(viewHolder.imageView, message.getInboxLabel());
+        int MODE_VIEWING = 0;
+        int MODE_EDITING = 1;
+
+        if (mode == MODE_VIEWING)
+            setImageView(viewHolder.imageView, message.getSender(), message.getInboxLabel());
 
         // Set star icon
         boolean isStarred = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
@@ -132,9 +141,6 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 inboxFragment.markMailStar(newOrderPosition, isStarred);
             }
         });
-
-        int MODE_VIEWING = 0;
-        int MODE_EDITING = 1;
 
         // Viewing Mode
         if (mode == MODE_VIEWING) {
@@ -211,7 +217,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
      * @param imageView  the icon of the mail sender or resource
      * @param inboxLabel the label of the mail
      */
-    private void setImageView(ImageView imageView, String inboxLabel){
+    private void setImageView(ImageView imageView, String sender, String inboxLabel){
         Context context = IntelligentPowerSaving.getContext();
         String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
 
@@ -226,10 +232,24 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(label, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+                loadImgFromFirebase(sender, label, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
+    }
+
+    private void loadImgFromFirebase(String poster, String imgUrl, final ImageView imageView){
+        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+            }
+        });
     }
 
     private void setAdminSenderIcon(ImageView imageView, int icon, int background){

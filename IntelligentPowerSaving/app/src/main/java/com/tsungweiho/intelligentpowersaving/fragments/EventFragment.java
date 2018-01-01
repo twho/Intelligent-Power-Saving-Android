@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -39,6 +40,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -57,6 +60,8 @@ import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
+import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
@@ -97,10 +102,10 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private LinearLayout llTopBarAddEvent, llMarkerInfo, llOpen;
     private TextView tvTitle, tvBottom;
     private EditText edEvent;
-    private ImageView ivAddIcon, ivMarker, ivPoster;
+    private ImageView ivAddIcon, ivMarker;
     private ImageButton ibAdd, ibCancel, ibCamera;
-    private static ProgressBar pbMarker, pbTopBar;
     private Button btnFullMap;
+    private static ProgressBar pbMarker, pbTopBar;
 
     // Functions
     private Context context;
@@ -113,8 +118,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private FragmentEventBinding binding;
     private ImgurUpload imgurUpload;
     private File tempImgFile;
-    private static Handler imgHandler, posterImgHandler;
-    private static Runnable runnable;
 
     // Google map
     private GoogleMap googleMap;
@@ -124,7 +127,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private HashMap<Marker, Event> mapMarkers;
     private boolean ifMarkerViewUp = false;
     private boolean lockLocation = false;
-    private Float initMapZoom = 16.0f;
+    private Float initMapZoom = 17.0f;
 
     // Camera
     public static final int REQUEST_CODE_CAMERA = 1;
@@ -187,7 +190,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         btnFullMap = view.findViewById(R.id.fragment_event_btn_full_map);
         ivAddIcon = view.findViewById(R.id.fragment_event_add_icon);
         ivMarker = view.findViewById(R.id.fragment_event_iv_marker_img);
-        ivPoster = view.findViewById(R.id.fragment_event_iv_marker_poster);
         pbMarker = view.findViewById(R.id.fragment_event_pb_marker_img);
         pbTopBar = view.findViewById(R.id.fragment_event_pb);
     }
@@ -213,6 +215,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                     } else {
                         pbTopBar.animate();
                         pbTopBar.setVisibility(View.VISIBLE);
+
                         tempImgFile = imageUtils.getFileFromBitmap(bmpBuffer);
                         createUpload(tempImgFile);
                         new UploadService(context).Execute(imgurUpload, new UiCallback());
@@ -224,11 +227,11 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                     break;
                 case R.id.fragment_event_ib_camera:
                     closeKeyboard(context, edEvent.getWindowToken());
+
                     if (null == bmpBuffer)
                         alertDialogMgr.showCameraDialog(EVENT_FRAGMENT);
-                    else {
+                    else
                         alertDialogMgr.showImageDialog(EVENT_FRAGMENT, bmpBuffer);
-                    }
                     break;
                 case R.id.fragment_event_btn_full_map:
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(bounds.getCenter()).zoom(initMapZoom).build();
@@ -284,38 +287,24 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
      */
     @BindingAdapter({"bind:image"})
     public static void loadImage(final ImageView imageView, final String url) {
+        imageView.invalidate();
         ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
-
-        if (null != imgHandler)
-            imgHandler.removeCallbacks(runnable);
-
-        imgHandler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
-            }
-        };
-
-        imgHandler.postDelayed(runnable, 5000);
     }
 
-    @BindingAdapter({"bind:posterImg"})
-    public static void loadPosterImg(final ImageView imageView, final String url) {
-        ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
-
-        if (null != posterImgHandler)
-            posterImgHandler.removeCallbacks(runnable);
-
-        runnable = new Runnable() {
+    @BindingAdapter({"bind:poster", "bind:posterImg"})
+    public static void loadPosterImg(final ImageView imageView, final String poster, String imgUrl) {
+        imageView.invalidate();
+        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
-            public void run() {
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+            public void onSuccess(Uri uri) {
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
             }
-        };
-
-
-        new Handler().postDelayed(runnable, 5000);
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+            }
+        });
     }
 
     /**
@@ -442,6 +431,46 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         }, 2000);
     }
 
+    private void getEventChannelHistory() {
+        pubnub.history().channel(EVENT_CHANNEL).count(100)
+                .async(new PNCallback<PNHistoryResult>() {
+                    @Override
+                    public void onResponse(PNHistoryResult result, PNStatus status) {
+                        try {
+                            if (null != result) {
+                                eventDBHelper.deleteAllDB();
+                                for (int index = 0; index < result.getMessages().size(); index++) {
+                                    Event event = JsonParser.getInstance().getEventByJSONObj(new JSONObject(String.valueOf(result.getMessages().get(index).getEntry())));
+
+                                    if (!eventDBHelper.isExist(event.getUniqueId()))
+                                        eventDBHelper.insertDB(event);
+                                }
+                                setMarkersOnUiThread();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Add all markers on UI thread
+     */
+    public void setMarkersOnUiThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setAllMarkers();
+                    }
+                });
+            }
+        }).start();
+    }
+
     /**
      * Add all markers on the map
      */
@@ -469,53 +498,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         googleMap.setOnMarkerClickListener(eventFragmentListener);
     }
 
-    //TODO　move below code to JsonParser class
-    private void getEventChannelHistory() {
-        pubnub.history().channel(EVENT_CHANNEL).count(100)
-                .async(new PNCallback<PNHistoryResult>() {
-                    @Override
-                    public void onResponse(PNHistoryResult result, PNStatus status) {
-                        try {
-                            if (null != result) {
-                                eventDBHelper.deleteAllDB();
-                                for (int index = 0; index < result.getMessages().size(); index++) {
-                                    JSONObject jObject = new JSONObject(String.valueOf(result.getMessages().get(index).getEntry()));
-                                    insertDataToDB(jObject);
-                                }
-                                setAllMarkers();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-    }
-
-    private void insertDataToDB(JSONObject jObject) {
-        Event event = getEventByJSONObj(jObject);
-        if (!eventDBHelper.isExist(event.getUniqueId())) {
-            eventDBHelper.insertDB(event);
-        }
-    }
-
-    private Event getEventByJSONObj(JSONObject jsonObject) {
-        Event event = null;
-        try {
-            String uniqueId = jsonObject.getString(EVENT_UNID);
-            String detail = jsonObject.getString(EVENT_DETAIL);
-            String position = jsonObject.getString(EVENT_POS);
-            String image = jsonObject.getString(EVENT_IMG);
-            String poster = jsonObject.getString(EVENT_POSTER);
-            String posterImg = jsonObject.getString(EVENT_POSTERIMG);
-            String time = jsonObject.getString(EVENT_TIME);
-            String isFixed = jsonObject.getString(EVENT_IF_FIXED);
-            event = new Event(uniqueId, detail, position, image, poster, posterImg, time, isFixed);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return event;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -535,20 +517,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         mapView.onPause();
     }
 
-    public void setMarkersOnUiThread() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setAllMarkers();
-                    }
-                });
-            }
-        }).start();
-    }
-
     private class UiCallback implements Callback<ImageResponse> {
 
         @Override
@@ -558,7 +526,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
 
             pubnub.publish().message(new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getImageUrl(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
+                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"))
                     .channel(EVENT_CHANNEL)
                     .async(new PNCallback<PNPublishResult>() {
                         @Override
