@@ -4,6 +4,7 @@
       "consumption" : "110,112,110,110,115,110,120,131,198,215,220,223,252,240,270,272,260,230,220,167,150,151,125,113",
       "detail" : "Department of Electrical Engineering, College of Design",
       "efficiency" : "-27,-30,3",
+      "goal" : "15,10,5",
       "img_url" : "http://i.imgur.com/4nYE4rPm.jpg",
       "name" : "Boat Building"
     },
@@ -11,6 +12,7 @@
       "consumption" : "107,117,113,113,116,113,119,151,219,236,250,243,273,259,300,295,280,250,240,177,160,155,120,118",
       "detail" : "College of Engineering",
       "efficiency" : "-13,-20,-7",
+      "goal" : "10,10,5",
       "img_url" : "http://i.imgur.com/aps0pG1m.png",
       "name" : "E1 Building"
     },
@@ -18,6 +20,7 @@
       "consumption" : "-6,107,115,110,116,117,112,129,147,215,230,245,240,264,254,295,290,280,245,235,170,155,150,115,113",
       "detail" : "College of Engineering",
       "efficiency" : "-6,-5,11",
+      "goal" : "10,7,4",
       "img_url" : "http://i.imgur.com/rUZOYq8m.jpg",
       "name" : "E2 Building"
     },
@@ -25,6 +28,7 @@
       "consumption" : "117,125,120,123,122,122,138,152,220,238,255,250,275,262,300,302,290,255,246,178,163,161,125,119",
       "detail" : "College of Electrical Engineering and Computer Science",
       "efficiency" : "10,2,12",
+      "goal" : "10,10,5",
       "img_url" : "http://i.imgur.com/NqMiPb9m.png",
       "name" : "EE Building"
     },
@@ -32,6 +36,7 @@
       "consumption" : "97,95,96,93,97,95,108,122,195,198,195,210,235,222,260,262,240,195,154,108,99,92,95,89",
       "detail" : "All students and faculties",
       "efficiency" : "4,-11,-16",
+      "goal" : "10,10,5",
       "img_url" : "http://i.imgur.com/GHcYQ6tm.jpg",
       "name" : "Gym"
     },
@@ -39,6 +44,7 @@
       "consumption" : "127,125,126,123,127,130,148,162,235,239,237,260,275,269,300,312,280,235,184,138,129,122,125,119",
       "detail" : "All students and faculties",
       "efficiency" : "-20,-3,-7",
+      "goal" : "10,7,4",
       "img_url" : "http://i.imgur.com/du1JLnVm.jpg",
       "name" : "International Building"
     },
@@ -46,6 +52,7 @@
       "consumption" : "117,120,120,119,122,125,143,152,225,231,231,254,265,259,295,307,272,225,174,127,123,117,120,115",
       "detail" : "All students and faculties",
       "efficiency" : "16,10,19",
+      "goal" : "10,10,5",
       "img_url" : "http://i.imgur.com/bNzM9jTm.png",
       "name" : "T4 Building"
     },
@@ -53,6 +60,7 @@
       "consumption" : "112,110,113,113,117,119,135,147,219,221,228,249,258,250,287,300,265,219,168,119,117,115,113,114",
       "detail" : "School of Management",
       "efficiency" : "12,-4,5",
+      "goal" : "15,10,5",
       "img_url" : "http://i.imgur.com/CtMfG4pm.jpg",
       "name" : "Yen-Yang Building"
     }

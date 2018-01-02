@@ -9,9 +9,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -49,8 +49,8 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     // UI views
     private LineChart lineChart;
-    private TextView tvIbFollow;
-    private ImageView ivIbFollow, ivFollowIndicator;
+    private ImageView ivFollowIndicator;
+    private Button btnFollow; // Button icon: crop, no trim with padding 15%
 
     // Functions
     private Context context;
@@ -92,12 +92,9 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
         // Compile with SDK 26, no need to cast views
         ivFollowIndicator = view.findViewById(R.id.fragment_building_iv_follow);
-        ivIbFollow = view.findViewById(R.id.fragment_building_iv_ib_follow);
-        tvIbFollow = view.findViewById(R.id.fragment_building_tv_ib_follow);
 
-        LinearLayout ibFollow;
-        ibFollow = view.findViewById(R.id.fragment_building_ib_follow);
-        ibFollow.setOnClickListener(new View.OnClickListener() {
+        btnFollow = view.findViewById(R.id.fragment_building_ib_follow);
+        btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 building.setIfFollow(Boolean.parseBoolean(building.getIfFollow()) ? BUILDING_NOT_FOLLOW : BUILDING_FOLLOW);
@@ -125,6 +122,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
 
     /**
      * Setup follow button
+     *
      * @param isFollow the boolean indicates if the building is followed by user
      */
     private void setFollowButton(Boolean isFollow) {
@@ -134,10 +132,16 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
             ivFollowIndicator.setVisibility(View.GONE);
         }
 
-        ivIbFollow.setImageDrawable(context.getResources().getDrawable(isFollow ? R.mipmap.ic_label_unhighlight : R.mipmap.ic_label_highlight));
-        tvIbFollow.setText(getString(isFollow ? R.string.unfollow_this : R.string.follow_this));
+        btnFollow.setCompoundDrawablesWithIntrinsicBounds(isFollow ? R.mipmap.ic_label_unhighlight : R.mipmap.ic_label_highlight, 0, 0, 0);
+        btnFollow.setText(getString(isFollow ? R.string.unfollow_this : R.string.follow_this));
     }
 
+    /**
+     * Load building image into imageView
+     *
+     * @param imageView the imageView to set image resource to
+     * @param url       the image resource url
+     */
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
         final ImageUtils imageUtils = ImageUtils.getInstance();
@@ -153,11 +157,23 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         }, 5000);
     }
 
+    /**
+     * Set building basic information
+     *
+     * @param textView the textView to display building basic information
+     * @param detail   the information details of the building
+     */
     @BindingAdapter({"bind:detail"})
     public static void loadDetail(TextView textView, String detail) {
         textView.setText(IntelligentPowerSaving.getContext().getString(R.string.use_dept) + detail);
     }
 
+    /**
+     * Set building energy consumption efficiency
+     *
+     * @param textView   the textView to display energy consumption efficiency
+     * @param efficiency the information of energy consumption efficiency
+     */
     @BindingAdapter({"bind:efficiency"})
     public static void loadTitle(TextView textView, String efficiency) {
         String energyInfo = Math.abs(Integer.valueOf(efficiency.split(SEPARATOR_CONSUMPTION)[0])) + IntelligentPowerSaving.getContext().getResources().getString(R.string.energy_eff_unit) +
@@ -186,14 +202,16 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         setChartData();
     }
 
+    /**
+     * Setup chart with energy consumption data of the building
+     */
     private void setChartData() {
         // Dummy data: The first two data are building's energy efficiency, not hourly power consumption
         for (int x = 0; x < currentHour; x++) {
             consumptionList.set(x, building.getConsumption().split(SEPARATOR_CONSUMPTION)[x]);
         }
 
-        // Setup chart and its data
-        chartUtils.setupLineChart(lineChart, consumptionList);
+        chartUtils.setupLineChart(lineChart, consumptionList); // Setup chart and its data
     }
 
     @Override

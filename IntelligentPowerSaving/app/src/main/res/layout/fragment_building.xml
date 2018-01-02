@@ -32,8 +32,8 @@
                 android:src="@mipmap/ic_back" />
 
             <TextView
-                style="@style/HeadlineText"
                 android:id="@+id/fragment_building_tv_title"
+                style="@style/HeadlineText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -135,30 +135,22 @@
                     android:padding="@dimen/activity_main_space" />
 
                 <LinearLayout
-                    android:id="@+id/fragment_building_ib_follow"
-                    android:layout_width="@dimen/activity_main_single_row_btn_width"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_theme_button"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/activity_main_space">
+                    android:gravity="center_horizontal">
 
-                    <ImageView
-                        android:id="@+id/fragment_building_iv_ib_follow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/activity_main_space"
-                        android:clickable="false"
-                        android:src="@mipmap/ic_label_highlight" />
-
-                    <TextView
+                    <Button
+                        android:id="@+id/fragment_building_ib_follow"
                         style="@style/Button"
-                        android:id="@+id/fragment_building_tv_ib_follow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/activity_main_space"
+                        android:background="@drawable/background_theme_button"
+                        android:drawableStart="@mipmap/ic_label_highlight"
+                        android:padding="@dimen/activity_main_space"
+                        android:paddingEnd="@dimen/activity_horizontal_margin"
+                        android:paddingStart="@dimen/activity_horizontal_margin"
                         android:text="@string/follow_this"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/white" />
                 </LinearLayout>
             </LinearLayout>

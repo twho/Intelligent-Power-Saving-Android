@@ -62,6 +62,9 @@
     <string name="fragment_event_hint">Event, Building, Floor, etc.</string>
     <string name="fragment_event_err_no_ed">Please enter at least one item name.</string>
 
+    <!--ReportFragment-->
+    <string name="send_to">Send to</string>
+
     <!--Imgur API-->
     <string name="notification_fail">Failed to upload image...</string>
     <string name="notification_share_link">Share link</string>

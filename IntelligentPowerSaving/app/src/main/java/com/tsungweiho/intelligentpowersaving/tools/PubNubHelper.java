@@ -46,6 +46,11 @@ public class PubNubHelper implements PubNubAPIConstants {
         return IntelligentPowerSaving.getContext();
     }
 
+    /**
+     * Initialize PubNub object
+     *
+     * @return the PubNub object to be used in app-wide
+     */
     public PubNub initPubNub() {
         PNConfiguration pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(PUBNUB_SUBSCRIBE_KEY);
@@ -55,6 +60,12 @@ public class PubNubHelper implements PubNubAPIConstants {
         return new PubNub(pnConfiguration);
     }
 
+    /**
+     * Subscribe to PubNub channels
+     *
+     * @param pubNub the PubNub object
+     * @param channels the channels to subscribe
+     */
     public void subscribeToChannels(PubNub pubNub, ActiveChannels channels) {
         switch (channels) {
             case EVENT:
@@ -66,6 +77,12 @@ public class PubNubHelper implements PubNubAPIConstants {
         }
     }
 
+    /**
+     * Unsubscribe to PubNub channels
+     *
+     * @param pubNub the PubNub object
+     * @param channels the channels to unsubscribe
+     */
     public void unsubscribeToChannels(PubNub pubNub, ActiveChannels channels) {
         switch (channels) {
             case EVENT:
@@ -146,6 +163,12 @@ public class PubNubHelper implements PubNubAPIConstants {
         }
     }
 
+    /**
+     * Publish an event to channel
+     *
+     * @param pubNub the PubNub object used in app-wide
+     * @param event the event object to be published
+     */
     public void publishEvent(PubNub pubNub, Event event) {
         pubNub.publish().message(event).channel(ActiveChannels.EVENT.toString())
                 .async(new PNCallback<PNPublishResult>() {
@@ -157,6 +180,9 @@ public class PubNubHelper implements PubNubAPIConstants {
                 });
     }
 
+    /**
+     * Task complete callback
+     */
     public interface OnTaskCompleted {
         void onTaskCompleted();
     }

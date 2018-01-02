@@ -64,29 +64,57 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         resetSelectedList();
     }
 
+    /**
+     * Set messageList in this adapter
+     *
+     * @param msgList the messageList to set from
+     */
     public void setMsgList(ArrayList<Message> msgList) {
         this.msgList = msgList;
         this.notifyDataSetChanged();
     }
 
+    /**
+     * Reset all item to be unselected in selectedList
+     */
     private void resetSelectedList(){
         this.msgSelectedList = new ArrayList<>(Arrays.asList(new Boolean[msgList.size()]));
         Collections.fill(msgSelectedList, Boolean.FALSE);
     }
 
+    /**
+     * Set msgSelectedList in this adapter
+     *
+     * @param msgSelectedList the selectedList to set from
+     */
     private void setSelectedList(ArrayList<Boolean> msgSelectedList) {
         this.msgSelectedList = msgSelectedList;
         this.notifyDataSetChanged();
     }
 
+    /**
+     * Get selectedList used in this adapter
+     *
+     * @return the selectedList used in this adapter
+     */
     public ArrayList<Boolean> getMsgSelectedList(){
         return this.msgSelectedList;
     }
 
+    /**
+     * Get current InboxMode
+     *
+     * @return current InboxMode used in this adapter
+     */
     public InboxMode getMode() {
         return mode;
     }
 
+    /**
+     * Set current InboxMode
+     *
+     * @param mode the mode to set from
+     */
     public void setMode(InboxMode mode) {
         this.mode = mode;
     }
@@ -214,6 +242,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         }
     }
 
+    // TODO move to ImgResourceManager
     /**
      * Set the icon of the mail sender or resource
      *
@@ -260,21 +289,51 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         imageView.setBackground(context.getResources().getDrawable(background));
     }
 
+    // Duplicate code ends here
+
+    /**
+     * Set message sender to textView
+     *
+     * @param textView the textView to display message sender
+     * @param sender the sender of the message
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:sender", "bind:inboxLabel"})
     public static void setSender(TextView textView, String sender, String inboxLabel) {
         setTextView(textView, sender, inboxLabel);
     }
 
+    /**
+     * Set message title to textView
+     *
+     * @param textView the textView to display message title
+     * @param title the title of the message
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:title", "bind:inboxLabel"})
     public static void setTitle(TextView textView, String title, String inboxLabel) {
         setTextView(textView, title, inboxLabel);
     }
 
+    /**
+     * Set message content to textView
+     *
+     * @param textView the textView to display message content
+     * @param content the content of the message
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:content", "bind:inboxLabel"})
     public static void setContent(TextView textView, String content, String inboxLabel) {
         setTextView(textView, content, inboxLabel);
     }
 
+    /**
+     * Set message received time to textView
+     *
+     * @param textView the textView to display time
+     * @param time the received time of the message
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:time", "bind:inboxLabel"})
     public static void setTime(TextView textView, String time, String inboxLabel) {
         // Check if in the same day to determine how to show the time
@@ -315,6 +374,12 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         setIndexSelected(position, Boolean.TRUE);
     }
 
+    /**
+     * Set the mail selected/unselected
+     *
+     * @param selectedPosition the position of selected mail item
+     * @param isSelected the boolean indicate if the mail is selected
+     */
     private void setIndexSelected(int selectedPosition, Boolean isSelected) {
         msgSelectedList.set(selectedPosition, isSelected);
         notifyDataSetChanged();
@@ -323,6 +388,9 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         inboxFragment.setIsSelectedRead(msgList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
     }
 
+    /**
+     * Get InboxFragment to execute functions
+     */
     private void setupInboxFragment(){
         if (null != inboxFragment)
             return;

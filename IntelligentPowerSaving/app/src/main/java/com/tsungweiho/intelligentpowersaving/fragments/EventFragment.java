@@ -271,11 +271,14 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         @Override
         public boolean onMarkerClick(Marker marker) {
             ivMarker.setImageDrawable(null);
+
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
             binding.executePendingBindings();
+
             animUtils.slideUpToVisible(llMarkerInfo, animUtils.FAST_ANIM_DURATION);
             ifMarkerViewUp = true;
+
             return false;
         }
     }
@@ -543,6 +546,8 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
 
     public static void closeKeyboard(Context context, IBinder windowToken) {
         InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.hideSoftInputFromWindow(windowToken, 0);
+
+        if (null != mgr)
+            mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 }
