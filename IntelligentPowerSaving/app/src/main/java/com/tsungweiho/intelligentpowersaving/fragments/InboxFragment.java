@@ -66,21 +66,20 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
     private MessageDBHelper msgDBHelper;
     private InboxFragmentListener inboxFragmentListener;
     private Thread uiThread;
-
-    // Mailbox functions, top bar buttons are padding 15%
     private MessageListAdapter msgListAdapter;
     private ArrayList<Message> msgList;
-    //    private ArrayList<Boolean> messageSelectedList;
-    private int REFRESH_DELAY = 5000;
     private String currentBox;
-    private Boolean isSelectedRead;
+    private int REFRESH_DELAY = 5000;
+    private boolean isSelectedRead;
     private boolean isUnreadShown;
+
     public static boolean isActive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_inbox, container, false);
+
         context = IntelligentPowerSaving.getContext();
 
         init();
@@ -89,7 +88,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
     }
 
     /**
-     * Init functions and UIs in this fragment
+     * Init functions and UIs in InboxFragment
      */
     private void init() {
         inboxFragmentListener = new InboxFragmentListener();
@@ -157,7 +156,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
     }
 
     /**
-     * Set all listeners in this fragment
+     * Set all listeners in InboxFragment
      */
     private void setListeners() {
         ibOptions.setOnClickListener(inboxFragmentListener);
@@ -232,7 +231,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
      *
      * @param isSelectedRead the boolean indicate read or unread
      */
-    public void setIsSelectedRead(Boolean isSelectedRead) {
+    public void setIsSelectedRead(boolean isSelectedRead) {
         this.isSelectedRead = isSelectedRead;
         if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH))
             ibInboxFunction.setImageDrawable(context.getResources().getDrawable(isSelectedRead ? R.mipmap.ic_read : R.mipmap.ic_unread));
@@ -244,6 +243,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
      * @param mode the current InboxMode
      */
     private void switchTopBar(InboxMode mode) {
+        // Mailbox functions, top bar buttons are padding 15%
         switch (mode) {
             case VIEW:
                 llEditing.setVisibility(View.GONE);
@@ -271,6 +271,9 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         SharedPrefsUtils.getInstance().saveCurrentMessageBox(currentBox);
     }
 
+    /**
+     * All listeners used in InboxFragment
+     */
     private class InboxFragmentListener implements View.OnClickListener, AdapterView.OnItemClickListener {
 
         @Override
@@ -317,6 +320,8 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                 case R.id.fragment_inbox_btn_unread:
                     btnUnread.setText(isUnreadShown ? getString(R.string.unread) : getString(R.string.all_mails));
                     refreshViewingInbox(isUnreadShown ? msgDBHelper.getMessageListByLabel(currentBox) : msgDBHelper.getUnreadMessageListInBox(msgList));
+
+                    // Alternate the flag
                     isUnreadShown = !isUnreadShown;
                     break;
                 case R.id.fragment_inbox_fab_write:
@@ -361,6 +366,9 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         }
     }
 
+    /**
+     * Refresh inbox on viewing mode
+     */
     public void refreshViewingInboxOnUiThread() {
         if (null != uiThread)
             uiThread.interrupt();

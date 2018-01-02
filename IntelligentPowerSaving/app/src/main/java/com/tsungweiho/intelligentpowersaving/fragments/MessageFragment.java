@@ -35,10 +35,14 @@ import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 import java.util.ArrayList;
 
 /**
- * Created by Tsung Wei Ho on 2015/4/15.
- * Updated by Tsung Wei Ho on 2017/12/23.
+ * Fragment for user to view message content and details
+ *
+ * This fragment is the child fragment of InboxFragment. It is the user interface that user can view message content and details
+ *
+ * @author Tsung Wei Ho
+ * @version 1223.2017
+ * @since 1.0.0
  */
-
 public class MessageFragment extends Fragment implements FragmentTags, DBConstants, PubNubAPIConstants {
     private String TAG = "MessageFragment";
 
@@ -76,6 +80,9 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         return view;
     }
 
+    /**
+     * Init functions and UIs in InboxFragment
+     */
     private void init() {
         msgDBHelper = new MessageDBHelper(context);
         messageFragmentListener = new MessageFragmentListener();
@@ -94,7 +101,9 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         setAllListeners();
     }
 
-    // Compile with SDK 26, no need to cast views
+    /**
+     * Link views in layout file to view controller, no need to cast views since compile with SDK 26
+     */
     private void findViews() {
         ibBack = view.findViewById(R.id.fragment_message_ib_back);
         ibDelete = view.findViewById(R.id.fragment_message_ib_delete);
@@ -105,6 +114,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         pbImg = view.findViewById(R.id.fragment_message_pb_img);
     }
 
+    /**
+     * Set event image from message object
+     *
+     * @param imageView the imageView to set event image to
+     * @param uniqueId the uniqueId of the message
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:eventImg", "bind:inboxLabel"})
     public static void loadImage(ImageView imageView, String uniqueId, String inboxLabel) {
         if (inboxLabel.split(",")[3].matches(".*\\d+.*")) {
@@ -118,16 +134,31 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         }
     }
 
+    /**
+     * Set if mail is starred from message object using data binding
+     *
+     * @param ibStar the imageButton to be set
+     * @param inboxLabel the inbox label of the message
+     */
     @BindingAdapter({"bind:star"})
     public static void loadStar(final ImageButton ibStar, final String inboxLabel) {
         ibStar.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
     }
 
+    /**
+     *
+     *
+     * @param tvTime
+     * @param time
+     */
     @BindingAdapter({"bind:time"})
     public static void loadTime(final TextView tvTime, final String time) {
         tvTime.setText(time.split(SEPARATOR_MSG_LABEL)[time.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(TimeUtils.getInstance().getDate()) ? 0 : 1]);
     }
 
+    /**
+     * Set all listeners within MessageFragment
+     */
     private void setAllListeners() {
         ibBack.setOnClickListener(messageFragmentListener);
         ibDelete.setOnClickListener(messageFragmentListener);
@@ -182,6 +213,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         imageView.setBackground(context.getResources().getDrawable(background));
     }
 
+    /**
+     * Duplicate functions ends here
+     */
+
+    /**
+     * All listeners used in InboxFragment
+     */
     private class MessageFragmentListener implements View.OnClickListener {
 
         @Override

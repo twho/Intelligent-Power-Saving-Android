@@ -71,7 +71,9 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         context = IntelligentPowerSaving.getContext();
+
         init();
+
         return view;
     }
 
