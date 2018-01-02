@@ -4,11 +4,9 @@ import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +23,7 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
+import com.tsungweiho.intelligentpowersaving.constants.ListAdapterConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.ObjMessageListItemBinding;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
@@ -33,6 +32,8 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Class in background to subscribe to PubNub channels
@@ -43,44 +44,56 @@ import java.util.ArrayList;
  * @version 1228.2017
  * @since 1.0.0
  */
-public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstants, DBConstants, FragmentTags {
+public class MessageListAdapter extends BaseAdapter implements ListAdapterConstants, PubNubAPIConstants, DBConstants, FragmentTags {
     private Context context;
 
-    private ArrayList<Message> messageList;
-    private ArrayList<Boolean> messageSelectedList;
-    private int mode;
+    private ArrayList<Message> msgList;
+    private ArrayList<Boolean> msgSelectedList;
+    private InboxMode mode;
 
     // functions
     private FragmentManager fm;
+    private InboxFragment inboxFragment;
 
-    public MessageListAdapter(Context context, ArrayList<Message> messageList, ArrayList<Boolean> messageSelectedList, int mode) {
+    public MessageListAdapter(Context context, ArrayList<Message> msgList, InboxMode mode) {
         this.context = context;
-        this.messageList = messageList;
-        this.messageSelectedList = messageSelectedList;
+        this.msgList = msgList;
         this.mode = mode;
+
+        // Give initial value to msgSelectedList
+        resetSelectedList();
     }
 
-    public void setMessageList(ArrayList<Message> messageList) {
-        this.messageList = messageList;
-    }
-
-    public void setSelectedList(ArrayList<Boolean> messageSelectedList) {
-        this.messageSelectedList = messageSelectedList;
+    public void setMsgList(ArrayList<Message> msgList) {
+        this.msgList = msgList;
         this.notifyDataSetChanged();
     }
 
-    public int getMode() {
+    private void resetSelectedList(){
+        this.msgSelectedList = new ArrayList<>(Arrays.asList(new Boolean[msgList.size()]));
+        Collections.fill(msgSelectedList, Boolean.FALSE);
+    }
+
+    private void setSelectedList(ArrayList<Boolean> msgSelectedList) {
+        this.msgSelectedList = msgSelectedList;
+        this.notifyDataSetChanged();
+    }
+
+    public ArrayList<Boolean> getMsgSelectedList(){
+        return this.msgSelectedList;
+    }
+
+    public InboxMode getMode() {
         return mode;
     }
 
-    public void setMode(int mode) {
+    public void setMode(InboxMode mode) {
         this.mode = mode;
-        this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return messageList.size();
+        return msgList.size();
     }
 
     @Override
@@ -114,13 +127,10 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final Message message = messageList.get(newOrderPosition);
+        final Message message = msgList.get(newOrderPosition);
         viewHolder.binding.setMessage(message);
 
-        int MODE_VIEWING = 0;
-        int MODE_EDITING = 1;
-
-        if (mode == MODE_VIEWING)
+        if (mode == InboxMode.VIEW)
             setImageView(viewHolder.imageView, message.getSender(), message.getInboxLabel());
 
         // Set star icon
@@ -134,16 +144,13 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 viewHolder.ibStar.setImageDrawable(context.getResources().getDrawable(isStarred ? R.mipmap.ic_unfollow : R.mipmap.ic_follow));
                 isStarred = !isStarred;
 
-                if (null == fm)
-                    fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-
-                InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
+                setupInboxFragment();
                 inboxFragment.markMailStar(newOrderPosition, isStarred);
             }
         });
 
         // Viewing Mode
-        if (mode == MODE_VIEWING) {
+        if (mode == InboxMode.VIEW) {
             viewHolder.imageView.setClickable(true);
             viewHolder.relativeLayout.setOnClickListener(null);
 
@@ -172,7 +179,7 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
                 }
             });
 
-        } else if (mode == MODE_EDITING) {
+        } else if (mode == InboxMode.EDIT) {
             viewHolder.imageView.setClickable(false);
             viewHolder.relativeLayout.setOnLongClickListener(null);
 
@@ -180,15 +187,11 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
             viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (null == fm)
-                        fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
-
-                    InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
-                    inboxFragment.setIndexSelected(newOrderPosition, !messageSelectedList.get(newOrderPosition));
+                    setIndexSelected(newOrderPosition, !msgSelectedList.get(newOrderPosition));
                 }
             });
 
-            setImageViewOnEditing(messageSelectedList.get(newOrderPosition), viewHolder.imageView);
+            setImageViewOnEditing(msgSelectedList.get(newOrderPosition), viewHolder.imageView);
         }
 
         return convertView;
@@ -300,11 +303,34 @@ public class MessageListAdapter extends BaseAdapter implements PubNubAPIConstant
      * @param position the position of the mail user clicked
      */
     private void startEditingMode(int position) {
+        setupInboxFragment();
+        inboxFragment.initEditingInbox(msgList);
+
+        resetSelectedList();
+
+        setMsgList(msgList);
+        setSelectedList(msgSelectedList);
+        setMode(InboxMode.EDIT);
+
+        setIndexSelected(position, Boolean.TRUE);
+    }
+
+    private void setIndexSelected(int selectedPosition, Boolean isSelected) {
+        msgSelectedList.set(selectedPosition, isSelected);
+        notifyDataSetChanged();
+
+        setupInboxFragment();
+        inboxFragment.setIsSelectedRead(msgList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
+    }
+
+    private void setupInboxFragment(){
+        if (null != inboxFragment)
+            return;
+
         if (null == fm)
             fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
-        InboxFragment inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
-        inboxFragment.initEditingInbox(position, messageList);
+        inboxFragment = (InboxFragment) fm.findFragmentByTag(MainFragment.INBOX.toString());
     }
 
     /**

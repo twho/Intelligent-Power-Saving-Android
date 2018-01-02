@@ -3,12 +3,10 @@ package com.tsungweiho.intelligentpowersaving.fragments;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +59,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
     private Message currentMessage;
     private String currentBox;
-    private MessageDBHelper messageDBHelper;
+    private MessageDBHelper msgDBHelper;
     private MessageFragmentListener messageFragmentListener;
 
     @Override
@@ -79,12 +77,12 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     }
 
     private void init() {
-        messageDBHelper = new MessageDBHelper(context);
+        msgDBHelper = new MessageDBHelper(context);
         messageFragmentListener = new MessageFragmentListener();
 
         // Mark message as read when getting in the message screen
-        currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
-        messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_READ);
+        currentMessage = msgDBHelper.getMessageByUnId(messageInfo.get(0));
+        msgDBHelper.markMailByLabel(currentMessage, LABEL_MSG_READ);
         this.position = Integer.parseInt(messageInfo.get(1));
         this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
 
@@ -193,9 +191,9 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_message_ib_delete:
-                    messageDBHelper.moveToBoxByLabel(currentMessage, LABEL_MSG_TRASH);
-                    if (position + 1 < messageDBHelper.getMessageListByLabel(currentBox).size()) {
-                        currentMessage = messageDBHelper.getMessageListByLabel(currentBox).get(position + 1);
+                    msgDBHelper.moveDirByLabel(currentMessage, LABEL_MSG_TRASH);
+                    if (position + 1 < msgDBHelper.getMessageListByLabel(currentBox).size()) {
+                        currentMessage = msgDBHelper.getMessageListByLabel(currentBox).get(position + 1);
                         setImageView(ivSender, currentMessage.getSender(), currentMessage.getInboxLabel());
                         binding.setMessage(currentMessage);
                         position = position + 1;
@@ -204,16 +202,16 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     }
                     break;
                 case R.id.fragment_message_ib_read:
-                    messageDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
+                    msgDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_home_ib_following:
-                    currentMessage = messageDBHelper.getMessageByUnId(messageInfo.get(0));
+                    currentMessage = msgDBHelper.getMessageByUnId(messageInfo.get(0));
                     Boolean isStarred = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
 
                     // Set star label
                     ibStar.setImageDrawable(context.getResources().getDrawable(isStarred ? R.mipmap.ic_unfollow : R.mipmap.ic_follow));
-                    messageDBHelper.starMailByLabel(currentMessage, isStarred ? LABEL_MSG_UNSTAR : LABEL_MSG_STAR);
+                    msgDBHelper.starMailByLabel(currentMessage, isStarred ? LABEL_MSG_UNSTAR : LABEL_MSG_STAR);
                     break;
             }
         }

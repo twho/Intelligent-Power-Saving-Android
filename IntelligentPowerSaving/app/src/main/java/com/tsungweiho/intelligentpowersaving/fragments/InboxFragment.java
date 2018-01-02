@@ -22,7 +22,7 @@ import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
-import com.tsungweiho.intelligentpowersaving.constants.DrawerListConstants;
+import com.tsungweiho.intelligentpowersaving.constants.ListAdapterConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
@@ -36,8 +36,6 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Fragment for user to receive important messages from admin
@@ -45,10 +43,10 @@ import java.util.Collections;
  * This fragment is the user interface that user can receive messages and can use as mailbox
  *
  * @author Tsung Wei Ho
- * @version 1222.2017
+ * @version 0101.2018
  * @since 1.0.0
  */
-public class InboxFragment extends Fragment implements DrawerListConstants, PubNubAPIConstants, DBConstants {
+public class InboxFragment extends Fragment implements ListAdapterConstants, PubNubAPIConstants, DBConstants {
     // UI Views
     private View view;
     private DrawerLayout drawer;
@@ -65,16 +63,14 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     private Context context;
     private ImageUtils imageUtils;
     private AnimUtils animUtils;
-    private MessageDBHelper messageDBHelper;
+    private MessageDBHelper msgDBHelper;
     private InboxFragmentListener inboxFragmentListener;
     private Thread uiThread;
 
     // Mailbox functions, top bar buttons are padding 15%
-    private MessageListAdapter messageListAdapter;
-    private ArrayList<Message> messageList;
-    private ArrayList<Boolean> messageSelectedList;
-    private int MODE_VIEWING = 0;
-    private int MODE_EDITING = 1;
+    private MessageListAdapter msgListAdapter;
+    private ArrayList<Message> msgList;
+    //    private ArrayList<Boolean> messageSelectedList;
     private int REFRESH_DELAY = 5000;
     private String currentBox;
     private Boolean isSelectedRead;
@@ -97,7 +93,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
      */
     private void init() {
         inboxFragmentListener = new InboxFragmentListener();
-        messageDBHelper = new MessageDBHelper(context);
+        msgDBHelper = new MessageDBHelper(context);
 
         // Singleton classes
         animUtils = AnimUtils.getInstance();
@@ -111,7 +107,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
     }
 
     /**
-     * Link views in layout file to view controller, compile with SDK 26, no need to cast views
+     * Link views in layout file to view controller, no need to cast views since compile with SDK 26
      */
     private void findViews() {
         DrawerListAdapter drawerListAdapter = new DrawerListAdapter(context, MESSAGE_DRAWER, MESSAGE_DRAWER_IMG);
@@ -185,86 +181,80 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
 
         // init inbox
         currentBox = SharedPrefsUtils.getInstance().getCurrentMessagebox();
-        messageList = messageDBHelper.getMessageListByLabel(currentBox);
-        messageListAdapter = new MessageListAdapter(context, messageList, messageSelectedList, MODE_VIEWING);
-        initInbox(messageList);
+        msgList = msgDBHelper.getMessageListByLabel(currentBox);
+        msgListAdapter = new MessageListAdapter(context, msgList, InboxMode.VIEW);
 
-        lvMessages.setAdapter(messageListAdapter);
+        lvMessages.setAdapter(msgListAdapter);
         animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
 
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
-        tvNoMail.setVisibility(messageList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
+        tvNoMail.setVisibility(msgList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
     }
 
-    // Initialize message list view
-    // Should be executed every time loading the message list
-    private void initInbox(ArrayList<Message> messageList) {
-        if (null != messageSelectedList)
-            messageSelectedList = null;
-        messageSelectedList = new ArrayList<>(Arrays.asList(new Boolean[messageList.size()]));
-        Collections.fill(messageSelectedList, Boolean.FALSE);
-
-        // Data set change
-        messageListAdapter.setMessageList(messageList);
-        messageListAdapter.setSelectedList(messageSelectedList);
-    }
-
-    // Refresh message list view
-    // Should be executed every time users have action on the message list
+    /**
+     * Refresh inbox listView on viewing mode
+     *
+     * @param messageList the msgList to be displayed in inbox
+     */
     private void refreshViewingInbox(ArrayList<Message> messageList) {
-        this.messageList = messageList;
-        initInbox(messageList);
-        switchTopBar(MODE_VIEWING);
-        messageListAdapter.setMode(MODE_VIEWING);
+        this.msgList = messageList;
+
+        switchTopBar(InboxMode.VIEW);
+        msgListAdapter.setMode(InboxMode.VIEW);
+        msgListAdapter.setMsgList(messageList);
 
         tvNoMail.setVisibility(messageList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
     }
 
-    // Be executed only When firstly start editing mode
-    public void initEditingInbox(int initSelectedPosition, ArrayList<Message> messageList) {
-        this.messageList = messageList;
-        initInbox(messageList);
-        switchTopBar(MODE_EDITING);
-
-        messageSelectedList.set(initSelectedPosition, Boolean.TRUE);
-        messageListAdapter.setMode(MODE_EDITING);
-        messageListAdapter.setSelectedList(messageSelectedList);
-
-        setIsSelectedRead(messageList.get(initSelectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
+    /**
+     * Setup inbox listView on editing mode
+     *
+     * @param messageList the msgList to be displayed in inbox
+     */
+    public void initEditingInbox(ArrayList<Message> messageList) {
+        this.msgList = messageList;
+        switchTopBar(InboxMode.EDIT);
     }
 
-    // Be executed When users selected another mail item
-    public void setIndexSelected(int selectedPosition, Boolean isSelected) {
-        messageSelectedList.set(selectedPosition, isSelected);
-        messageListAdapter.setSelectedList(messageSelectedList);
-
-        setIsSelectedRead(messageList.get(selectedPosition).getInboxLabel().split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ));
-    }
-
+    /**
+     * Star or unstar the inbox mail
+     *
+     * @param position the position of the mail in the list
+     * @param isStar the boolean indicate star or unstar action
+     */
     public void markMailStar(int position, boolean isStar) {
-        String strStar = isStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR;
-
-        messageDBHelper.starMailByLabel(messageList.get(position), strStar);
-        messageList = messageDBHelper.getMessageListByLabel(currentBox);
-        refreshViewingInbox(messageList);
+        msgDBHelper.starMailByLabel(msgList.get(position), isStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR);
+        this.msgList = msgDBHelper.getMessageListByLabel(currentBox);
     }
 
-    // Change top un/read button according to selected mail items
-    private void setIsSelectedRead(Boolean isSelectedRead) {
+    /**
+     * Change top un/read button according to selected mail items
+     *
+     * @param isSelectedRead the boolean indicate read or unread
+     */
+    public void setIsSelectedRead(Boolean isSelectedRead) {
         this.isSelectedRead = isSelectedRead;
         if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH))
             ibInboxFunction.setImageDrawable(context.getResources().getDrawable(isSelectedRead ? R.mipmap.ic_read : R.mipmap.ic_unread));
     }
 
-    private void switchTopBar(int mode) {
-        if (mode == MODE_EDITING) {
-            llEditing.setVisibility(View.VISIBLE);
-            btnUnread.setVisibility(View.GONE);
-            animUtils.rotateToIcon(ibOptions, R.mipmap.ic_back);
-        } else if (mode == MODE_VIEWING) {
-            llEditing.setVisibility(View.GONE);
-            btnUnread.setVisibility(View.VISIBLE);
-            animUtils.rotateToIcon(ibOptions, R.mipmap.ic_options);
+    /**
+     * Switch top function bar based on InboxMode
+     *
+     * @param mode the current InboxMode
+     */
+    private void switchTopBar(InboxMode mode) {
+        switch (mode) {
+            case VIEW:
+                llEditing.setVisibility(View.GONE);
+                btnUnread.setVisibility(View.VISIBLE);
+                animUtils.rotateToIcon(ibOptions, R.mipmap.ic_options);
+                break;
+            case EDIT:
+                llEditing.setVisibility(View.VISIBLE);
+                btnUnread.setVisibility(View.GONE);
+                animUtils.rotateToIcon(ibOptions, R.mipmap.ic_back);
+                break;
         }
     }
 
@@ -275,7 +265,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         isActive = false;
 
         // Clean memory
-        messageDBHelper.closeDB();
+        msgDBHelper.closeDB();
 
         // save which box the user is using
         SharedPrefsUtils.getInstance().saveCurrentMessageBox(currentBox);
@@ -287,55 +277,50 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.fragment_inbox_ib_options:
-                    if (messageListAdapter.getMode() == MODE_VIEWING) {
-                        drawer.openDrawer(Gravity.LEFT);
-                    } else if (messageListAdapter.getMode() == MODE_EDITING) {
-                        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
+                    // Change functions based on current mode
+                    switch (msgListAdapter.getMode()) {
+                        case VIEW:
+                            drawer.openDrawer(Gravity.LEFT);
+                            break;
+                        case EDIT:
+                            refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
+                            break;
                     }
                     break;
                 case R.id.fragment_inbox_ib_delete:
-                    if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) {
-                        // If in trash box, the delete button will permanently delete the mail
-                        for (int i = messageSelectedList.size() - 1; i >= 0; i--) {
-                            if (messageSelectedList.get(i))
-                                messageDBHelper.deleteByUniqueId(messageList.get(i).getUniqueId());
+                    // If the mail is in trash box, the delete button will permanently delete the mail
+                    for (int i = msgListAdapter.getMsgSelectedList().size() - 1; i >= 0; i--) {
+                        if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) && msgListAdapter.getMsgSelectedList().get(i))
+                            msgDBHelper.deleteByUniqueId(msgList.get(i).getUniqueId());
+                        else {
+                            if (msgListAdapter.getMsgSelectedList().get(i))
+                                Toast.makeText(context, getString(R.string.delete_caption1) + " " + msgDBHelper.moveDirByLabel(msgList.get(i), LABEL_MSG_TRASH) + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        // Remember to reverse the order back
-                        int count = 0;
-                        for (int i = messageSelectedList.size() - 1; i >= 0; i--) {
-                            if (messageSelectedList.get(i)) {
-                                messageDBHelper.moveToBoxByLabel(messageList.get(i), LABEL_MSG_TRASH);
-                                count++;
-                            }
-                        }
-                        makeDeleteToast(count);
                     }
-                    refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-                    switchTopBar(MODE_VIEWING);
+
+                    refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
+                    switchTopBar(InboxMode.VIEW);
                     break;
                 case R.id.fragment_inbox_ib_inbox_function:
-                    for (int i = messageSelectedList.size() - 1; i >= 0; i--) {
-                        if (messageSelectedList.get(i)) {
-                            // Check which mailbox user is currently in, trash box is different from the others
-                            if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) {
-                                messageDBHelper.moveToBoxByLabel(messageList.get(i), LABEL_MSG_INBOX);
-                            } else {
-                                // Check if mail is read or unread
-                                messageDBHelper.markMailByLabel(messageList.get(i), isSelectedRead ? LABEL_MSG_UNREAD : LABEL_MSG_READ);
-                            }
+                    for (int i = msgListAdapter.getMsgSelectedList().size() - 1; i >= 0; i--) {
+                        if (msgListAdapter.getMsgSelectedList().get(i)) {
+                            if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH)) // Check which mailbox user is currently in, trash box is different from the others
+                                msgDBHelper.moveDirByLabel(msgList.get(i), LABEL_MSG_INBOX);
+                            else // Check if mail is read or unread
+                                msgDBHelper.markMailByLabel(msgList.get(i), isSelectedRead ? LABEL_MSG_UNREAD : LABEL_MSG_READ);
                         }
                     }
-                    refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
-                    switchTopBar(MODE_VIEWING);
+
+                    refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
+                    switchTopBar(InboxMode.VIEW);
                     break;
                 case R.id.fragment_inbox_btn_unread:
                     btnUnread.setText(isUnreadShown ? getString(R.string.unread) : getString(R.string.all_mails));
-                    refreshViewingInbox(isUnreadShown ? messageDBHelper.getMessageListByLabel(currentBox) : messageDBHelper.getUnreadMessageListInBox(messageList));
+                    refreshViewingInbox(isUnreadShown ? msgDBHelper.getMessageListByLabel(currentBox) : msgDBHelper.getUnreadMessageListInBox(msgList));
                     isUnreadShown = !isUnreadShown;
                     break;
                 case R.id.fragment_inbox_fab_write:
-
+                    // TODO write function to be developed
                     break;
             }
         }
@@ -355,6 +340,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                             currentBox = LABEL_MSG_STAR;
                             break;
                         case 2:
+                            // TODO function to be developed
                             break;
                         case 3:
                             tvTitle.setText(getString(R.string.trash));
@@ -365,7 +351,7 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                     // If the mailbox is trash, the button is changed to be move back
                     ibInboxFunction.setImageDrawable(context.getResources().getDrawable(currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) ? R.mipmap.ic_move_back : R.mipmap.ic_unread));
 
-                    refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
+                    refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
                     animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
 
                     super.onDrawerClosed(drawerView);
@@ -385,19 +371,11 @@ public class InboxFragment extends Fragment implements DrawerListConstants, PubN
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
+                        refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
                     }
                 });
             }
         });
         uiThread.start();
-    }
-
-    private void makeDeleteToast(int count) {
-        Toast.makeText(context, getString(R.string.delete_caption1) + " " + count + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
-    }
-
-    public void refreshViewingFromService() {
-        refreshViewingInbox(messageDBHelper.getMessageListByLabel(currentBox));
     }
 }

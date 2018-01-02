@@ -15,8 +15,8 @@ import java.util.List;
 public interface PubNubAPIConstants {
     // Project: Intelligent Power Saving
     // Pubnub keys
-    String PUBNUB_PUBLISH_KEY = "pub-c-dca997e6-cdc6-44eb-929d-d6cc56a56a1f";
-    String PUBNUB_SUBSCRIBE_KEY = "sub-c-1061b83c-f6e2-11e6-ac91-02ee2ddab7fe";
+    String PUBNUB_PUBLISH_KEY = "pub-c-7ba4f492-6b0b-4aa3-a625-87167eca2214";
+    String PUBNUB_SUBSCRIBE_KEY = "sub-c-bee2108c-ef52-11e7-acf8-26f7716e5467";
 
     // PubNub channels
     String CHANNEL_VERSION = "1";

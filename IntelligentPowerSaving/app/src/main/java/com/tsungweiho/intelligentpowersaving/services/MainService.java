@@ -9,10 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
@@ -23,16 +21,11 @@ import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
-import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
 import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Service in background to subscribe to PubNub channels
@@ -51,7 +44,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private MainServiceListener mainServiceListener;
     private FragmentManager fm;
     private EventDBHelper eventDBHelper;
-    private MessageDBHelper messageDBHelper;
+    private MessageDBHelper msgDBHelper;
     private PubNubHelper pubNubHelper;
     private JsonParser jsonParser;
     private static PubNub pubnub = null;
@@ -80,7 +73,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
 
         eventDBHelper = new EventDBHelper(context);
-        messageDBHelper = new MessageDBHelper(context);
+        msgDBHelper = new MessageDBHelper(context);
 
         // Singleton class
         jsonParser = JsonParser.getInstance();
@@ -117,7 +110,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
             public void onTaskCompleted() {
                 // Do tasks related to UI
                 if (InboxFragment.isActive)
-                    ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingFromService();
+                    ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingInboxOnUiThread();
             }
         });
     }
@@ -154,13 +147,12 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                             ((EventFragment) setUpFragment(MainFragment.EVENT)).setMarkersOnUiThread();
                     }
 
-
                     // Save message in messageDB
-                    if (!messageDBHelper.isExist(event.getUniqueId())) {
-                        messageDBHelper.insertDB(jsonParser.convertEventToMessage(jObject));
+                    if (!msgDBHelper.isExist(event.getUniqueId())) {
+                        msgDBHelper.insertDB(jsonParser.convertEventToMessage(jObject));
 
                         if (InboxFragment.isActive)
-                            ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingFromService();
+                            ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingInboxOnUiThread();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -171,8 +163,8 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
                     String strMessage = message.getMessage().toString();
                     String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
 
-                    if (!messageDBHelper.isExist(uniqueId))
-                        messageDBHelper.insertDB(JsonParser.getInstance().getMessageByString(strMessage));
+                    if (!msgDBHelper.isExist(uniqueId))
+                        msgDBHelper.insertDB(JsonParser.getInstance().getMessageByString(strMessage));
 
                     if (InboxFragment.isActive)
                         ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingInboxOnUiThread();
@@ -208,7 +200,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         super.onDestroy();
 
         // Clean memory
-        messageDBHelper.closeDB();
+        msgDBHelper.closeDB();
         eventDBHelper.closeDB();
     }
 }

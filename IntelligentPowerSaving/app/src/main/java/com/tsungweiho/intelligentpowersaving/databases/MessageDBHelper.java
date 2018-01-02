@@ -173,9 +173,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
         String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
 
-        int count = db.update(TABLE_NAME, values, whereClause, null);
-
-        return count;
+        return db.update(TABLE_NAME, values, whereClause, null);
     }
 
     // Handle star mails
@@ -194,13 +192,11 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
         String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
 
-        int count = db.update(TABLE_NAME, values, whereClause, null);
-
-        return count;
+        return db.update(TABLE_NAME, values, whereClause, null);
     }
 
     // Handle mails moving between inbox and trash
-    public int moveToBoxByLabel(Message message, String label) {
+    public int moveDirByLabel(Message message, String label) {
         SQLiteDatabase db = getWritableDatabase();
 
         String newInboxLabel = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[0] + SEPARATOR_MSG_LABEL +
@@ -216,9 +212,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         values.put(DB_MESSAGE_INBOX_LABEL, newInboxLabel);
         String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
 
-        int count = db.update(TABLE_NAME, values, whereClause, null);
-
-        return count;
+        return db.update(TABLE_NAME, values, whereClause, null);
     }
 
     public Message getMessageByUnId(String unId) {
@@ -240,6 +234,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         }
         cursor.close();
         db.close();
+
         return message;
     }
 
