@@ -71,10 +71,12 @@
                 style="@style/TitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_margin="@dimen/activity_main_space"
-                android:layout_toLeftOf="@+id/fragment_home_ib_following"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_main_space"
+                android:layout_marginRight="@dimen/activity_main_space"
+                android:layout_toStartOf="@+id/fragment_home_ib_following"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:maxLines="2"
@@ -97,7 +99,10 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/activity_main_img_frame"
-            android:layout_margin="@dimen/activity_half_horizontal_margin"
+            android:layout_marginBottom="@dimen/activity_main_space"
+            android:layout_marginLeft="@dimen/activity_half_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_half_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_main_space"
             android:background="@color/colorPrimaryLTDark"/>
 
         <FrameLayout

@@ -17,7 +17,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 
@@ -50,7 +50,7 @@ public class ChartUtils implements BuildingConstants {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     /**

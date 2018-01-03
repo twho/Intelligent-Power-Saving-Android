@@ -84,7 +84,6 @@
                         android:layout_marginStart="@dimen/activity_main_space"
                         android:padding="@dimen/activity_main_space"
                         android:src="@mipmap/ic_preload_img"
-                        app:poster="@{event.poster}"
                         app:posterImg="@{event.posterImg}" />
 
                     <LinearLayout

@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -68,7 +68,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_building, container, false);
         view = binding.getRoot();
 
-        context = IntelligentPowerSaving.getContext();
+        context = IPowerSaving.getContext();
 
         this.buildingName = this.getArguments().getString(BUILDING_FRAGMENT_KEY);
 
@@ -145,14 +145,14 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
         final ImageUtils imageUtils = ImageUtils.getInstance();
-        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
+        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_ROUNDED_CORNER);
 
         // Auto refresh after 5 seconds.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
+                imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_ROUNDED_CORNER);
             }
         }, 5000);
     }
@@ -165,7 +165,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
      */
     @BindingAdapter({"bind:detail"})
     public static void loadDetail(TextView textView, String detail) {
-        textView.setText(IntelligentPowerSaving.getContext().getString(R.string.use_dept) + detail);
+        textView.setText(IPowerSaving.getContext().getString(R.string.use_dept) + detail);
     }
 
     /**
@@ -176,18 +176,18 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
      */
     @BindingAdapter({"bind:efficiency"})
     public static void loadTitle(TextView textView, String efficiency) {
-        String energyInfo = Math.abs(Integer.valueOf(efficiency.split(SEPARATOR_CONSUMPTION)[0])) + IntelligentPowerSaving.getContext().getResources().getString(R.string.energy_eff_unit) +
+        String energyInfo = Math.abs(Integer.valueOf(efficiency.split(SEPARATOR_CONSUMPTION)[0])) + IPowerSaving.getContext().getResources().getString(R.string.energy_eff_unit) +
                 (Integer.valueOf(efficiency.split(",")[0]) > 0 ?
-                        IntelligentPowerSaving.getContext().getString(R.string.increase_weekly) : IntelligentPowerSaving.getContext().getString(R.string.decrease_weekly));
+                        IPowerSaving.getContext().getString(R.string.increase_weekly) : IPowerSaving.getContext().getString(R.string.decrease_weekly));
 
         // Get the data from yesterday
         int lastHour = currentHour - 2;
         lastHour += lastHour < 0 ? 24 : 0;
 
-        StringBuilder strBuilder = new StringBuilder(IntelligentPowerSaving.getContext().getString(R.string.consump_this_hour));
+        StringBuilder strBuilder = new StringBuilder(IPowerSaving.getContext().getString(R.string.consump_this_hour));
         strBuilder.append(consumptionList.get(currentHour - 1));
         strBuilder.append(BUILDING_UNIT);
-        strBuilder.append(IntelligentPowerSaving.getContext().getString(R.string.consump_last_hour));
+        strBuilder.append(IPowerSaving.getContext().getString(R.string.consump_last_hour));
         strBuilder.append(consumptionList.get(lastHour));
         strBuilder.append(BUILDING_UNIT);
         strBuilder.append(energyInfo);

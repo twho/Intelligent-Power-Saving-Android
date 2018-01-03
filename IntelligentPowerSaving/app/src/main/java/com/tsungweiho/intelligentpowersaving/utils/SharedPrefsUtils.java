@@ -2,10 +2,9 @@ package com.tsungweiho.intelligentpowersaving.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
@@ -49,7 +48,7 @@ public class SharedPrefsUtils implements DBConstants {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     /**

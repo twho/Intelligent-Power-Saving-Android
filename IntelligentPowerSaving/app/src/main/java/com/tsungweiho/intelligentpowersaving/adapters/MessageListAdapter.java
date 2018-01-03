@@ -1,4 +1,4 @@
-package com.tsungweiho.intelligentpowersaving.tools;
+package com.tsungweiho.intelligentpowersaving.adapters;
 
 import android.content.Context;
 import android.databinding.BindingAdapter;
@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -28,6 +28,7 @@ import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.ObjMessageListItemBinding;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
+import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
@@ -159,7 +160,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         viewHolder.binding.setMessage(message);
 
         if (mode == InboxMode.VIEW)
-            setImageView(viewHolder.imageView, message.getSender(), message.getInboxLabel());
+            setImageView(viewHolder.imageView, message.getInboxLabel());
 
         // Set star icon
         boolean isStarred = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
@@ -249,8 +250,8 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
      * @param imageView  the icon of the mail sender or resource
      * @param inboxLabel the label of the mail
      */
-    private void setImageView(ImageView imageView, String sender, String inboxLabel){
-        Context context = IntelligentPowerSaving.getContext();
+    private void setImageView(ImageView imageView, String inboxLabel){
+        Context context = IPowerSaving.getContext();
         String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
 
         switch (label) {
@@ -264,22 +265,22 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                loadImgFromFirebase(sender, label, imageView);
+                loadImgFromFirebase(label, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
     }
 
-    private void loadImgFromFirebase(String poster, String imgUrl, final ImageView imageView){
-        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
+    private void loadImgFromFirebase(String imgUrl, final ImageView imageView){
+        FirebaseManager.getInstance().downloadProfileImg(imgUrl + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_CIRCULAR);
             }
         }, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+                imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
             }
         });
     }
@@ -352,7 +353,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         textView.setText(text);
 
         // Set read message as gray, unread message as white bold
-        textView.setTextColor(IntelligentPowerSaving.getContext().getResources().getColor(isRead ? R.color.colorTint : R.color.white));
+        textView.setTextColor(IPowerSaving.getContext().getResources().getColor(isRead ? R.color.colorTint : R.color.white));
         textView.setTypeface(textView.getTypeface(), isRead ? Typeface.NORMAL : Typeface.BOLD);
     }
 

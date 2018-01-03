@@ -55,7 +55,8 @@ public interface FragmentTags {
      */
     enum ChildFragment {
         BUILDING(packageName + "BuildingFragment"),
-        MESSAGE(packageName + "MessageFragment");
+        MESSAGE(packageName + "MessageFragment"),
+        REPORT(packageName + "ReportFragment");
 
         private final String text;
 

@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -72,7 +72,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_message, container, false);
         view = binding.getRoot();
 
-        context = IntelligentPowerSaving.getContext();
+        context = IPowerSaving.getContext();
         this.messageInfo = this.getArguments().getStringArrayList(MESSAGE_FRAGMENT_KEY);
 
         init();
@@ -125,7 +125,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     public static void loadImage(ImageView imageView, String uniqueId, String inboxLabel) {
         if (inboxLabel.split(",")[3].matches(".*\\d+.*")) {
             imgLayout.setVisibility(View.VISIBLE);
-            EventDBHelper eventDBHelper = new EventDBHelper(IntelligentPowerSaving.getContext());
+            EventDBHelper eventDBHelper = new EventDBHelper(IPowerSaving.getContext());
 
             String url = eventDBHelper.getEventByUnId(uniqueId).getImage();
             ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbImg);
@@ -142,7 +142,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
      */
     @BindingAdapter({"bind:star"})
     public static void loadStar(final ImageButton ibStar, final String inboxLabel) {
-        ibStar.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
+        ibStar.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(inboxLabel.split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR) ? R.mipmap.ic_follow : R.mipmap.ic_unfollow));
     }
 
     /**
@@ -174,7 +174,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
      * @param inboxLabel the label of the mail
      */
     private void setImageView(ImageView imageView, String sender, String inboxLabel){
-        Context context = IntelligentPowerSaving.getContext();
+        Context context = IPowerSaving.getContext();
         String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
 
         switch (label) {
@@ -188,22 +188,22 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                loadImgFromFirebase(sender, label, imageView);
+                loadImgFromFirebase(label, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
     }
 
-    private void loadImgFromFirebase(String poster, String imgUrl, final ImageView imageView){
-        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
+    private void loadImgFromFirebase(String imgUrl, final ImageView imageView){
+        FirebaseManager.getInstance().downloadProfileImg(imgUrl + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_CIRCULAR);
             }
         }, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+                imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
             }
         });
     }

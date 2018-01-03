@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.isseiaoki.simplecropview.CropImageView;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;

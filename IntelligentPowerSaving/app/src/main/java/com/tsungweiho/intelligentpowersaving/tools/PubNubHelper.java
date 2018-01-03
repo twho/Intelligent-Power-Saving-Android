@@ -8,7 +8,7 @@ import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
@@ -43,7 +43,7 @@ public class PubNubHelper implements PubNubAPIConstants {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     /**

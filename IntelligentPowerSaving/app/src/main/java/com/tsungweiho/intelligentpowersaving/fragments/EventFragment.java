@@ -42,12 +42,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.PNCallback;
-import com.pubnub.api.models.consumer.PNPublishResult;
-import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.history.PNHistoryResult;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
@@ -61,16 +56,12 @@ import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
-import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
 import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 import com.tsungweiho.intelligentpowersaving.tools.UploadService;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -145,7 +136,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         view = binding.getRoot();
 
-        context = IntelligentPowerSaving.getContext();
+        context = IPowerSaving.getContext();
 
         init(savedInstanceState);
 
@@ -295,18 +286,18 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
     }
 
-    @BindingAdapter({"bind:poster", "bind:posterImg"})
-    public static void loadPosterImg(final ImageView imageView, final String poster, String imgUrl) {
+    @BindingAdapter({"bind:posterImg"})
+    public static void loadPosterImg(final ImageView imageView, String imgUrl) {
         imageView.invalidate();
-        FirebaseManager.getInstance().downloadProfileImg(poster + "/" + imgUrl, new OnSuccessListener<Uri>() {
+        FirebaseManager.getInstance().downloadProfileImg(imgUrl + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_TYPE_PROFILE);
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_CIRCULAR);
             }
         }, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+                imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
             }
         });
     }
@@ -436,7 +427,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     }
 
     private void getEventChannelHistory() {
-        pubNubHelper.getChannelHistory(MainActivity.getPubNub(), ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
+        pubNubHelper.getChannelHistory(IPowerSaving.getPubNub(), ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
             @Override
             public void onTaskCompleted() {
                 setMarkersOnUiThread();
@@ -448,17 +439,12 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
      * Add all markers on UI thread
      */
     public void setMarkersOnUiThread() {
-        new Thread(new Runnable() {
+        ((MainActivity) MainActivity.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setAllMarkers();
-                    }
-                });
+                setAllMarkers();
             }
-        }).start();
+        });
     }
 
     /**
@@ -514,7 +500,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             tempImgFile.delete();
 
             MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
-            pubNubHelper.publishEvent(MainActivity.getPubNub(), new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
+            pubNubHelper.publishEvent(IPowerSaving.getPubNub(), new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
                     clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"));
 
             pbTopBar.clearAnimation();

@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -27,8 +27,8 @@ import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
-import com.tsungweiho.intelligentpowersaving.tools.DrawerListAdapter;
-import com.tsungweiho.intelligentpowersaving.tools.MessageListAdapter;
+import com.tsungweiho.intelligentpowersaving.adapters.DrawerListAdapter;
+import com.tsungweiho.intelligentpowersaving.adapters.MessageListAdapter;
 import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 /**
  * Fragment for user to receive important messages from admin
- *
+ * <p>
  * This fragment is the user interface that user can receive messages and can use as mailbox
  *
  * @author Tsung Wei Ho
@@ -80,7 +80,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-        context = IntelligentPowerSaving.getContext();
+        context = IPowerSaving.getContext();
 
         init();
 
@@ -119,7 +119,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         pullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                PubNubHelper.getInstance().getChannelHistory(MainActivity.getPubNub(), ActiveChannels.MESSAGE, new PubNubHelper.OnTaskCompleted() {
+                PubNubHelper.getInstance().getChannelHistory(IPowerSaving.getPubNub(), ActiveChannels.MESSAGE, new PubNubHelper.OnTaskCompleted() {
                     @Override
                     public void onTaskCompleted() {
                         pullToRefreshView.setRefreshing(false);
@@ -175,7 +175,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
 
         // use the data already saved
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
-        imageUtils.setRoundedCornerImageViewFromUrl(myAccountInfo.getImageUrl(), ivDrawerPic, imageUtils.IMG_TYPE_PROFILE);
+        imageUtils.setRoundedCornerImageViewFromUrl(myAccountInfo.getImageUrl(), ivDrawerPic, imageUtils.IMG_CIRCULAR);
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
@@ -219,7 +219,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
      * Star or unstar the inbox mail
      *
      * @param position the position of the mail in the list
-     * @param isStar the boolean indicate star or unstar action
+     * @param isStar   the boolean indicate star or unstar action
      */
     public void markMailStar(int position, boolean isStar) {
         msgDBHelper.starMailByLabel(msgList.get(position), isStar ? LABEL_MSG_STAR : LABEL_MSG_UNSTAR);
@@ -292,14 +292,18 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                     break;
                 case R.id.fragment_inbox_ib_delete:
                     // If the mail is in trash box, the delete button will permanently delete the mail
+                    int count = 0;
                     for (int i = msgListAdapter.getMsgSelectedList().size() - 1; i >= 0; i--) {
-                        if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) && msgListAdapter.getMsgSelectedList().get(i))
+                        if (currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) && msgListAdapter.getMsgSelectedList().get(i)) {
                             msgDBHelper.deleteByUniqueId(msgList.get(i).getUniqueId());
-                        else {
+                        } else {
                             if (msgListAdapter.getMsgSelectedList().get(i))
-                                Toast.makeText(context, getString(R.string.delete_caption1) + " " + msgDBHelper.moveDirByLabel(msgList.get(i), LABEL_MSG_TRASH) + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
+                                count += msgDBHelper.moveDirByLabel(msgList.get(i), LABEL_MSG_TRASH);
                         }
                     }
+
+                    if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH))
+                        Toast.makeText(context, getString(R.string.delete_caption1) + " " + count + " " + getString(R.string.delete_caption2), Toast.LENGTH_SHORT).show();
 
                     refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
                     switchTopBar(InboxMode.VIEW);
@@ -325,7 +329,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                     isUnreadShown = !isUnreadShown;
                     break;
                 case R.id.fragment_inbox_fab_write:
-                    // TODO write function to be developed
+                    ((MainActivity) getActivity()).setReportFragment();
                     break;
             }
         }

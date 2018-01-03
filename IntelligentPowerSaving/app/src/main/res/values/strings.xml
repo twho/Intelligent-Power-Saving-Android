@@ -64,6 +64,8 @@
 
     <!--ReportFragment-->
     <string name="send_to">Send to</string>
+    <string name="content_hint">Enter event details here ...</string>
+    <string name="title_hint">Enter an event title</string>
 
     <!--Imgur API-->
     <string name="notification_fail">Failed to upload image...</string>

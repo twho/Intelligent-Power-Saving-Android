@@ -2,7 +2,7 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
 
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 
 /**
  * Created by tsung on 2018/1/1.
@@ -25,6 +25,6 @@ public class ImgResourceMananger {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 }

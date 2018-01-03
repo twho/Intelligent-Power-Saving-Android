@@ -1,4 +1,4 @@
-package com.tsungweiho.intelligentpowersaving.tools;
+package com.tsungweiho.intelligentpowersaving.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -22,7 +22,8 @@ import com.tsungweiho.intelligentpowersaving.R;
  */
 public class DrawerListAdapter extends BaseAdapter {
     private Context context;
-    private LayoutInflater layoutInflater;
+
+    // Constants
     private int[] functions;
     private int[] drawables;
 
@@ -50,10 +51,10 @@ public class DrawerListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        layoutInflater = LayoutInflater.from(context);
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.obj_drawer_list_item,
-                    null);
+            convertView = layoutInflater.inflate(R.layout.obj_drawer_list_item, null);
             viewHolder = new ViewHolder();
             viewHolder.tvFunction = (TextView) convertView
                     .findViewById(R.id.obj_drawer_list_item_tv);

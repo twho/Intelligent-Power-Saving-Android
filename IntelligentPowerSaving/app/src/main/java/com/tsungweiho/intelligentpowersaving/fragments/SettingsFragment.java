@@ -11,11 +11,9 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +28,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
@@ -46,8 +44,6 @@ import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Fragment for user to set basic user information
@@ -93,7 +89,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         view = binding.getRoot();
 
         // Get access to main context
-        context = IntelligentPowerSaving.getContext();
+        context = IPowerSaving.getContext();
 
         init();
 
@@ -101,7 +97,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     }
 
     /**
-     * Init all classes needed in this fragment
+     * Init all classes needed in this fragment, no need to cast views while compile with SDK 26
      */
     private void init() {
         settingsFragmentListener = new SettingsFragmentListener();
@@ -112,7 +108,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         imageUtils = ImageUtils.getInstance();
         pubNubHelper = PubNubHelper.getInstance();
 
-        // Compile with SDK 26, no need to cast views
         edName = view.findViewById(R.id.fragment_settings_ed_name);
         edEmail = view.findViewById(R.id.fragment_settings_ed_email);
         tvProgress = view.findViewById(R.id.fragment_settings_tv_progress);
@@ -257,9 +252,9 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         ActiveChannels channels = index == 0 ? ActiveChannels.EVENT : ActiveChannels.MESSAGE;
 
         if (isChecked)
-            pubNubHelper.subscribeToChannels(MainActivity.getPubNub(), channels);
+            pubNubHelper.subscribeToChannels(IPowerSaving.getPubNub(), channels);
         else
-            pubNubHelper.unsubscribeToChannels(MainActivity.getPubNub(), channels);
+            pubNubHelper.unsubscribeToChannels(IPowerSaving.getPubNub(), channels);
 
         myAccountInfo.setSubscriptionBools(index, isChecked);
     }
@@ -273,13 +268,13 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     @BindingAdapter({"bind:userImage"})
     public static void loadUserImage(final ImageView imageView, final String url) {
         if (url.equalsIgnoreCase("")) {
-            imageView.setImageDrawable(IntelligentPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+            imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
             return;
         }
 
         imageView.invalidate();
         final ImageUtils imageUtils = ImageUtils.getInstance();
-        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_PROFILE);
+        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_CIRCULAR);
     }
 
     @Override
@@ -299,6 +294,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     public void onPause() {
         super.onPause();
 
+        // Auto save user profile information
         myAccountInfo.setName(edName.getText().toString());
         myAccountInfo.setEmail(edEmail.getText().toString());
         SharedPrefsUtils.getInstance().saveMyAccountInfo(myAccountInfo);

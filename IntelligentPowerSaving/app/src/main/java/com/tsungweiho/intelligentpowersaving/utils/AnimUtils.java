@@ -6,7 +6,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 
 /**
@@ -38,7 +38,7 @@ public class AnimUtils {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     public void fadeinToVisible(View view, int duration) {

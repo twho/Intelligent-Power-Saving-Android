@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 
@@ -35,7 +35,7 @@ public class NotificationHelper {
     }
 
     private NotificationHelper() {
-        this.context = new WeakReference<>(IntelligentPowerSaving.getContext());
+        this.context = new WeakReference<>(IPowerSaving.getContext());
         notificationMgr = (NotificationManager) context.get().getSystemService(Context.NOTIFICATION_SERVICE);
     }
 

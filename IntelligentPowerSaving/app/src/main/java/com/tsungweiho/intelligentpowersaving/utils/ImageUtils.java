@@ -13,15 +13,13 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
-import com.tsungweiho.intelligentpowersaving.MainActivity;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 
 import java.io.ByteArrayOutputStream;
@@ -59,7 +57,7 @@ public class ImageUtils {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     /**
@@ -243,8 +241,8 @@ public class ImageUtils {
     }
 
     // Different types of image will have different editing style
-    public final int IMG_TYPE_BUILDING = 0;
-    public final int IMG_TYPE_PROFILE = 1;
+    public final int IMG_ROUNDED_CORNER = 0;
+    public final int IMG_CIRCULAR = 1;
 
     /**
      * Set rounded-corner image from web resource using Picasso library
@@ -260,14 +258,16 @@ public class ImageUtils {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     switch (imgType) {
-                        case IMG_TYPE_BUILDING:
+                        case IMG_ROUNDED_CORNER:
                             imageView.setImageBitmap(getRoundedRectBitmap(bitmap, bitmap.getWidth() / 15));
                             break;
-                        case IMG_TYPE_PROFILE:
+                        case IMG_CIRCULAR:
                             imageView.setImageBitmap(getRoundedCroppedBitmap(bitmap));
+                            imageView.buildDrawingCache();
                             break;
                         default:
                             imageView.setImageBitmap(getRoundedCroppedBitmap(bitmap));
+                            imageView.buildDrawingCache();
                             break;
                     }
 

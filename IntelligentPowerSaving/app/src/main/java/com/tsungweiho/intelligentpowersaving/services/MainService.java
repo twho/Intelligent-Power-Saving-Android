@@ -13,6 +13,7 @@ import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
@@ -83,11 +84,12 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Set PubNub Listeners
-        if (null != MainActivity.getContext()) {
-            pubnub = MainActivity.getPubNub();
+        if (null != IPowerSaving.getContext()) {
+            pubnub = IPowerSaving.getPubNub();
             pubnub.addListener(mainServiceListener);
         }
 
+        // TODO use timerTask with delay
         getEventChannelHistory();
         getMessageChannelHistory();
 

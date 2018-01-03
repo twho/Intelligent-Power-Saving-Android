@@ -16,7 +16,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
@@ -53,7 +53,7 @@ public class FirebaseManager implements DBConstants, BuildingConstants {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     /**
@@ -108,7 +108,7 @@ public class FirebaseManager implements DBConstants, BuildingConstants {
         StorageReference usrProfilePicRef = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC);
 
         // Upload file and metadata to the path 'usrProfilePic/[uid].jpg'
-        return usrProfilePicRef.child(SharedPrefsUtils.getInstance().getMyAccountInfo().getName() + "/" + SharedPrefsUtils.getInstance().getMyAccountInfo().getUid()).putFile(imgFile, metadata);
+        return usrProfilePicRef.child(SharedPrefsUtils.getInstance().getMyAccountInfo().getUid() + "/" + SharedPrefsUtils.getInstance().getMyAccountInfo().getUid()).putFile(imgFile, metadata);
     }
 
     /**

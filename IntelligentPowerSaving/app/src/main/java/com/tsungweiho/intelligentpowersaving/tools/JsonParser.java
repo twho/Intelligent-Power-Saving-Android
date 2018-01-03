@@ -5,7 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 
-import com.tsungweiho.intelligentpowersaving.IntelligentPowerSaving;
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
@@ -47,7 +47,7 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
      * @return application context
      */
     private Context getContext() {
-        return IntelligentPowerSaving.getContext();
+        return IPowerSaving.getContext();
     }
 
     public Event getEventByJSONObj(JSONObject jsonObject) {

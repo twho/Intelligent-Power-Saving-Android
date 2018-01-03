@@ -52,14 +52,14 @@ public class BuildingIcon extends View implements BuildingConstants {
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
         final ImageUtils imageUtils = ImageUtils.getInstance();
-        ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
+        ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_ROUNDED_CORNER);
 
         // Auto refresh after 3.5 seconds.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_TYPE_BUILDING);
+                ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_ROUNDED_CORNER);
             }
         }, 3500);
     }

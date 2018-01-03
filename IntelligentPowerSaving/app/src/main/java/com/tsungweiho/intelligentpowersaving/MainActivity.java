@@ -30,6 +30,7 @@ import com.tsungweiho.intelligentpowersaving.fragments.EventFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.HomeFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.InboxFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.MessageFragment;
+import com.tsungweiho.intelligentpowersaving.fragments.ReportFragment;
 import com.tsungweiho.intelligentpowersaving.fragments.SettingsFragment;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
@@ -70,10 +71,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static float screenHeight;
     public static ActionBar actionBar;
     private FragmentManager fragmentManager;
-
-    // PubNub Configuration
-    private PubNubHelper pubNubHelper;
-    public static PubNub pubnub = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,11 +114,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         float density = getResources().getDisplayMetrics().density;
         screenWidth = metrics.widthPixels / density;
         screenHeight = metrics.heightPixels / density;
-
-        // Init Pubnub
-        pubNubHelper = PubNubHelper.getInstance();
-        pubnub = pubNubHelper.initPubNub();
-        setupServiceInThread();
 
         setActionbar();
     }
@@ -170,15 +162,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 flError.setVisibility(task.isSuccessful() ? View.GONE : View.VISIBLE);
             }
         });
-    }
-
-    /**
-     * Get PubNub used in app-wide
-     *
-     * @return the PubNub object used in the app
-     */
-    public static PubNub getPubNub() {
-        return pubnub;
     }
 
     /**
@@ -235,9 +218,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         // Read users preference
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         if (myAccountInfo.getSubscriptionBools()[0])
-            pubNubHelper.subscribeToChannels(pubnub, ActiveChannels.EVENT);
+            PubNubHelper.getInstance().subscribeToChannels(IPowerSaving.getPubNub(), ActiveChannels.EVENT);
         if (myAccountInfo.getSubscriptionBools()[1])
-            pubNubHelper.subscribeToChannels(pubnub, ActiveChannels.MESSAGE);
+            PubNubHelper.getInstance().subscribeToChannels(IPowerSaving.getPubNub(), ActiveChannels.MESSAGE);
+
+        // Start background service
+        setupServiceInThread();
     }
 
     @Override
@@ -310,6 +296,16 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     /**
+     * Set up ReportFragment
+     */
+    public void setReportFragment(){
+        // TODO pass draft content as argument to the fragment
+        ReportFragment reportFragment = new ReportFragment();
+
+        startReplaceFragment(reportFragment, ChildFragment.REPORT.toString(), true);
+    }
+
+    /**
      * Start replacing current fragment
      *
      * @param fragment the fragment to be set active
@@ -345,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
         // Clean background listeners
         stopService(new Intent(MainActivity.this, MainService.class));
-        pubnub.destroy();
+        IPowerSaving.getPubNub().destroy();
         FirebaseManager.getInstance().signOutSystemAccount();
     }
 }
