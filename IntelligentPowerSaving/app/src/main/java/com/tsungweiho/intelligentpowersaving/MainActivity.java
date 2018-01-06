@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     public static float screenWidth;
     public static float screenHeight;
     public static ActionBar actionBar;
-    private FragmentManager fragmentManager;
+    public static FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +127,10 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
      */
     public static Context getContext() {
         return context;
+    }
+
+    public static FragmentManager getFragmentMgr(){
+        return fragmentManager;
     }
 
     /**
@@ -343,5 +349,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         stopService(new Intent(MainActivity.this, MainService.class));
         IPowerSaving.getPubNub().destroy();
         FirebaseManager.getInstance().signOutSystemAccount();
+    }
+
+    public static void closeKeyboard(Context context, IBinder windowToken) {
+        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if (null != mgr)
+            mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 }

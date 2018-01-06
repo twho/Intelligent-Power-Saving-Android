@@ -78,10 +78,6 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     private ImageUtils imageUtils;
     private Bitmap bmpBuffer;
 
-    // Camera
-    public static final int REQUEST_CODE_CAMERA = 1;
-    public static final int REQUEST_CODE_IMAGE = 0;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -127,7 +123,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE_IMAGE) {
+            if (requestCode == alertDialogMgr.REQUEST_CODE_IMAGE) {
                 ContentResolver resolver = context.getContentResolver();
                 Uri uri = data.getData();
 
@@ -138,7 +134,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (requestCode == REQUEST_CODE_CAMERA) {
+            } else if (requestCode == alertDialogMgr.REQUEST_CODE_CAMERA) {
                 bmpBuffer = (Bitmap) data.getExtras().get("data");
             }
 
