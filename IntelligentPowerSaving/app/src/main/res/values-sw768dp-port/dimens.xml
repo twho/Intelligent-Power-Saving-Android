@@ -9,6 +9,7 @@
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">200dp</dimen>
     <dimen name="activity_main_img_size_padding">10dp</dimen>
+    <dimen name="activity_main_notification_icon_size">26dp</dimen>
     <dimen name="activity_main_small_icon_size">48dp</dimen>
     <dimen name="activity_main_min_img_size">50dp</dimen>
     <dimen name="activity_main_icon_size">55dp</dimen>

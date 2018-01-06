@@ -66,6 +66,9 @@
     <string name="send_to">Send to</string>
     <string name="content_hint">Enter event details here ...</string>
     <string name="title_hint">Enter an event title</string>
+    <string name="fragment_report_title">Report an event</string>
+    <string name="send_message">Sending ...</string>
+    <string name="message_sent">Your message has been sent successfully</string>
 
     <!--Imgur API-->
     <string name="notification_fail">Failed to upload image...</string>

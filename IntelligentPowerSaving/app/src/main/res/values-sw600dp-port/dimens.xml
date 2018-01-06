@@ -8,6 +8,7 @@
     <!--follow image resolution-->
     <dimen name="activity_main_img_size">180dp</dimen>
     <dimen name="activity_main_img_size_padding">9dp</dimen>
+    <dimen name="activity_main_notification_icon_size">26dp</dimen>
     <dimen name="activity_main_min_img_size">45dp</dimen>
     <dimen name="activity_main_icon_size">50dp</dimen>
     <dimen name="activity_main_single_edittext_width">320dp</dimen>
