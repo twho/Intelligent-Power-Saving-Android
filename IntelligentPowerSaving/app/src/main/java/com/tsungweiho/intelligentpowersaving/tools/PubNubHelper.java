@@ -63,7 +63,7 @@ public class PubNubHelper implements PubNubAPIConstants {
     /**
      * Subscribe to PubNub channels
      *
-     * @param pubNub the PubNub object
+     * @param pubNub   the PubNub object
      * @param channels the channels to subscribe
      */
     public void subscribeToChannels(PubNub pubNub, ActiveChannels channels) {
@@ -80,7 +80,7 @@ public class PubNubHelper implements PubNubAPIConstants {
     /**
      * Unsubscribe to PubNub channels
      *
-     * @param pubNub the PubNub object
+     * @param pubNub   the PubNub object
      * @param channels the channels to unsubscribe
      */
     public void unsubscribeToChannels(PubNub pubNub, ActiveChannels channels) {
@@ -97,8 +97,8 @@ public class PubNubHelper implements PubNubAPIConstants {
     /**
      * Get the all messages in the channel
      *
-     * @param pubNub the PubNub object used in app-wide
-     * @param channel the channel to get messages from
+     * @param pubNub            the PubNub object used in app-wide
+     * @param channel           the channel to get messages from
      * @param completedCallback callback for UI changes
      */
     public void getChannelHistory(PubNub pubNub, ActiveChannels channel, final OnTaskCompleted completedCallback) {
@@ -126,7 +126,7 @@ public class PubNubHelper implements PubNubAPIConstants {
                             }
 
                             // Callback when tasks are completed
-                            completedCallback.onTaskCompleted();
+                            completedCallback.onTaskCompleted(!status.isError());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -153,7 +153,7 @@ public class PubNubHelper implements PubNubAPIConstants {
                             }
 
                             // Callback when tasks are completed
-                            completedCallback.onTaskCompleted();
+                            completedCallback.onTaskCompleted(!status.isError());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -167,15 +167,15 @@ public class PubNubHelper implements PubNubAPIConstants {
      * Publish an event to channel
      *
      * @param pubNub the PubNub object used in app-wide
-     * @param event the event object to be published
+     * @param obj  the event or message object to be published
+     * @param completedCallback  callback for UI changes
      */
-    public void publishEvent(PubNub pubNub, Event event) {
-        pubNub.publish().message(event).channel(ActiveChannels.EVENT.toString())
+    public void publishMessage(PubNub pubNub, ActiveChannels channel, Object obj, final OnTaskCompleted completedCallback) {
+        pubNub.publish().message(obj).channel(channel.toString())
                 .async(new PNCallback<PNPublishResult>() {
                     @Override
                     public void onResponse(PNPublishResult result, PNStatus status) {
-                        if (status.isError())
-                            AlertDialogManager.getInstance().showAlertDialog(getContext().getString(R.string.alert_dialog_manager_error), getContext().getString(R.string.alert_dialog_manager_fail_publish));
+                        completedCallback.onTaskCompleted(!status.isError());
                     }
                 });
     }
@@ -184,6 +184,6 @@ public class PubNubHelper implements PubNubAPIConstants {
      * Task complete callback
      */
     public interface OnTaskCompleted {
-        void onTaskCompleted();
+        void onTaskCompleted(boolean isSuccessful);
     }
 }
