@@ -6,22 +6,16 @@
 
  			function handleClick(button){
  				var timeMillies = new Date().getTime();
- 				var defaultLabel = "unread,unstar,inbox,";
  				var type = document.getElementById('sel').value;
- 				var inboxLabel = defaultLabel + type;
+ 				var inboxLabel = "unread,unstar,inbox,noimg";
  				var name = document.getElementById('messageSender').value;
  				var title = document.getElementById('messageTitle').value;
  				var content = document.getElementById('messageContent').value;
 
- 				// if (true) {
-
- 				// } else {
-
- 				// }
- 				publish(timeMillies, inboxLabel, title, name, content);
+ 				publish(timeMillies, inboxLabel, title, name, type, content);
 	 		}
 
-	 		function publish(timeMillies, inboxLabel, title, name, content) {
+	 		function publish(timeMillies, inboxLabel, title, name, type, content) {
 	 			var separtor = "IPSFROMWEB"
     			pubnub = new PubNub({
         			publishKey : 'pub-c-7ba4f492-6b0b-4aa3-a625-87167eca2214',
@@ -29,9 +23,10 @@
     			})
     			
     			var publishConfig = {
-            		channel : "message_channel_1",
-            		message : separtor + timeMillies + separtor + title + separtor + content + separtor + name + separtor + inboxLabel + separtor
+            		channel : "message_channel_17",
+            		message : separtor + timeMillies + separtor + title + separtor + content + separtor + name + separtor + type + separtor + inboxLabel + separtor
         		}
+        		
         		pubnub.publish(publishConfig, function(status, response) {
         			document.getElementById('demo').innerHTML = response;
             		console.log(status, response);
