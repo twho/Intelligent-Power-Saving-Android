@@ -3,6 +3,7 @@ package com.tsungweiho.intelligentpowersaving.tools;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,7 +30,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
 /**
  * Class for alert dialogs used in the app
- *
+ * <p>
  * This singleton class is used to handle all alert dialogs used in the app
  *
  * @author Tsung Wei Ho
@@ -44,7 +45,8 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         return instance;
     }
 
-    private AlertDialogManager() {}
+    private AlertDialogManager() {
+    }
 
     /**
      * Get application context for animation use
@@ -58,7 +60,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
     /**
      * Show general alert dialog with customizable title and message content
      *
-     * @param title the title of the alert dialog
+     * @param title   the title of the alert dialog
      * @param message the message content in the alert dialog
      */
     public void showAlertDialog(String title, String message) {
@@ -77,8 +79,8 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         alertDialog.show();
     }
 
-    private static final int REQUEST_CODE_CAMERA = 1;
-    private static final int REQUEST_CODE_IMAGE = 0;
+    public final int REQUEST_CODE_CAMERA = 1;
+    public final int REQUEST_CODE_IMAGE = 0;
 
     /**
      * Show photo selection dialog
@@ -123,7 +125,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
      * Show image dialog for user to report FIXIT event
      *
      * @param fragmentTag the tag of the fragment calls this method
-     * @param bitmap the bitmap of the image user wants to upload
+     * @param bitmap      the bitmap of the image user wants to upload
      */
     public void showImageDialog(final String fragmentTag, Bitmap bitmap) {
         final Dialog dialog = new Dialog(getContext());
@@ -169,7 +171,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
      * Show image editing dialog
      *
      * @param imageView the imageView to be set in UI
-     * @param bitmap the bitmap to be set to imageView
+     * @param bitmap    the bitmap to be set to imageView
      * @return the dialog created
      */
     public Dialog showCropImageDialog(final ImageView imageView, final Bitmap bitmap) {

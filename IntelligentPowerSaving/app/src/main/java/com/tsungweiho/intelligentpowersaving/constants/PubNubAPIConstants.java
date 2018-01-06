@@ -19,7 +19,7 @@ public interface PubNubAPIConstants {
     String PUBNUB_SUBSCRIBE_KEY = "sub-c-bee2108c-ef52-11e7-acf8-26f7716e5467";
 
     // PubNub channels
-    String CHANNEL_VERSION = "1";
+    String CHANNEL_VERSION = "17";
 
     enum ActiveChannels {
         EVENT("event_channel_" + CHANNEL_VERSION),
@@ -61,12 +61,15 @@ public interface PubNubAPIConstants {
     int FROM_WEB_MESSAGE_TITLE = 2;
     int FROM_WEB_MESSAGE_CONTENT = 3;
     int FROM_WEB_MESSAGE_SENDER = 4;
-    int FROM_WEB_MESSAGE_INBOX_LABEL = 5;
+    int FROM_WEB_MESSAGE_SENDER_UID = 5;
+    int FROM_WEB_MESSAGE_INBOX_LABEL = 6;
 
     // Message Inbox Label
     String MESSAGE_LABEL_ANNOUNCEMENT = "announcement";
     String MESSAGE_LABEL_WARNING = "warning";
     String MESSAGE_LABEL_EMERGENCY = "emergency";
+
+    String NO_IMG = "noimg";
 
     // Message Params
     String MESSAGE_UNID = "uniqueId";

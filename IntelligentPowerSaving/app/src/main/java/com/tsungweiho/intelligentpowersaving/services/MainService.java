@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -59,7 +60,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     @Override
     public void onCreate() {
         super.onCreate();
-        context = MainService.this;
+        context = IPowerSaving.getContext();
 
         init();
     }
@@ -71,7 +72,7 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         mainServiceListener = new MainServiceListener();
 
         if (null != MainActivity.getContext())
-            fm = ((MainActivity) MainActivity.getContext()).getSupportFragmentManager();
+            fm = MainActivity.getFragmentMgr();
 
         eventDBHelper = new EventDBHelper(context);
         msgDBHelper = new MessageDBHelper(context);
@@ -99,8 +100,8 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private void getEventChannelHistory() {
         pubNubHelper.getChannelHistory(pubnub, ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
             @Override
-            public void onTaskCompleted() {
-                if (EventFragment.isActive)
+            public void onTaskCompleted(boolean isSuccessful) {
+                if (EventFragment.isActive && isSuccessful)
                     ((EventFragment) setUpFragment(MainFragment.EVENT)).setMarkersOnUiThread();
             }
         });
@@ -109,9 +110,9 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     private void getMessageChannelHistory() {
         pubNubHelper.getChannelHistory(pubnub, ActiveChannels.MESSAGE, new PubNubHelper.OnTaskCompleted() {
             @Override
-            public void onTaskCompleted() {
+            public void onTaskCompleted(boolean isSuccessful) {
                 // Do tasks related to UI
-                if (InboxFragment.isActive)
+                if (InboxFragment.isActive && isSuccessful)
                     ((InboxFragment) setUpFragment(MainFragment.INBOX)).refreshViewingInboxOnUiThread();
             }
         });
@@ -181,7 +182,10 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
     }
 
     private Fragment setUpFragment(MainFragment fragment) {
-        Fragment existingFragment = fm.findFragmentByTag(MainFragment.INBOX.toString());
+        if (null == fm && null != MainActivity.getContext())
+           fm = MainActivity.getFragmentMgr();
+
+        Fragment existingFragment = fm.findFragmentByTag(fragment.toString());
 
         switch (fragment) {
             case INBOX:

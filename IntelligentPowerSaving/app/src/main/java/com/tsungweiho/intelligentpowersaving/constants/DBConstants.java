@@ -27,7 +27,7 @@ public interface DBConstants {
     String FDB_STORAGE_PROFILEPIC = "usrProfilePic";
 
     // For all databases
-    int VERSION = 5;
+    int VERSION = 1;
     String ID = "Id";
 
     // BuildingDBHelper
@@ -51,6 +51,7 @@ public interface DBConstants {
     // MessageDBHelper
     String DB_MESSAGE_UNID = "MESSAGE_UNID";
     String DB_MESSAGE_SENDER = "MESSAGE_SENDER";
+    String DB_MESSAGE_SENDER_UID = "MESSAGE_SENDER_UID";
     String DB_MESSAGE_TITLE = "MESSAGE_TITLE";
     String DB_MESSAGE_CONTENT = "MESSAGE_CONTENT";
     String DB_MESSAGE_TIME = "MESSAGE_TIME";

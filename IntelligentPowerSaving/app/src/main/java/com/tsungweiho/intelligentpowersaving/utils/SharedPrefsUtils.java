@@ -26,8 +26,10 @@ public class SharedPrefsUtils implements DBConstants {
     // MyAccountInfo
     private String PREF_USER_ACCOUNT = "PREF_EMAIL";
 
+    public String PREF_REPORT_DRAFT = "PREF_REPORT_DRAFT";
+
     // Inbox Fragment use
-    private String CURRENT_INBOX = "CURRENT_INBOX";
+    public String CURRENT_INBOX = "CURRENT_INBOX";
 
     // Home Fragment use
     private String CURRENT_DISPLAY_MODE = "CURRENT_DISPLAY_MODE";
@@ -81,13 +83,13 @@ public class SharedPrefsUtils implements DBConstants {
         return gson.fromJson(json, MyAccountInfo.class);
     }
 
-    public String getCurrentMessagebox() {
-        return sharedPreferences.getString(CURRENT_INBOX, LABEL_MSG_INBOX);
+    public String getPreferenceString(String key, String defaultStr) {
+        return sharedPreferences.getString(key, defaultStr);
     }
 
-    public void saveCurrentMessageBox(String currentBox) {
+    public void savePreferenceString(String key, String strToSave) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-        prefsEditor.putString(CURRENT_INBOX, currentBox);
+        prefsEditor.putString(key, strToSave);
         prefsEditor.apply();
     }
 
