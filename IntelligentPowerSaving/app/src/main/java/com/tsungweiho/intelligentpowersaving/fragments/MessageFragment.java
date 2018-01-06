@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 /**
  * Fragment for user to view message content and details
- *
+ * <p>
  * This fragment is the child fragment of InboxFragment. It is the user interface that user can view message content and details
  *
  * @author Tsung Wei Ho
@@ -97,7 +97,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
 
         findViews();
 
-        setImageView(ivSender, currentMessage.getSender(), currentMessage.getInboxLabel());
+        setImageView(ivSender, currentMessage.getSenderImg());
         setAllListeners();
     }
 
@@ -117,27 +117,24 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     /**
      * Set event image from message object
      *
-     * @param imageView the imageView to set event image to
-     * @param uniqueId the uniqueId of the message
+     * @param imageView  the imageView to set event image to
      * @param inboxLabel the inbox label of the message
      */
-    @BindingAdapter({"bind:eventImg", "bind:inboxLabel"})
-    public static void loadImage(ImageView imageView, String uniqueId, String inboxLabel) {
-        if (inboxLabel.split(",")[3].matches(".*\\d+.*")) {
-            imgLayout.setVisibility(View.VISIBLE);
-            EventDBHelper eventDBHelper = new EventDBHelper(IPowerSaving.getContext());
+    @BindingAdapter({"bind:inboxLabel"})
+    public static void loadImage(ImageView imageView, String inboxLabel) {
+        imgLayout.setVisibility(View.GONE);
 
-            String url = eventDBHelper.getEventByUnId(uniqueId).getImage();
-            ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbImg);
-        } else {
-            imgLayout.setVisibility(View.GONE);
+        // Check if inbox label contains digit, only uid in label contains digit
+        if (!inboxLabel.split(",")[3].equals(NO_IMG)) {
+            imgLayout.setVisibility(View.VISIBLE);
+            ImageUtils.getInstance().setImageViewFromUrl(inboxLabel.split(",")[3], imageView, pbImg);
         }
     }
 
     /**
      * Set if mail is starred from message object using data binding
      *
-     * @param ibStar the imageButton to be set
+     * @param ibStar     the imageButton to be set
      * @param inboxLabel the inbox label of the message
      */
     @BindingAdapter({"bind:star"})
@@ -146,10 +143,10 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     }
 
     /**
+     * Load time to textView
      *
-     *
-     * @param tvTime
-     * @param time
+     * @param tvTime the textView to display message time
+     * @param time   the received time of the message
      */
     @BindingAdapter({"bind:time"})
     public static void loadTime(final TextView tvTime, final String time) {
@@ -167,17 +164,17 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
     }
 
     // TODO duplicate function in MessageListAdapter
+
     /**
      * Set the icon of the mail sender or resource
      *
-     * @param imageView  the icon of the mail sender or resource
-     * @param inboxLabel the label of the mail
+     * @param imageView the icon of the mail sender or resource
+     * @param senderImg the image of the sender
      */
-    private void setImageView(ImageView imageView, String sender, String inboxLabel){
+    private void setImageView(ImageView imageView, String senderImg) {
         Context context = IPowerSaving.getContext();
-        String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
 
-        switch (label) {
+        switch (senderImg) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_announcement, R.drawable.background_circle_teal);
                 break;
@@ -188,13 +185,13 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                loadImgFromFirebase(label, imageView);
+                loadImgFromFirebase(senderImg, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
     }
 
-    private void loadImgFromFirebase(String imgUrl, final ImageView imageView){
+    private void loadImgFromFirebase(String imgUrl, final ImageView imageView) {
         FirebaseManager.getInstance().downloadProfileImg(imgUrl + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -208,14 +205,12 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         });
     }
 
-    private void setAdminSenderIcon(ImageView imageView, int icon, int background){
+    private void setAdminSenderIcon(ImageView imageView, int icon, int background) {
         imageView.setImageDrawable(context.getResources().getDrawable(icon));
         imageView.setBackground(context.getResources().getDrawable(background));
     }
 
-    /**
-     * Duplicate functions ends here
-     */
+    // Duplicate functions ends here
 
     /**
      * All listeners used in InboxFragment
@@ -232,7 +227,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                     msgDBHelper.moveDirByLabel(currentMessage, LABEL_MSG_TRASH);
                     if (position + 1 < msgDBHelper.getMessageListByLabel(currentBox).size()) {
                         currentMessage = msgDBHelper.getMessageListByLabel(currentBox).get(position + 1);
-                        setImageView(ivSender, currentMessage.getSender(), currentMessage.getInboxLabel());
+                        setImageView(ivSender, currentMessage.getInboxLabel());
                         binding.setMessage(currentMessage);
                         position = position + 1;
                     } else {

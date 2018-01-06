@@ -8,10 +8,10 @@ import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -52,12 +51,11 @@ import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentEventBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
-import com.tsungweiho.intelligentpowersaving.objects.ImgurUpload;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 import com.tsungweiho.intelligentpowersaving.tools.AlertDialogManager;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
 import com.tsungweiho.intelligentpowersaving.tools.PubNubHelper;
-import com.tsungweiho.intelligentpowersaving.tools.UploadService;
+import com.tsungweiho.intelligentpowersaving.tools.ImgurHelper;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
@@ -108,7 +106,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private AlertDialogManager alertDialogMgr;
     private EventFragmentListener eventFragmentListener;
     private FragmentEventBinding binding;
-    private ImgurUpload imgurUpload;
+    private ImgurHelper imgurHelper;
     private File tempImgFile;
 
     // Google map
@@ -122,8 +120,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private Float initMapZoom = 17.0f;
 
     // Camera
-    public static final int REQUEST_CODE_CAMERA = 1;
-    public static final int REQUEST_CODE_IMAGE = 0;
     private Bitmap bmpBuffer = null;
 
     // PubNub
@@ -151,6 +147,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private void init(Bundle savedInstanceState) {
         eventFragmentListener = new EventFragmentListener();
         eventDBHelper = new EventDBHelper(context);
+        imgurHelper = new ImgurHelper(context);
 
         // Singleton classes
         timeUtils = TimeUtils.getInstance();
@@ -160,7 +157,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         pubNubHelper = PubNubHelper.getInstance();
 
         findViews();
-        setAllListeners();
+        setListeners();
 
         // Play animation when loading map
         llOpen.setVisibility(View.VISIBLE);
@@ -186,7 +183,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         pbTopBar = view.findViewById(R.id.fragment_event_pb);
     }
 
-    private void setAllListeners() {
+    private void setListeners() {
         ibAdd.setOnClickListener(eventFragmentListener);
         ibCancel.setOnClickListener(eventFragmentListener);
         ibCamera.setOnClickListener(eventFragmentListener);
@@ -208,17 +205,21 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                         pbTopBar.animate();
                         pbTopBar.setVisibility(View.VISIBLE);
 
+                        if (null == bmpBuffer) {
+                            publishEvent(NO_IMG); // No image thus the link is ""
+                            return;
+                        }
+
                         tempImgFile = imageUtils.getFileFromBitmap(bmpBuffer);
-                        createUpload(tempImgFile);
-                        new UploadService(context).Execute(imgurUpload, new UiCallback());
+                        imgurHelper.Execute(imgurHelper.createUpload(tempImgFile, edEvent.getText().toString()), new UiCallback());
                     }
                     break;
                 case R.id.fragment_event_ib_cancel:
                     dismissAddView();
-                    setAllMarkers();
+                    setMarkersOnUiThread();
                     break;
                 case R.id.fragment_event_ib_camera:
-                    closeKeyboard(context, edEvent.getWindowToken());
+                    MainActivity.closeKeyboard(context, edEvent.getWindowToken());
 
                     if (null == bmpBuffer)
                         alertDialogMgr.showCameraDialog(MainFragment.EVENT.toString());
@@ -277,15 +278,27 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     /**
      * Load marker image to marker imageView
      *
-     * @param imageView the imageView of clicked marker
-     * @param url       the url resource to load image from
+     * @param imageView the imageView of clicked map marker
+     * @param url       the url resource for loading image
      */
     @BindingAdapter({"bind:image"})
     public static void loadImage(final ImageView imageView, final String url) {
         imageView.invalidate();
-        ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
+
+        if (NO_IMG.equals(url)) {
+            pbMarker.setVisibility(View.GONE);
+            imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_noimage));
+        } else {
+            ImageUtils.getInstance().setImageViewFromUrl(url, imageView, pbMarker);
+        }
     }
 
+    /**
+     * Load event poster image to imageView
+     *
+     * @param imageView the imageView of event poster
+     * @param imgUrl    the url resource for loading image
+     */
     @BindingAdapter({"bind:posterImg"})
     public static void loadPosterImg(final ImageView imageView, String imgUrl) {
         imageView.invalidate();
@@ -317,7 +330,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         bmpBuffer = null;
         lockLocation = false;
 
-        closeKeyboard(context, edEvent.getWindowToken());
+        MainActivity.closeKeyboard(context, edEvent.getWindowToken());
     }
 
     /**
@@ -330,7 +343,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE_IMAGE) {
+            if (requestCode == alertDialogMgr.REQUEST_CODE_IMAGE) {
                 ContentResolver resolver = context.getContentResolver();
                 Uri uri = data.getData();
 
@@ -341,7 +354,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (requestCode == REQUEST_CODE_CAMERA) {
+            } else if (requestCode == alertDialogMgr.REQUEST_CODE_CAMERA) {
                 bmpBuffer = (Bitmap) data.getExtras().get("data");
             }
 
@@ -349,20 +362,6 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                 animUtils.fadeinToVisible(ivAddIcon, animUtils.FAST_ANIM_DURATION);
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Create Imgur upload task
-     *
-     * @param image the image to be uploaded to Imgur
-     */
-    private void createUpload(File image) {
-        try {
-            imgurUpload = new ImgurUpload(imageUtils.getCompressedImgFile(image), edEvent.getText().toString(), edEvent.getText().toString(), "");
-        } catch (IOException e) {
-            e.printStackTrace();
-            alertDialogMgr.showAlertDialog(context.getResources().getString(R.string.alert_dialog_manager_error), context.getResources().getString(R.string.notification_fail));
-        }
     }
 
     /**
@@ -429,8 +428,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     private void getEventChannelHistory() {
         pubNubHelper.getChannelHistory(IPowerSaving.getPubNub(), ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
             @Override
-            public void onTaskCompleted() {
-                setMarkersOnUiThread();
+            public void onTaskCompleted(boolean isSuccessful) {
+                if (isSuccessful)
+                    setMarkersOnUiThread();
             }
         });
     }
@@ -439,10 +439,12 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
      * Add all markers on UI thread
      */
     public void setMarkersOnUiThread() {
+        final ArrayList<Event> eventList = eventDBHelper.getAllEventList();
+
         ((MainActivity) MainActivity.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                setAllMarkers();
+                setAllMarkers(eventList);
             }
         });
     }
@@ -450,10 +452,8 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     /**
      * Add all markers on the map
      */
-    private void setAllMarkers() {
-        ArrayList<Event> eventList = eventDBHelper.getAllEventList();
+    private void setAllMarkers(ArrayList<Event> eventList) {
         mapMarkers = new HashMap<>();
-
         googleMap.clear();
 
         for (int index = 0; index < eventList.size(); index++) {
@@ -491,31 +491,46 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         // Clean memory
         eventDBHelper.closeDB();
         mapView.onPause();
+
+        if (null != bmpBuffer && !bmpBuffer.isRecycled())
+            bmpBuffer.recycle();
     }
 
     private class UiCallback implements Callback<ImageResponse> {
 
         @Override
         public void success(ImageResponse imageResponse, Response response) {
-            tempImgFile.delete();
-
-            MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
-            pubNubHelper.publishEvent(IPowerSaving.getPubNub(), new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
-                    clickedLatLng.longitude, imageResponse.data.link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"));
-
-            pbTopBar.clearAnimation();
-            pbTopBar.setVisibility(View.GONE);
-            dismissAddView();
+            tempImgFile = null;
+            publishEvent(imageResponse.data.link);
         }
 
         @Override
         public void failure(RetrofitError error) {
-            //Assume we have no connection, since error is null
-            if (error != null) {
+            // Assume we have no connection, since error is null
+            if (error != null)
                 Log.d(TAG, "ImgurUpload error: " + error.getMessage());
-            }
         }
+    }
 
+    /**
+     * Publish event to PubNub channel
+     *
+     * @param link the link to image uploaded
+     */
+    private void publishEvent(String link) {
+        MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
+        pubNubHelper.publishMessage(IPowerSaving.getPubNub(), ActiveChannels.EVENT, new Event(timeUtils.getTimeMillies(), edEvent.getText().toString(), clickedLatLng.latitude + "," +
+                clickedLatLng.longitude, link, myAccountInfo.getName(), myAccountInfo.getUid(), timeUtils.getDate() + "," + timeUtils.getTimehhmm(), "0"), new PubNubHelper.OnTaskCompleted() {
+            @Override
+            public void onTaskCompleted(boolean isSuccessful) {
+                if (!isSuccessful)
+                    alertDialogMgr.showAlertDialog(getContext().getString(R.string.alert_dialog_manager_error), getContext().getString(R.string.alert_dialog_manager_fail_publish));
+
+                pbTopBar.clearAnimation();
+                pbTopBar.setVisibility(View.GONE);
+                dismissAddView();
+            }
+        });
     }
 
     @Override
@@ -528,12 +543,5 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    public static void closeKeyboard(Context context, IBinder windowToken) {
-        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        if (null != mgr)
-            mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 }

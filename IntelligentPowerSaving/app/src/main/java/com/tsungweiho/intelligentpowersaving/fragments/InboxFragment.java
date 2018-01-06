@@ -121,7 +121,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
             public void onRefresh() {
                 PubNubHelper.getInstance().getChannelHistory(IPowerSaving.getPubNub(), ActiveChannels.MESSAGE, new PubNubHelper.OnTaskCompleted() {
                     @Override
-                    public void onTaskCompleted() {
+                    public void onTaskCompleted(boolean isSuccessful) {
                         pullToRefreshView.setRefreshing(false);
                     }
                 });
@@ -179,7 +179,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         tvMail.setText(myAccountInfo.getEmail());
 
         // init inbox
-        currentBox = SharedPrefsUtils.getInstance().getCurrentMessagebox();
+        currentBox = SharedPrefsUtils.getInstance().getPreferenceString(SharedPrefsUtils.getInstance().CURRENT_INBOX, DBConstants.LABEL_MSG_INBOX);
         msgList = msgDBHelper.getMessageListByLabel(currentBox);
         msgListAdapter = new MessageListAdapter(context, msgList, InboxMode.VIEW);
 
@@ -234,7 +234,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
     public void setIsSelectedRead(boolean isSelectedRead) {
         this.isSelectedRead = isSelectedRead;
         if (!currentBox.equalsIgnoreCase(LABEL_MSG_TRASH))
-            ibInboxFunction.setImageDrawable(context.getResources().getDrawable(isSelectedRead ? R.mipmap.ic_read : R.mipmap.ic_unread));
+            ibInboxFunction.setImageDrawable(context.getResources().getDrawable(isSelectedRead ? R.mipmap.ic_unread : R.mipmap.ic_read));
     }
 
     /**
@@ -268,7 +268,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         msgDBHelper.closeDB();
 
         // save which box the user is using
-        SharedPrefsUtils.getInstance().saveCurrentMessageBox(currentBox);
+        SharedPrefsUtils.getInstance().savePreferenceString(SharedPrefsUtils.getInstance().CURRENT_INBOX, currentBox);
     }
 
     /**

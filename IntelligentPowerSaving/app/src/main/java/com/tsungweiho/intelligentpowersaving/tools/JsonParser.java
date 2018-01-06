@@ -22,7 +22,7 @@ import java.util.Locale;
 
 /**
  * Class for converting JSON format data to app data objects
- *
+ * <p>
  * This singleton class is used to convert JSON format data to available app data objects
  *
  * @author Tsung Wei Ho
@@ -50,6 +50,12 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         return IPowerSaving.getContext();
     }
 
+    /**
+     * Load event object from specified JSON object
+     *
+     * @param jsonObject the JSON object to load event object from
+     * @return the event object loaded from JSON object
+     */
     public Event getEventByJSONObj(JSONObject jsonObject) {
         Event event = null;
 
@@ -75,10 +81,11 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
         String content = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_CONTENT];
         String sender = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER];
+        String senderImg = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_SENDER_UID];
         String time = TimeUtils.getInstance().getTimeByMillies(strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID]);
         String inboxLabel = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_INBOX_LABEL];
 
-        return new Message(uniqueId, title, content, sender, time, inboxLabel);
+        return new Message(uniqueId, title, content, sender, senderImg, time, inboxLabel);
     }
 
     public Message convertEventToMessage(JSONObject jsonObject) {
@@ -87,12 +94,13 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         try {
             String uniqueId = jsonObject.getString(EVENT_UNID);
             String detail = jsonObject.getString(EVENT_DETAIL);
+            String eventImg = jsonObject.getString(EVENT_IMG);
             String address = getAddressByPosition(jsonObject.getString(EVENT_POS));
             String poster = jsonObject.getString(EVENT_POSTER);
             String posterImg = jsonObject.getString(EVENT_POSTERIMG);
             String time = jsonObject.getString(EVENT_TIME);
 
-            message = new Message(uniqueId, detail, getContext().getString(R.string.event_reported_around) + " " + address, poster, time, getContext().getString(R.string.label_default) + posterImg);
+            message = new Message(uniqueId, detail, getContext().getString(R.string.event_reported_around) + " " + address, poster, posterImg, time, getContext().getString(R.string.label_default) + eventImg);
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }

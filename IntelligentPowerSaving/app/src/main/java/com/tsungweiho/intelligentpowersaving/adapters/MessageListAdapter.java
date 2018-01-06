@@ -160,7 +160,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         viewHolder.binding.setMessage(message);
 
         if (mode == InboxMode.VIEW)
-            setImageView(viewHolder.imageView, message.getInboxLabel());
+            setImageView(viewHolder.imageView, message.getSenderImg());
 
         // Set star icon
         boolean isStarred = message.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
@@ -248,13 +248,10 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
      * Set the icon of the mail sender or resource
      *
      * @param imageView  the icon of the mail sender or resource
-     * @param inboxLabel the label of the mail
+     * @param senderImg the image of the sender
      */
-    private void setImageView(ImageView imageView, String inboxLabel){
-        Context context = IPowerSaving.getContext();
-        String label = inboxLabel.split(SEPARATOR_MSG_LABEL)[3];
-
-        switch (label) {
+    private void setImageView(ImageView imageView, String senderImg){
+        switch (senderImg) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_announcement, R.drawable.background_circle_teal);
                 break;
@@ -265,7 +262,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_emergency, R.drawable.background_circle_red);
                 break;
             default:
-                loadImgFromFirebase(label, imageView);
+                loadImgFromFirebase(senderImg, imageView);
                 imageView.setBackground(context.getResources().getDrawable(R.drawable.background_circle_lightred));
                 break;
         }
