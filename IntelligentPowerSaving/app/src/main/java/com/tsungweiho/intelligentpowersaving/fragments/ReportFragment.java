@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -31,7 +30,6 @@ import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
-import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.ImageResponse;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
@@ -79,6 +77,7 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     private AlertDialogManager alertDialogMgr;
     private AnimUtils animUtils;
     private ImageUtils imageUtils;
+    private SharedPrefsUtils prefUtils;
     private PubNubHelper pubNubHelper;
     private ImgurHelper imgurHelper;
     private ArrayList<Building> buildingList;
@@ -135,6 +134,25 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         spBuilding.setOnItemSelectedListener(reportFragmentListener);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        prefUtils = SharedPrefsUtils.getInstance();
+        setupDraft(prefUtils.getPreferenceString(prefUtils.PREF_REPORT_DRAFT, ""));
+    }
+
+    private void setupDraft(String strDraft) {
+        if ("".equals(strDraft))
+            return;
+
+        spBuilding.setSelection(Integer.valueOf(strDraft.split(prefUtils.SEPARATOR)[0]));
+        edTitle.setText(strDraft.split(prefUtils.SEPARATOR)[1]);
+
+        if (strDraft.split(prefUtils.SEPARATOR).length > 2)
+            edContent.setText(strDraft.split(prefUtils.SEPARATOR)[2]);
+    }
+
     /**
      * All listeners used in ReportFragment
      */
@@ -147,6 +165,13 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_report_ib_delete:
+                    // Clean up message content in memory
+                    edTitle.setText("");
+                    edContent.setText("");
+                    prefUtils.savePreferenceString(prefUtils.PREF_REPORT_DRAFT, "");
+
+                    // Go back to InboxFragment
+                    ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
                 case R.id.fragment_report_ib_send:
                     if ("".equals(edTitle.getText().toString()) || "".equals(edContent.getText().toString()))
@@ -166,9 +191,9 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                     MainActivity.closeKeyboard(context, edContent.getWindowToken());
 
                     if (null == bmpBuffer)
-                        alertDialogMgr.showCameraDialog(MainFragment.EVENT.toString());
+                        alertDialogMgr.showCameraDialog(ChildFragment.REPORT.toString());
                     else
-                        alertDialogMgr.showImageDialog(MainFragment.EVENT.toString(), bmpBuffer);
+                        alertDialogMgr.showImageDialog(ChildFragment.REPORT.toString(), bmpBuffer);
                     break;
             }
         }
@@ -208,6 +233,9 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * UI callback when Imgur API call gets results
+     */
     private class UiCallback implements Callback<ImageResponse> {
 
         @Override
@@ -224,6 +252,11 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         }
     }
 
+    /**
+     * Publish a message object to PubNub channel
+     *
+     * @param imgLink the link of the image of the message
+     */
     private void publishMessage(String imgLink) {
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         TimeUtils tu = TimeUtils.getInstance();
@@ -248,6 +281,9 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     @Override
     public void onPause() {
         super.onPause();
+
+        if (!edTitle.getText().toString().equals("") || !edContent.getText().toString().equals(""))
+            prefUtils.savePreferenceString(prefUtils.PREF_REPORT_DRAFT, spBuilding.getSelectedItemPosition() + prefUtils.SEPARATOR + edTitle.getText().toString() + prefUtils.SEPARATOR + edContent.getText().toString());
 
         if (null != bmpBuffer && !bmpBuffer.isRecycled())
             bmpBuffer.recycle();

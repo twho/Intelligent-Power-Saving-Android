@@ -47,11 +47,12 @@ import java.util.ArrayList;
  * @since 1.0.0
  */
 public class InboxFragment extends Fragment implements ListAdapterConstants, PubNubAPIConstants, DBConstants {
+
     // UI Views
     private View view;
     private DrawerLayout drawer;
     private LinearLayout llDrawer, llEditing;
-    private TextView tvTitle, tvMail, tvNoMail;
+    private TextView tvTitle, tvMail, tvNoMail, tvFab;
     private ListView navList, lvMessages;
     private PullToRefreshView pullToRefreshView;
     private ImageButton ibOptions, ibDelete, ibInboxFunction;
@@ -136,6 +137,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
             }
         });
 
+        tvFab = view.findViewById(R.id.fragment_inbox_fab_tv_count);
         tvMail = view.findViewById(R.id.fragment_inbox_drawer_tv_mail);
         tvNoMail = view.findViewById(R.id.fragmnet_inbox_tv_no_mail);
         tvTitle = view.findViewById(R.id.fragment_inbox_tv_title);
@@ -188,6 +190,9 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
 
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
         tvNoMail.setVisibility(msgList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
+
+        if (!SharedPrefsUtils.getInstance().getPreferenceString(SharedPrefsUtils.getInstance().PREF_REPORT_DRAFT, "").equals(""))
+            tvFab.setVisibility(View.VISIBLE);
     }
 
     /**

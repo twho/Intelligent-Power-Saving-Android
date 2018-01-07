@@ -7,13 +7,14 @@ import com.google.gson.Gson;
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
+import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 
 import java.util.UUID;
 
 /**
  * Class for managing share preference in the app
- *
+ * <p>
  * This singleton class is used to manage share preferences and local stored information in the app
  *
  * @author Tsung Wei Ho
@@ -22,6 +23,9 @@ import java.util.UUID;
  */
 public class SharedPrefsUtils implements DBConstants {
     private SharedPreferences sharedPreferences;
+
+    // Comma separator
+    public String SEPARATOR = ",";
 
     // MyAccountInfo
     private String PREF_USER_ACCOUNT = "PREF_EMAIL";
@@ -36,6 +40,11 @@ public class SharedPrefsUtils implements DBConstants {
 
     private static final SharedPrefsUtils instance = new SharedPrefsUtils();
 
+    /**
+     * Get singleton instance
+     *
+     * @return singleton instance of SharePrefsUtils class
+     */
     public static SharedPrefsUtils getInstance() {
         return instance;
     }
@@ -56,7 +65,7 @@ public class SharedPrefsUtils implements DBConstants {
     /**
      * Init user preference
      */
-    public void initMyAccountInfo(){
+    public void initMyAccountInfo() {
         if (null == getMyAccountInfo()) {
             synchronized (this) {
                 String uid = null == UUID.randomUUID() ? TimeUtils.getInstance().getTimeMillies() : UUID.randomUUID().toString();
@@ -77,10 +86,9 @@ public class SharedPrefsUtils implements DBConstants {
     }
 
     public MyAccountInfo getMyAccountInfo() {
-        Gson gson = new Gson();
         String json = sharedPreferences.getString(PREF_USER_ACCOUNT, null);
 
-        return gson.fromJson(json, MyAccountInfo.class);
+        return new Gson().fromJson(json, MyAccountInfo.class);
     }
 
     public String getPreferenceString(String key, String defaultStr) {
