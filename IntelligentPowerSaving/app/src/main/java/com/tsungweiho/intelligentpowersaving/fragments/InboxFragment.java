@@ -146,14 +146,10 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         ibOptions = view.findViewById(R.id.fragment_inbox_ib_options);
         ibInboxFunction = view.findViewById(R.id.fragment_inbox_ib_inbox_function);
         ibDelete = view.findViewById(R.id.fragment_inbox_ib_delete);
-
         btnUnread = view.findViewById(R.id.fragment_inbox_btn_unread);
-
         llDrawer = view.findViewById(R.id.fragment_inbox_ll_drawer);
         llEditing = view.findViewById(R.id.fragment_inbox_layout_editing);
-
         ivDrawerPic = view.findViewById(R.id.fragment_inbox_drawer_iv);
-
         fabWrite = view.findViewById(R.id.fragment_inbox_fab_write);
     }
 
@@ -191,6 +187,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
 
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
         tvNoMail.setVisibility(msgList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
+        ibInboxFunction.setImageDrawable(context.getResources().getDrawable(currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) ? R.mipmap.ic_move_back : R.mipmap.ic_unread));
 
         // Show indicator if there is unfinished draft
         if (!SharedPrefsUtils.getInstance().getPreferenceString(SharedPrefsUtils.getInstance().PREF_REPORT_DRAFT, "").equals(""))
