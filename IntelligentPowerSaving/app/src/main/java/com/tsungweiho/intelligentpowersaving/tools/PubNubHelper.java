@@ -30,6 +30,11 @@ public class PubNubHelper implements PubNubAPIConstants {
 
     private static final PubNubHelper instance = new PubNubHelper();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static PubNubHelper getInstance() {
         return instance;
     }
@@ -166,9 +171,9 @@ public class PubNubHelper implements PubNubAPIConstants {
     /**
      * Publish an event to channel
      *
-     * @param pubNub the PubNub object used in app-wide
-     * @param obj  the event or message object to be published
-     * @param completedCallback  callback for UI changes
+     * @param pubNub            the PubNub object used in app-wide
+     * @param obj               the event or message object to be published
+     * @param completedCallback callback for UI changes
      */
     public void publishMessage(PubNub pubNub, ActiveChannels channel, Object obj, final OnTaskCompleted completedCallback) {
         pubNub.publish().message(obj).channel(channel.toString())

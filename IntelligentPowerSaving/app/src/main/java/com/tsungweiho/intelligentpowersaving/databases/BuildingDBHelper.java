@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Class for handling building database read and write operations
- *
+ * <p>
  * This class is used to read and write building data objects in database
  *
  * @author Tsung Wei Ho
@@ -34,6 +34,11 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
         createDatabase(db);
     }
 
+    /**
+     * Initialize database
+     *
+     * @param db currently available database
+     */
     private void createDatabase(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -45,6 +50,12 @@ public class BuildingDBHelper extends SQLiteOpenHelper implements DBConstants {
                 DB_BUILDING_IS_FOLLOW + " VARCHAR(10)" + ");");
     }
 
+    /**
+     * Check if the instance already exists in database
+     *
+     * @param name the name of the building instance
+     * @return boolean that indicates if the instance exists
+     */
     public Boolean isExist(String name) {
         SQLiteDatabase db = getReadableDatabase();
         String[] columns = {DB_BUILDING_NAME};

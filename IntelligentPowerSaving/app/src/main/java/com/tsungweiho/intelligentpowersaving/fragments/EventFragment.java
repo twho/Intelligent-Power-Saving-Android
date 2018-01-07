@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -164,7 +163,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         initMap(savedInstanceState);
     }
 
-    // Compile with SDK 26, no need to cast views
+    /**
+     * Link views in EventFragment, no need to cast views while compile with SDK 26
+     */
     private void findViews() {
         flTopBarAddEvent = view.findViewById(R.id.fragment_event_top_bar_add_event1);
         llTopBarAddEvent = view.findViewById(R.id.fragment_event_top_bar_add_event2);
@@ -183,6 +184,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         pbTopBar = view.findViewById(R.id.fragment_event_pb);
     }
 
+    /**
+     * Set all listeners in EventFragment
+     */
     private void setListeners() {
         ibAdd.setOnClickListener(eventFragmentListener);
         ibCancel.setOnClickListener(eventFragmentListener);
@@ -206,7 +210,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
                         pbTopBar.setVisibility(View.VISIBLE);
 
                         if (null == bmpBuffer) {
-                            publishEvent(NO_IMG); // No image thus the link is ""
+                            publishEvent(NO_IMG);
                             return;
                         }
 
@@ -235,8 +239,8 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
 
         @Override
         public void onMapLongClick(LatLng latLng) {
-            animUtils.fadeinToVisible(flTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
-            animUtils.fadeinToVisible(llTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
+            animUtils.fadeInToVisible(flTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
+            animUtils.fadeInToVisible(llTopBarAddEvent, animUtils.FAST_ANIM_DURATION);
 
             tvTitle.setText(context.getResources().getString(R.string.fragment_event_title_add));
             tvBottom.setText(context.getString(R.string.fragment_event_bottom_add));
@@ -264,6 +268,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
         public boolean onMarkerClick(Marker marker) {
             ivMarker.setImageDrawable(null);
 
+            // Set data binding
             Event event = mapMarkers.get(marker);
             binding.setEvent(event);
             binding.executePendingBindings();
@@ -359,7 +364,7 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             }
 
             if (null != bmpBuffer)
-                animUtils.fadeinToVisible(ivAddIcon, animUtils.FAST_ANIM_DURATION);
+                animUtils.fadeInToVisible(ivAddIcon, animUtils.FAST_ANIM_DURATION);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -420,11 +425,14 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             @Override
             public void run() {
                 llOpen.setVisibility(View.GONE);
-                animUtils.fadeinToVisible(mapView, animUtils.FAST_ANIM_DURATION);
+                animUtils.fadeInToVisible(mapView, animUtils.FAST_ANIM_DURATION);
             }
         }, 2000);
     }
 
+    /**
+     * Get all event data objects in PubNub event channel
+     */
     private void getEventChannelHistory() {
         pubNubHelper.getChannelHistory(IPowerSaving.getPubNub(), ActiveChannels.EVENT, new PubNubHelper.OnTaskCompleted() {
             @Override
@@ -496,6 +504,9 @@ public class EventFragment extends Fragment implements FragmentTags, BuildingCon
             bmpBuffer.recycle();
     }
 
+    /**
+     * UI callback after Imgur API call gets response
+     */
     private class UiCallback implements Callback<ImageResponse> {
 
         @Override

@@ -38,7 +38,7 @@ import java.util.Collections;
 
 /**
  * Class in background to subscribe to PubNub channels
- *
+ * <p>
  * This class is the user interface of mail overview in InboxFragment
  *
  * @author Tsung Wei Ho
@@ -56,6 +56,13 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     private FragmentManager fm;
     private InboxFragment inboxFragment;
 
+    /**
+     * Constructor of MessageListAdapter
+     *
+     * @param context the context that uses this class
+     * @param msgList the messageList that contains Message objects to be displayed
+     * @param mode    the mode of MessageListAdapter, which includes viewing and editing mode
+     */
     public MessageListAdapter(Context context, ArrayList<Message> msgList, InboxMode mode) {
         this.context = context;
         this.msgList = msgList;
@@ -78,7 +85,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Reset all item to be unselected in selectedList
      */
-    private void resetSelectedList(){
+    private void resetSelectedList() {
         this.msgSelectedList = new ArrayList<>(Arrays.asList(new Boolean[msgList.size()]));
         Collections.fill(msgSelectedList, Boolean.FALSE);
     }
@@ -98,7 +105,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
      *
      * @return the selectedList used in this adapter
      */
-    public ArrayList<Boolean> getMsgSelectedList(){
+    public ArrayList<Boolean> getMsgSelectedList() {
         return this.msgSelectedList;
     }
 
@@ -244,13 +251,14 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     }
 
     // TODO move to ImgResourceManager
+
     /**
      * Set the icon of the mail sender or resource
      *
-     * @param imageView  the icon of the mail sender or resource
+     * @param imageView the icon of the mail sender or resource
      * @param senderImg the image of the sender
      */
-    private void setImageView(ImageView imageView, String senderImg){
+    private void setImageView(ImageView imageView, String senderImg) {
         switch (senderImg) {
             case MESSAGE_LABEL_ANNOUNCEMENT:
                 setAdminSenderIcon(imageView, R.mipmap.ic_label_announcement, R.drawable.background_circle_teal);
@@ -268,7 +276,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         }
     }
 
-    private void loadImgFromFirebase(String imgUrl, final ImageView imageView){
+    private void loadImgFromFirebase(String imgUrl, final ImageView imageView) {
         FirebaseManager.getInstance().downloadProfileImg(imgUrl + "/" + imgUrl, new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -282,7 +290,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
         });
     }
 
-    private void setAdminSenderIcon(ImageView imageView, int icon, int background){
+    private void setAdminSenderIcon(ImageView imageView, int icon, int background) {
         imageView.setImageDrawable(context.getResources().getDrawable(icon));
         imageView.setBackground(context.getResources().getDrawable(background));
     }
@@ -292,8 +300,8 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Set message sender to textView
      *
-     * @param textView the textView to display message sender
-     * @param sender the sender of the message
+     * @param textView   the textView to display message sender
+     * @param sender     the sender of the message
      * @param inboxLabel the inbox label of the message
      */
     @BindingAdapter({"bind:sender", "bind:inboxLabel"})
@@ -304,8 +312,8 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Set message title to textView
      *
-     * @param textView the textView to display message title
-     * @param title the title of the message
+     * @param textView   the textView to display message title
+     * @param title      the title of the message
      * @param inboxLabel the inbox label of the message
      */
     @BindingAdapter({"bind:title", "bind:inboxLabel"})
@@ -316,8 +324,8 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Set message content to textView
      *
-     * @param textView the textView to display message content
-     * @param content the content of the message
+     * @param textView   the textView to display message content
+     * @param content    the content of the message
      * @param inboxLabel the inbox label of the message
      */
     @BindingAdapter({"bind:content", "bind:inboxLabel"})
@@ -328,8 +336,8 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Set message received time to textView
      *
-     * @param textView the textView to display time
-     * @param time the received time of the message
+     * @param textView   the textView to display time
+     * @param time       the received time of the message
      * @param inboxLabel the inbox label of the message
      */
     @BindingAdapter({"bind:time", "bind:inboxLabel"})
@@ -342,10 +350,10 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
      * Set textView UI for each message list item
      *
      * @param textView the textView to be styled and set
-     * @param text the text content
-     * @param label the label for styling the textView
+     * @param text     the text content
+     * @param label    the label for styling the textView
      */
-    private static void setTextView(TextView textView, String text, String label){
+    private static void setTextView(TextView textView, String text, String label) {
         Boolean isRead = label.split(SEPARATOR_MSG_LABEL)[0].equalsIgnoreCase(LABEL_MSG_READ);
         textView.setText(text);
 
@@ -376,7 +384,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
      * Set the mail selected/unselected
      *
      * @param selectedPosition the position of selected mail item
-     * @param isSelected the boolean indicate if the mail is selected
+     * @param isSelected       the boolean indicate if the mail is selected
      */
     private void setIndexSelected(int selectedPosition, Boolean isSelected) {
         msgSelectedList.set(selectedPosition, isSelected);
@@ -389,7 +397,7 @@ public class MessageListAdapter extends BaseAdapter implements ListAdapterConsta
     /**
      * Get InboxFragment to execute functions
      */
-    private void setupInboxFragment(){
+    private void setupInboxFragment() {
         if (null != inboxFragment)
             return;
 

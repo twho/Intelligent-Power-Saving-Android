@@ -11,7 +11,7 @@ import retrofit.mime.TypedFile;
 
 /**
  * Interface for Imgur API usage
- *
+ * <p>
  * This interface is used to store all constants used to make Imgur API calls, was created by AKiniyalocts on 2/23/2015.
  *
  * @author Tsung Wei Ho
@@ -30,10 +30,10 @@ public interface ImgurAPIConstants {
     /**
      * ImgurUpload image to imgur website
      *
-     * @param auth        #Type of authorization for upload
-     * @param title       #Title of image
-     * @param description #Description of image
-     * @param albumId     #ID for album (if the user is adding this image to an album)
+     * @param auth        the type of authorization for upload
+     * @param title       title of image
+     * @param description description of image
+     * @param albumId     ID for album (if the user is adding this image to an album)
      * @param username    username for upload
      * @param file        image
      * @param cb          Callback used for success/failures

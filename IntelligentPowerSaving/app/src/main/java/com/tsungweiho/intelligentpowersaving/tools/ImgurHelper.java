@@ -25,13 +25,23 @@ import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
 /**
- * Created by AKiniyalocts on 1/12/15.
- * Modified by Tsung Wei Ho on 11/10/17
+ * Class for handling Imgur API calls
+ * <p>
+ * This class is used to handle all Imgur API calls in the app
+ *
+ * @author AKiniyalocts, Tsung Wei Ho
+ * @version 1110.2017
+ * @since 1.0.0
  */
 public class ImgurHelper implements ImgurAPIConstants {
 
     private WeakReference<Context> context;
 
+    /**
+     * ImgurHelper constructor
+     *
+     * @param context the context that used this class
+     */
     public ImgurHelper(Context context) {
         this.context = new WeakReference<>(context);
     }
@@ -90,6 +100,11 @@ public class ImgurHelper implements ImgurAPIConstants {
                 });
     }
 
+    /**
+     * Get Imgur adapter
+     *
+     * @return Imgur adapter
+     */
     private RestAdapter buildRestAdapter() {
         RestAdapter imgurAdapter = new RestAdapter.Builder()
                 .setEndpoint(ImgurAPIConstants.server)
@@ -106,6 +121,13 @@ public class ImgurHelper implements ImgurAPIConstants {
         // Unused
     }
 
+    /**
+     * Create image upload item
+     *
+     * @param image the image file to be uploaded
+     * @param event the event describe the image
+     * @return the ImgurUpload item
+     */
     public ImgurUpload createUpload(File image, String event) {
         ImgurUpload imgurUpload = null;
 

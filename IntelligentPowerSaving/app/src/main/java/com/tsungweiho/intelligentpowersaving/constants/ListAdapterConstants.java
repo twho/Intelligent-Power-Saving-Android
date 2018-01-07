@@ -4,7 +4,7 @@ import com.tsungweiho.intelligentpowersaving.R;
 
 /**
  * Interface that stores all constants used by ListAdapters
- *
+ * <p>
  * This interface is used to store all constants used by ListAdapters
  *
  * @author Tsung Wei Ho

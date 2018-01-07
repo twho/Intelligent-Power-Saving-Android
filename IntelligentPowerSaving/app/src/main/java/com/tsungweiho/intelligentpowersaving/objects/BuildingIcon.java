@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.databinding.ObjIconBuildingBinding;
@@ -16,27 +17,34 @@ import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 import com.tsungweiho.intelligentpowersaving.utils.ImageUtils;
 
 /**
- * Created by Tsung Wei Ho on 2/18/2017.
- * Updated by Tsung Wei Ho on 12/22/2017
+ * Object class to show building icon in dashboard view (HomeFragment)
+ * <p>
+ * This class is used to display interactive building icon used in HomeFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 1222.2017
+ * @since 1.0.0
  */
-
 public class BuildingIcon extends View implements BuildingConstants {
 
-    private static Context context;
+    // The building shown in the icon
     private Building building;
 
-    // UI
+    // Main view
     private View view;
-    private ImageView ivIndicator, ivFollowIndicator;
-    private TextView tvConsumpPercent, tvConsump;
 
     // Functions
     private ObjIconBuildingBinding binding;
 
+    /**
+     * BuildingIcon constructor
+     *
+     * @param context  the context uses this class
+     * @param building the building information as an object to be displayed
+     */
     public BuildingIcon(Context context, Building building) {
         super(context);
 
-        this.context = context;
         this.building = building;
 
         // Data binding
@@ -48,7 +56,21 @@ public class BuildingIcon extends View implements BuildingConstants {
         initViews();
     }
 
+    /**
+     * Get application context for buildingIcon use
+     *
+     * @return application context
+     */
+    private Context getApplicationContext() {
+        return IPowerSaving.getContext();
+    }
 
+    /**
+     * Load building image to imageView
+     *
+     * @param imageView the imageView to show building image
+     * @param url       the image url resource
+     */
     @BindingAdapter({"bind:imageUrl"})
     public static void loadImage(final ImageView imageView, final String url) {
         final ImageUtils imageUtils = ImageUtils.getInstance();
@@ -64,30 +86,44 @@ public class BuildingIcon extends View implements BuildingConstants {
         }, 3500);
     }
 
-    // Compile with SDK 26, no need to cast views
+    /**
+     * Link views to buildingIcon class, no need to cast views while compile with SDK 26
+     */
     private void initViews() {
-        ivFollowIndicator = view.findViewById(R.id.obj_building_icon_iv_follow);
+        ImageView ivFollowIndicator = view.findViewById(R.id.obj_building_icon_iv_follow);
         ivFollowIndicator.setVisibility(Boolean.parseBoolean(building.getIfFollow()) ? View.VISIBLE : View.GONE);
 
-        ivIndicator = view.findViewById(R.id.obj_building_icon_iv_indicator);
-        tvConsump = view.findViewById(R.id.obj_building_icon_tv_consumption);
-        tvConsumpPercent = view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
+        ImageView ivIndicator = view.findViewById(R.id.obj_building_icon_iv_indicator);
+        TextView tvConsump = view.findViewById(R.id.obj_building_icon_tv_consumption);
+        TextView tvConsumpPercent = view.findViewById(R.id.obj_building_icon_tv_consumption_percentage);
 
         // Use different colors to represent increase or decrease in energy consumption
         Boolean energyIncrease = Integer.valueOf(building.getEfficiency().split(",")[0]) > 0;
-        tvConsump.setText(context.getString(energyIncrease ? R.string.increase_weekly : R.string.decrease_weekly));
-        setTextViewColor(tvConsump, tvConsumpPercent, context.getResources().getColor(energyIncrease ? R.color.light_red : R.color.green));
-        ivIndicator.setImageDrawable(context.getResources().getDrawable(energyIncrease ? R.mipmap.ic_increase : R.mipmap.ic_decrease));
+        tvConsump.setText(getApplicationContext().getString(energyIncrease ? R.string.increase_weekly : R.string.decrease_weekly));
+        setTextViewColor(tvConsump, tvConsumpPercent, getApplicationContext().getResources().getColor(energyIncrease ? R.color.light_red : R.color.green));
+        ivIndicator.setImageDrawable(getApplicationContext().getResources().getDrawable(energyIncrease ? R.mipmap.ic_increase : R.mipmap.ic_decrease));
 
-        AnimUtils.getInstance().fadeinToVisible(ivIndicator, AnimUtils.getInstance().FAST_ANIM_DURATION);
-        tvConsumpPercent.setText(Math.abs(Integer.valueOf(building.getEfficiency().split(",")[0])) + context.getResources().getString(R.string.energy_eff_unit));
+        AnimUtils.getInstance().fadeInToVisible(ivIndicator, AnimUtils.getInstance().FAST_ANIM_DURATION);
+        tvConsumpPercent.setText(Math.abs(Integer.valueOf(building.getEfficiency().split(",")[0])) + getApplicationContext().getResources().getString(R.string.energy_eff_unit));
     }
 
+    /**
+     * Set textView color and text based on the energy consumption efficiency of the building
+     *
+     * @param tvConsump        the text that says increase or decrease in energy consumption of the building
+     * @param tvConsumpPercent the numbers that represents building energy consumption efficiency
+     * @param color            set the color of the textView
+     */
     private void setTextViewColor(TextView tvConsump, TextView tvConsumpPercent, int color) {
         tvConsump.setTextColor(color);
         tvConsumpPercent.setTextColor(color);
     }
 
+    /**
+     * Get UI views of the class
+     *
+     * @return the buildingIcon view
+     */
     public View getView() {
         return view;
     }

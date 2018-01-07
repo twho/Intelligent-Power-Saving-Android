@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 /**
  * Class for setting spinner in ReportFragment
- *
+ * <p>
  * This class is the user interface of spinner in ReportFragment
  *
  * @author Tsung Wei Ho
@@ -33,6 +33,12 @@ public class SpinnerItemAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<Building> buildingList;
 
+    /**
+     * DrawerListAdapter constructor
+     *
+     * @param context      the context that uses this class
+     * @param buildingList the buildingList that contains Building objects to be shown
+     */
     public SpinnerItemAdapter(Context context, ArrayList<Building> buildingList) {
         this.context = context;
         this.buildingList = buildingList;
@@ -97,7 +103,7 @@ public class SpinnerItemAdapter extends BaseAdapter {
      * Load building image to spinner item
      *
      * @param imageView the imageView in each spinner item
-     * @param imgUrl the url resource of the image
+     * @param imgUrl    the url resource of the image
      */
     @BindingAdapter({"bind:spImage"})
     public static void setBuildingImg(final ImageView imageView, final String imgUrl) {

@@ -2,7 +2,7 @@ package com.tsungweiho.intelligentpowersaving.constants;
 
 /**
  * Interface that stores all constants used by database
- *
+ * <p>
  * This interface is used to store and handle all constants used by database
  *
  * @author Tsung Wei Ho

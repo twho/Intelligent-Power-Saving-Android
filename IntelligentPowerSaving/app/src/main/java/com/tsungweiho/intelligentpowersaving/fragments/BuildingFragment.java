@@ -34,7 +34,7 @@ import java.util.Collections;
 
 /**
  * Fragment for showing building energy consumption information
- *
+ * <p>
  * This fragment is the user interface that display real-time energy consumption with charts
  *
  * @author Tsung Wei Ho
@@ -114,6 +114,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
             }
         });
 
+        // Generate hour list
         currentHour = Integer.parseInt(TimeUtils.getInstance().getTimeHH());
         consumptionList = new ArrayList<>(Arrays.asList(new String[TIME_HOURS.length]));
         currentHour += currentHour == 0 ? 24 : 0;
@@ -127,7 +128,7 @@ public class BuildingFragment extends Fragment implements FragmentTags, Building
      */
     private void setFollowButton(Boolean isFollow) {
         if (isFollow) {
-            animUtils.fadeinToVisible(ivFollowIndicator, animUtils.FAST_ANIM_DURATION);
+            animUtils.fadeInToVisible(ivFollowIndicator, animUtils.FAST_ANIM_DURATION);
         } else {
             ivFollowIndicator.setVisibility(View.GONE);
         }

@@ -175,7 +175,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
 
         isActive = true;
 
-        // use the data already saved
+        // Use the data already saved
         MyAccountInfo myAccountInfo = SharedPrefsUtils.getInstance().getMyAccountInfo();
         imageUtils.setRoundedCornerImageViewFromUrl(myAccountInfo.getImageUrl(), ivDrawerPic, imageUtils.IMG_CIRCULAR);
         tvMail.setText(myAccountInfo.getEmail());
@@ -185,12 +185,14 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
         msgList = msgDBHelper.getMessageListByLabel(currentBox);
         msgListAdapter = new MessageListAdapter(context, msgList, InboxMode.VIEW);
 
+        // Set up message listView
         lvMessages.setAdapter(msgListAdapter);
-        animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
+        animUtils.fadeInToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
 
         tvTitle.setText(currentBox.substring(0, 1).toUpperCase() + currentBox.substring(1));
         tvNoMail.setVisibility(msgList.size() == 0 ? View.VISIBLE : ViewGroup.GONE);
 
+        // Show indicator if there is unfinished draft
         if (!SharedPrefsUtils.getInstance().getPreferenceString(SharedPrefsUtils.getInstance().PREF_REPORT_DRAFT, "").equals(""))
             tvFab.setVisibility(View.VISIBLE);
     }
@@ -366,7 +368,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                     ibInboxFunction.setImageDrawable(context.getResources().getDrawable(currentBox.equalsIgnoreCase(LABEL_MSG_TRASH) ? R.mipmap.ic_move_back : R.mipmap.ic_unread));
 
                     refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
-                    animUtils.fadeinToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
+                    animUtils.fadeInToVisible(lvMessages, animUtils.MID_ANIM_DURATION);
 
                     super.onDrawerClosed(drawerView);
                 }

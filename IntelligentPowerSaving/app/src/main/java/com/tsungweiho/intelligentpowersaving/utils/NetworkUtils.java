@@ -14,12 +14,18 @@ import java.net.URL;
 
 /**
  * Created by AKiniyalocts on 1/15/15.
- *
+ * <p>
  * Basic network utils
  */
 public class NetworkUtils {
     private static final String TAG = "NetworkUtils";
 
+    /**
+     * Check if the internet connection is active
+     *
+     * @param context the context calls this method
+     * @return the boolean indicate if the internet is connected
+     */
     public static boolean isConnected(Context context) {
         try {
             ConnectivityManager connectivityManager =
@@ -41,6 +47,9 @@ public class NetworkUtils {
         new TaskCheckConnection().execute();
     }
 
+    /**
+     * AsyncTask for checking internet connection
+     */
     private static class TaskCheckConnection extends AsyncTask<String, Void, Boolean> {
 
         @Override

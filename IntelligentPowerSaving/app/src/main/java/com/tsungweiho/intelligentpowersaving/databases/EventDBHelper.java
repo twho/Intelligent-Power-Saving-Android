@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Class for handling event database read and write operations
- *
+ * <p>
  * This class is used to read and write event data objects in database
  *
  * @author Tsung Wei Ho
@@ -34,6 +34,11 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
         createDatabase(db);
     }
 
+    /**
+     * Initialize database
+     *
+     * @param db currently available database
+     */
     private void createDatabase(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
                 ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -202,7 +207,7 @@ public class EventDBHelper extends SQLiteOpenHelper implements DBConstants {
      */
     public void deleteAllDB() {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from "+ TABLE_NAME);
+        db.execSQL("delete from " + TABLE_NAME);
     }
 
     /**

@@ -6,7 +6,7 @@ import java.util.Calendar;
 
 /**
  * Class to perform all time formatting tasks in the app
- *
+ * <p>
  * This singleton class consist of all time formatting functions used in the app
  *
  * @author Tsung Wei Ho
@@ -15,13 +15,19 @@ import java.util.Calendar;
  */
 public class TimeUtils {
 
-    private static final TimeUtils ourInstance = new TimeUtils();
+    private static final TimeUtils instance = new TimeUtils();
 
+    /**
+     * Get singleton instance
+     *
+     * @return singleton instance of TimeUtils class
+     */
     public static TimeUtils getInstance() {
-        return ourInstance;
+        return instance;
     }
 
-    private TimeUtils() {}
+    private TimeUtils() {
+    }
 
     /**
      * Get time in milliseconds since 1970

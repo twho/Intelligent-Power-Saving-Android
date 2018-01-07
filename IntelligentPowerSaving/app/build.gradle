@@ -12,7 +12,7 @@ android {
         applicationId "com.tsungweiho.intelligentpowersaving"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 17
+        versionCode 18
         versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true

@@ -3,7 +3,6 @@ package com.tsungweiho.intelligentpowersaving.tools;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +38,11 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
  */
 public class AlertDialogManager implements BuildingConstants, FragmentTags {
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     private static final AlertDialogManager instance = new AlertDialogManager();
 
     public static AlertDialogManager getInstance() {
@@ -49,9 +53,9 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
     }
 
     /**
-     * Get application context for animation use
+     * Get activity context for alertDialog use
      *
-     * @return application context
+     * @return activity context
      */
     private Context getContext() {
         return MainActivity.getContext();
@@ -79,6 +83,7 @@ public class AlertDialogManager implements BuildingConstants, FragmentTags {
         alertDialog.show();
     }
 
+    // The request code used in camera and image dialog
     public final int REQUEST_CODE_CAMERA = 1;
     public final int REQUEST_CODE_IMAGE = 0;
 

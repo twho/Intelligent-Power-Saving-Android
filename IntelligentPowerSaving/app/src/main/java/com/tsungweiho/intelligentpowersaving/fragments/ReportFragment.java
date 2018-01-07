@@ -109,26 +109,29 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         pubNubHelper = PubNubHelper.getInstance();
         imageUtils = ImageUtils.getInstance();
 
+        // Find views, no need to cast views when compiling with SDK 26
         ImageButton ibBack = view.findViewById(R.id.fragment_report_ib_back);
         ImageButton ibDelete = view.findViewById(R.id.fragment_report_ib_delete);
         ImageButton ibSend = view.findViewById(R.id.fragment_report_ib_send);
         FloatingActionButton imgFab = view.findViewById(R.id.fragment_report_fab_add);
-
-        ibBack.setOnClickListener(reportFragmentListener);
-        ibDelete.setOnClickListener(reportFragmentListener);
-        ibSend.setOnClickListener(reportFragmentListener);
-        imgFab.setOnClickListener(reportFragmentListener);
-
         tvFab = view.findViewById(R.id.fragment_report_fab_tv_count);
         progressBar = view.findViewById(R.id.fragment_report_pb);
         edTitle = view.findViewById(R.id.fragment_report_ed_title);
         edContent = view.findViewById(R.id.fragment_report_ed_content);
 
+        // Set listeners to views
+        ibBack.setOnClickListener(reportFragmentListener);
+        ibDelete.setOnClickListener(reportFragmentListener);
+        ibSend.setOnClickListener(reportFragmentListener);
+        imgFab.setOnClickListener(reportFragmentListener);
+
+        // Set up spinner
         spBuilding = view.findViewById(R.id.fragment_report_spinner);
         buildingList = buildingDBHelper.getAllBuildingSet();
         SpinnerItemAdapter spItemAdapter = new SpinnerItemAdapter(context, buildingList);
         spBuilding.setAdapter(spItemAdapter);
 
+        // Store the value of currently selected building
         selectedBuilding = buildingList.get(0).getName();
 
         spBuilding.setOnItemSelectedListener(reportFragmentListener);
@@ -138,10 +141,16 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     public void onResume() {
         super.onResume();
 
+        // Check if draft exists
         prefUtils = SharedPrefsUtils.getInstance();
         setupDraft(prefUtils.getPreferenceString(prefUtils.PREF_REPORT_DRAFT, ""));
     }
 
+    /**
+     * Load draft to UI views
+     *
+     * @param strDraft the string of draft that is stored in local memory
+     */
     private void setupDraft(String strDraft) {
         if ("".equals(strDraft))
             return;
@@ -161,10 +170,10 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
-                case R.id.fragment_report_ib_back:
+                case R.id.fragment_report_ib_back: // Back button
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
-                case R.id.fragment_report_ib_delete:
+                case R.id.fragment_report_ib_delete: // Delete button
                     // Clean up message content in memory
                     edTitle.setText("");
                     edContent.setText("");
@@ -173,21 +182,21 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                     // Go back to InboxFragment
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
-                case R.id.fragment_report_ib_send:
+                case R.id.fragment_report_ib_send: // Send button
                     if ("".equals(edTitle.getText().toString()) || "".equals(edContent.getText().toString()))
                         return;
 
-                    animUtils.fadeinToVisible(progressBar, animUtils.FAST_ANIM_DURATION);
+                    animUtils.fadeInToVisible(progressBar, animUtils.FAST_ANIM_DURATION);
 
                     if (null == bmpBuffer) {
-                        publishMessage(NO_IMG);
+                        publishMessage(NO_IMG); // Set no image if user does not add any image
                         return;
                     }
 
                     tempImgFile = imageUtils.getFileFromBitmap(bmpBuffer);
                     imgurHelper.Execute(imgurHelper.createUpload(tempImgFile, edTitle.getText().toString()), new ReportFragment.UiCallback());
                     break;
-                case R.id.fragment_report_fab_add:
+                case R.id.fragment_report_fab_add: // Add image button
                     MainActivity.closeKeyboard(context, edContent.getWindowToken());
 
                     if (null == bmpBuffer)
@@ -209,6 +218,13 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
         }
     }
 
+    /**
+     * Get the result from the intent
+     *
+     * @param requestCode the code that represents requested resource
+     * @param resultCode  the code that represents request status
+     * @param data        the data get from requested resource
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -228,8 +244,9 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
             }
 
             if (null != bmpBuffer)
-                animUtils.fadeinToVisible(tvFab, animUtils.FAST_ANIM_DURATION);
+                animUtils.fadeInToVisible(tvFab, animUtils.FAST_ANIM_DURATION);
         }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -282,9 +299,11 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     public void onPause() {
         super.onPause();
 
+        // Save draft to local memory
         if (!edTitle.getText().toString().equals("") || !edContent.getText().toString().equals(""))
             prefUtils.savePreferenceString(prefUtils.PREF_REPORT_DRAFT, spBuilding.getSelectedItemPosition() + prefUtils.SEPARATOR + edTitle.getText().toString() + prefUtils.SEPARATOR + edContent.getText().toString());
 
+        // Clean up memory
         if (null != bmpBuffer && !bmpBuffer.isRecycled())
             bmpBuffer.recycle();
     }

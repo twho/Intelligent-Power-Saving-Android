@@ -24,7 +24,6 @@ import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
-import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;
 import com.tsungweiho.intelligentpowersaving.databinding.FragmentMessageBinding;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
@@ -93,6 +92,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         this.position = Integer.parseInt(messageInfo.get(1));
         this.currentBox = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[2];
 
+        // Set data binding object
         binding.setMessage(currentMessage);
 
         findViews();
@@ -210,7 +210,7 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         imageView.setBackground(context.getResources().getDrawable(background));
     }
 
-    // Duplicate functions ends here
+    // Duplicate functions end here
 
     /**
      * All listeners used in InboxFragment
@@ -220,10 +220,10 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
-                case R.id.fragment_message_ib_back:
+                case R.id.fragment_message_ib_back: // Back button
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
-                case R.id.fragment_message_ib_delete:
+                case R.id.fragment_message_ib_delete: // Delete button
                     msgDBHelper.moveDirByLabel(currentMessage, LABEL_MSG_TRASH);
                     if (position + 1 < msgDBHelper.getMessageListByLabel(currentBox).size()) {
                         currentMessage = msgDBHelper.getMessageListByLabel(currentBox).get(position + 1);
@@ -234,11 +234,11 @@ public class MessageFragment extends Fragment implements FragmentTags, DBConstan
                         ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     }
                     break;
-                case R.id.fragment_message_ib_read:
+                case R.id.fragment_message_ib_read: // Mark as read button
                     msgDBHelper.markMailByLabel(currentMessage, LABEL_MSG_UNREAD);
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
                     break;
-                case R.id.fragment_home_ib_following:
+                case R.id.fragment_home_ib_following: // Star the mail button
                     currentMessage = msgDBHelper.getMessageByUnId(messageInfo.get(0));
                     Boolean isStarred = currentMessage.getInboxLabel().split(SEPARATOR_MSG_LABEL)[1].equalsIgnoreCase(LABEL_MSG_STAR);
 

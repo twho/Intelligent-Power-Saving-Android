@@ -32,7 +32,7 @@ import id.zelory.compressor.Compressor;
 
 /**
  * Class for performing image processing tasks
- *
+ * <p>
  * This singleton class is designed as a singleton class and is used to handle all image processing tasks within the app.
  *
  * @author Tsung Wei Ho
@@ -43,13 +43,19 @@ public class ImageUtils {
 
     private static final int MAX_SIZE = (200) * 1024; // unit KB
 
-    private static final ImageUtils ourInstance = new ImageUtils();
+    private static final ImageUtils instance = new ImageUtils();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static ImageUtils getInstance() {
-        return ourInstance;
+        return instance;
     }
 
-    private ImageUtils() {}
+    private ImageUtils() {
+    }
 
     /**
      * Get application context for chart use
@@ -247,9 +253,9 @@ public class ImageUtils {
     /**
      * Set rounded-corner image from web resource using Picasso library
      *
-     * @param url the url of the image resource
+     * @param url       the url of the image resource
      * @param imageView the imageView to be set
-     * @param imgType the type of image
+     * @param imgType   the type of image
      */
     public void setRoundedCornerImageViewFromUrl(String url, final ImageView imageView, final int imgType) {
 
@@ -291,8 +297,8 @@ public class ImageUtils {
     /**
      * Set image from web resource using Picasso library
      *
-     * @param url the url of the image resource
-     * @param imageView the imageView to be set
+     * @param url         the url of the image resource
+     * @param imageView   the imageView to be set
      * @param progressBar the progressBar shown before image finishes loading
      */
     public void setImageViewFromUrl(final String url, final ImageView imageView, final ProgressBar progressBar) {

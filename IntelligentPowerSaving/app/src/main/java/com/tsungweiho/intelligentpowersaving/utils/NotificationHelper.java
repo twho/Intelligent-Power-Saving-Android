@@ -15,7 +15,7 @@ import java.lang.ref.WeakReference;
 
 /**
  * Class handles push notifications
- *
+ * <p>
  * This singleton class is used to handle all push notifications in the app
  *
  * @author Tsung Wei Ho
@@ -30,10 +30,18 @@ public class NotificationHelper {
 
     private static final NotificationHelper instance = new NotificationHelper();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static NotificationHelper getInstance() {
         return instance;
     }
 
+    /**
+     * NotificationHelper constructor
+     */
     private NotificationHelper() {
         this.context = new WeakReference<>(IPowerSaving.getContext());
         notificationMgr = (NotificationManager) context.get().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -64,7 +72,6 @@ public class NotificationHelper {
                 (NotificationManager) context.get().getSystemService(Context.NOTIFICATION_SERVICE);
 
         mNotificationManager.notify(context.get().getString(R.string.app_name).hashCode(), builder.build());
-
     }
 
     /**

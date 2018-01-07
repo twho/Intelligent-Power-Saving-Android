@@ -42,6 +42,7 @@ public interface PubNubAPIConstants {
         }
     }
 
+    // Channel pairs
     List<String> EVENT_CHANNEL_SET = Arrays.asList(ActiveChannels.EVENT.toString(), ActiveChannels.EVENT_DELETED.toString());
     List<String> MESSAGE_CHANNEL_SET = Arrays.asList(ActiveChannels.MESSAGE.toString(), ActiveChannels.MESSAGE_DELETED.toString());
 

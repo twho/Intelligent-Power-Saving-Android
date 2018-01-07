@@ -11,7 +11,7 @@ import com.tsungweiho.intelligentpowersaving.R;
 
 /**
  * Class to perform all animation tasks in app
- *
+ * <p>
  * This singleton class consist of all animation tasks used in the app
  *
  * @author Tsung Wei Ho
@@ -24,13 +24,19 @@ public class AnimUtils {
     public int MID_ANIM_DURATION = 500;
     public int FAST_ANIM_DURATION = 250;
 
-    private static final AnimUtils ourInstance = new AnimUtils();
+    private static final AnimUtils instance = new AnimUtils();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static AnimUtils getInstance() {
-        return ourInstance;
+        return instance;
     }
 
-    private AnimUtils() {}
+    private AnimUtils() {
+    }
 
     /**
      * Get application context for animation use
@@ -41,7 +47,13 @@ public class AnimUtils {
         return IPowerSaving.getContext();
     }
 
-    public void fadeinToVisible(View view, int duration) {
+    /**
+     * Fade in view object
+     *
+     * @param view     the view to be faded in to visible
+     * @param duration the duration of the animation
+     */
+    public void fadeInToVisible(View view, int duration) {
         view.setVisibility(View.VISIBLE);
         Animation am = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
         am.setDuration(duration);
@@ -49,6 +61,12 @@ public class AnimUtils {
         am.startNow();
     }
 
+    /**
+     * slide up view object
+     *
+     * @param view     the view to be slided up to visible
+     * @param duration the duration of the animation
+     */
     public void slideUpToVisible(View view, int duration) {
         view.setVisibility(View.VISIBLE);
         Animation am = AnimationUtils.loadAnimation(getContext(), R.anim.design_bottom_sheet_slide_in);
@@ -57,13 +75,18 @@ public class AnimUtils {
         am.startNow();
     }
 
+    /**
+     * slide down view object
+     *
+     * @param view     the view to be slided down to invisible
+     * @param duration the duration of the animation
+     */
     public void slideDown(final View view, int duration) {
         Animation am = AnimationUtils.loadAnimation(getContext(), R.anim.design_bottom_sheet_slide_out);
         am.setDuration(duration);
         am.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
             }
 
             @Override
@@ -80,6 +103,12 @@ public class AnimUtils {
         am.startNow();
     }
 
+    /**
+     * Rotate the imageButton and change its icon
+     *
+     * @param imageButton the imageButton to perform animation
+     * @param icon        the icon to set to imageButton after the animation
+     */
     public void rotateToIcon(ImageButton imageButton, int icon) {
         imageButton.setImageResource(icon);
         Animation am = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);

@@ -26,7 +26,7 @@ import java.io.File;
 
 /**
  * Class for performing Firebase tasks
- *
+ * <p>
  * This class is used to perform different kinds of Firebase tasks.
  *
  * @author Tsung Wei Ho
@@ -34,8 +34,14 @@ import java.io.File;
  * @since 2.0.0
  */
 public class FirebaseManager implements DBConstants, BuildingConstants {
+
     private String TAG = "FirebaseManager";
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     private static final FirebaseManager instance = new FirebaseManager();
 
     public static FirebaseManager getInstance() {
@@ -71,19 +77,30 @@ public class FirebaseManager implements DBConstants, BuildingConstants {
     /**
      * Sign out Firebase system account
      */
-    public void signOutSystemAccount(){
+    public void signOutSystemAccount() {
         if (null == firebaseAuth)
             firebaseAuth = FirebaseAuth.getInstance();
 
         firebaseAuth.signOut();
     }
 
-    public void loadBuildings(ValueEventListener valueEventListener){
+    /**
+     * Load building from Firebase database
+     *
+     * @param valueEventListener the listener listens to Firebase response
+     */
+    public void loadBuildings(ValueEventListener valueEventListener) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(BUILDING_DB);
         databaseReference.addValueEventListener(valueEventListener);
     }
 
-    public Building loadBuildingBySnapshot(DataSnapshot buildingSnapshot){
+    /**
+     * Load building object from data snapshot
+     *
+     * @param buildingSnapshot the building data snapshot
+     * @return the building object loaded from data snapshot
+     */
+    public Building loadBuildingBySnapshot(DataSnapshot buildingSnapshot) {
         String name = buildingSnapshot.child(FDB_NAME).getValue() + "";
         String efficiency = buildingSnapshot.child(FDB_EFFICIENCY).getValue() + "";
         String consumption = buildingSnapshot.child(FDB_CONSUMPTION).getValue() + "";
@@ -114,11 +131,11 @@ public class FirebaseManager implements DBConstants, BuildingConstants {
     /**
      * Download user profile image from Firebase
      *
-     * @param imgUrl is the user name plus user uid in the format of [userName]/[uid]
+     * @param imgUrl          the user uid in the format of [uid]/[uid]
      * @param successListener success event listener for UI callback
      * @param failureListener failure event listener for UI callback
      */
-    public void downloadProfileImg(String imgUrl, OnSuccessListener<Uri> successListener, OnFailureListener failureListener){
+    public void downloadProfileImg(String imgUrl, OnSuccessListener<Uri> successListener, OnFailureListener failureListener) {
         StorageReference load = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC).child(imgUrl);
 
         load.getDownloadUrl().addOnSuccessListener(successListener).addOnFailureListener(failureListener);

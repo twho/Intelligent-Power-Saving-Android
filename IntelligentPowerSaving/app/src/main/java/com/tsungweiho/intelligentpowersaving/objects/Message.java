@@ -1,9 +1,14 @@
 package com.tsungweiho.intelligentpowersaving.objects;
 
 /**
- * Created by MichaelHo on 2015/6/1.
+ * Object class to store message information
+ * <p>
+ * This class is used to store message information used in InboxFragment, MessageFragment and ReportFragment
+ *
+ * @author Tsung Wei Ho
+ * @version 0104.2018
+ * @since 1.0.0
  */
-
 public class Message {
 
     private String uniqueId;
@@ -17,13 +22,13 @@ public class Message {
     /**
      * Message constructor
      *
-     * @param uniqueId the uniqueId of the message
-     * @param title
-     * @param content
-     * @param sender the sender of the message in the format of sender,senderUid
-     * @param senderImg the image url of the sender
-     * @param time the timestamp of the message
-     * @param inboxLabel inbox label stores information in the format fo un/read,star,inbox,messageImgUrl
+     * @param uniqueId   the uniqueId of the message
+     * @param title      the title of the message
+     * @param content    the content of the message
+     * @param sender     the sender of the message in the format of [sender],[senderUid]
+     * @param senderImg  the image url of the sender
+     * @param time       the timestamp of the message
+     * @param inboxLabel inbox label stores information in the format of [un/read],[star],[inbox],[messageImgUrl]
      */
     public Message(String uniqueId, String title, String content, String sender, String senderImg, String time, String inboxLabel) {
         this.uniqueId = uniqueId;
@@ -91,7 +96,12 @@ public class Message {
         this.inboxLabel = inboxLabel;
     }
 
-    public String toEncodedString(){
+    /**
+     * Convert to a long string that matches web version
+     *
+     * @return the string encoded with specified separator
+     */
+    public String toEncodedString() {
         // Separator in encoding
         String SEPARATOR = "IPSFROMWEB";
 

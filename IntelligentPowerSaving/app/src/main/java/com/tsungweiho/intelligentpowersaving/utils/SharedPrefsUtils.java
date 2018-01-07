@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
-import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.objects.MyAccountInfo;
 
 import java.util.UUID;
@@ -74,6 +73,11 @@ public class SharedPrefsUtils implements DBConstants {
         }
     }
 
+    /**
+     * Save myAccountInfo to local memory
+     *
+     * @param myAccountInfo the user preference used in this app
+     */
     public void saveMyAccountInfo(MyAccountInfo myAccountInfo) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -85,26 +89,54 @@ public class SharedPrefsUtils implements DBConstants {
         }
     }
 
+    /**
+     * Get myAccountInfo from local memory
+     *
+     * @return myAccountInfo object
+     */
     public MyAccountInfo getMyAccountInfo() {
         String json = sharedPreferences.getString(PREF_USER_ACCOUNT, null);
 
         return new Gson().fromJson(json, MyAccountInfo.class);
     }
 
+    /**
+     * Get String from sharedPreference
+     *
+     * @param key        the key of the stored String
+     * @param defaultStr the default String value
+     * @return the String get from sharePreference
+     */
     public String getPreferenceString(String key, String defaultStr) {
         return sharedPreferences.getString(key, defaultStr);
     }
 
+    /**
+     * Save String to sharedPreference
+     *
+     * @param key       the key of the stored String
+     * @param strToSave the String to be saved to SharedPreference
+     */
     public void savePreferenceString(String key, String strToSave) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putString(key, strToSave);
         prefsEditor.apply();
     }
 
+    /**
+     * Get if user sets to show followed buildings
+     *
+     * @return the boolean indicates if user sets to show followed buildings
+     */
     public boolean getIfShowFollowedBuilding() {
         return sharedPreferences.getBoolean(CURRENT_DISPLAY_MODE, false);
     }
 
+    /**
+     * Save if user sets to show followed buildings
+     *
+     * @param ifShowFollowedBuilding the boolean indicates if user sets to show followed buildings
+     */
     public void saveIfShowFollowedBuilding(boolean ifShowFollowedBuilding) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putBoolean(CURRENT_DISPLAY_MODE, ifShowFollowedBuilding);

@@ -10,9 +10,14 @@ import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.utils.NetworkUtils;
 
 /**
- * Created by Tsung Wei Ho on 2017/3/8.
+ * BroadcastReceiver in background to check internet connection status
+ * <p>
+ * This broadcastReceiver is always running in background to check internet connection status of the device
+ *
+ * @author Tsung Wei Ho
+ * @version 0308.2017
+ * @since 1.0.0
  */
-
 public class NetworkChangeReceiver extends BroadcastReceiver {
     private NetworkUtils networkUtils;
 
@@ -27,6 +32,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         networkUtils = new NetworkUtils();
         networkUtils.checkNetworkConnection();
         if (!isConnected) {
+            // Display connection status messages
             if (null != MainActivity.getContext())
                 ((MainActivity) MainActivity.getContext()).setConnectionMessage(false);
         }

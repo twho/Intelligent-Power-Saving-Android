@@ -18,21 +18,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
-import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
 import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.BuildingIcon;
 import com.tsungweiho.intelligentpowersaving.tools.FirebaseManager;
+import com.tsungweiho.intelligentpowersaving.tools.JsonParser;
 import com.tsungweiho.intelligentpowersaving.utils.SharedPrefsUtils;
 import com.tsungweiho.intelligentpowersaving.utils.AnimUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -44,7 +38,7 @@ import java.util.ArrayList;
  * @version 0218.2017
  * @since 1.0.0
  */
-public class HomeFragment extends Fragment implements DBConstants, BuildingConstants {
+public class HomeFragment extends Fragment implements DBConstants {
 
     private final String TAG = "HomeFragment";
 
@@ -79,12 +73,11 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
         animUtils = AnimUtils.getInstance();
         buildingDBHelper = new BuildingDBHelper(context);
 
-        // find views
-        // Compile with SDK 26, no need to cast views
+        // Find views, no need to cast views while compile with SDK 26
         gridLayout = view.findViewById(R.id.fragment_home_grid_layout);
         llProgress = view.findViewById(R.id.fragment_home_progress_layout);
         tvNoBuilding = view.findViewById(R.id.fragmnet_home_tv_no_building);
-        animUtils.fadeinToVisible(llProgress, animUtils.FAST_ANIM_DURATION);
+        animUtils.fadeInToVisible(llProgress, animUtils.FAST_ANIM_DURATION);
 
         ibFollowing = view.findViewById(R.id.fragment_home_ib_following);
         ibFollowing.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +101,9 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             gridLayout.setColumnCount(2);
     }
 
+    /**
+     * Set up follow button in HomeFragment user interface
+     */
     private void setupFollowingBuildings() {
         ArrayList<Building> buildingList = ifShowFollow ? buildingDBHelper.getFollowedBuildingSet() : buildingDBHelper.getAllBuildingSet();
         ibFollowing.setImageDrawable(context.getResources().getDrawable(ifShowFollow ? R.mipmap.ic_label_highlight : R.mipmap.ic_label_unhighlight));
@@ -164,13 +160,18 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
 
         // If Firebase is inaccessible, read local file
         if (buildingList.size() == 0)
-            addLocalDataToDatabase();
+            JsonParser.getInstance().loadLocalBuildingDataToDB();
 
         llProgress.setVisibility(View.GONE);
         setupFollowingBuildings();
-        animUtils.fadeinToVisible(gridLayout, animUtils.MID_ANIM_DURATION);
+        animUtils.fadeInToVisible(gridLayout, animUtils.MID_ANIM_DURATION);
     }
 
+    /**
+     * Refresh building icons shown in the dashboard
+     *
+     * @param buildingList an arrayList of all buildings loaded from database
+     */
     private void refreshBuildingIcons(ArrayList<Building> buildingList) {
         Building building;
         gridLayout.removeAllViews();
@@ -188,49 +189,6 @@ public class HomeFragment extends Fragment implements DBConstants, BuildingConst
             });
             gridLayout.addView(buildingIcon.getView());
         }
-    }
-
-    /**
-     * Load data from local storage if network is bad
-     */
-    private void addLocalDataToDatabase() {
-        JSONObject obj;
-        try {
-            obj = new JSONObject(loadJSONFromAsset());
-            JSONArray jArr = obj.getJSONArray(JSON_ARRAY_NAME);
-
-            for (int i = 0; i < jArr.length(); i++) {
-                JSONObject currentObj = jArr.getJSONObject(i);
-                String name = currentObj.getString(FDB_NAME);
-
-                // if already have in local, don't override the data
-                if (!buildingDBHelper.isExist(name)) {
-                    String detail = currentObj.getString(FDB_DETAIL);
-                    String efficiency = currentObj.getString(FDB_EFFICIENCY);
-                    String consumption = currentObj.getString(FDB_CONSUMPTION);
-                    String imgUrl = currentObj.getString(FDB_IMGURL);
-                    buildingDBHelper.insertDB(new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW));
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String loadJSONFromAsset() {
-        String json = null;
-        InputStream is;
-        try {
-            is = context.getAssets().open(LOCAL_BUILDING_JSON);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException e) {
-            Log.d(TAG, e.getMessage());
-        }
-        return json;
     }
 
     @Override

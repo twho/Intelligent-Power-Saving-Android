@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Class to perform all animation tasks in app
- *
+ * <p>
  * This singleton class consist of all animation tasks used in the app
  *
  * @author Tsung Wei Ho
@@ -36,13 +36,19 @@ import java.util.List;
  */
 public class ChartUtils implements BuildingConstants {
 
-    private static final ChartUtils ourInstance = new ChartUtils();
+    private static final ChartUtils instance = new ChartUtils();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static ChartUtils getInstance() {
-        return ourInstance;
+        return instance;
     }
 
-    private ChartUtils() {}
+    private ChartUtils() {
+    }
 
     /**
      * Get application context for chart use
@@ -56,7 +62,7 @@ public class ChartUtils implements BuildingConstants {
     /**
      * Create line chart using 3rd party library
      *
-     * @param lineChart the lineChart UI widgets to set the components to
+     * @param lineChart       the lineChart UI widgets to set the components to
      * @param stringArrayList the data as String arrayList to be shown
      */
     public void setupLineChart(LineChart lineChart, ArrayList<String> stringArrayList) {
@@ -111,7 +117,7 @@ public class ChartUtils implements BuildingConstants {
         leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
         leftAxis.addLimitLine(ll1);
         leftAxis.addLimitLine(ll2);
-        leftAxis.setAxisMaximum(Collections.max(intList)*1.1f);
+        leftAxis.setAxisMaximum(Collections.max(intList) * 1.1f);
         leftAxis.setAxisMinimum(Collections.min(intList) - 20f);
         leftAxis.setTextColor(Color.WHITE);
         leftAxis.enableGridDashedLine(10f, 10f, 0f);
@@ -160,8 +166,8 @@ public class ChartUtils implements BuildingConstants {
     /**
      * Load data to line chart UI
      *
-     * @param context the context to get resources in app
-     * @param lineChart the lineChart UI to load data to
+     * @param context         the context to get resources in app
+     * @param lineChart       the lineChart UI to load data to
      * @param stringArrayList the String arrayList that consists of data
      */
     private void setLineChartData(Context context, LineChart lineChart, ArrayList<String> stringArrayList) {

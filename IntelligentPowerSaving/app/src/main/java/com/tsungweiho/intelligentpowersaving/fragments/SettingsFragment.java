@@ -29,7 +29,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask;
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
-import com.tsungweiho.intelligentpowersaving.MainActivity;
 import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
@@ -104,22 +103,29 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         imageUtils = ImageUtils.getInstance();
         pubNubHelper = PubNubHelper.getInstance();
 
+        // Find views
         edName = view.findViewById(R.id.fragment_settings_ed_name);
         edEmail = view.findViewById(R.id.fragment_settings_ed_email);
         tvProgress = view.findViewById(R.id.fragment_settings_tv_progress);
-        tvProgress.setOnClickListener(settingsFragmentListener);
         progressBar = view.findViewById(R.id.fragment_settings_progressBar);
-
         ivProfile = view.findViewById(R.id.fragment_settings_iv);
-        ivProfile.setOnClickListener(settingsFragmentListener);
-
         swEvent = view.findViewById(R.id.fragment_settings_sw_event);
-        swEvent.setOnCheckedChangeListener(settingsFragmentListener);
-
         swPublic = view.findViewById(R.id.fragment_settings_sw_public);
+
+        // Set listeners
+        tvProgress.setOnClickListener(settingsFragmentListener);
+        ivProfile.setOnClickListener(settingsFragmentListener);
+        swEvent.setOnCheckedChangeListener(settingsFragmentListener);
         swPublic.setOnCheckedChangeListener(settingsFragmentListener);
     }
 
+    /**
+     * Get the result from the intent
+     *
+     * @param requestCode the code that represents requested resource
+     * @param resultCode  the code that represents request status
+     * @param data        the data get from requested resource
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -146,15 +152,18 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * All listeners used in SettingsFragment
+     */
     private class SettingsFragmentListener implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DialogInterface.OnDismissListener,
             OnProgressListener<UploadTask.TaskSnapshot>, OnFailureListener, OnSuccessListener<UploadTask.TaskSnapshot> {
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
-                case R.id.fragment_settings_iv:
+                case R.id.fragment_settings_iv: // Profile imageView
                     alertDialogMgr.showCameraDialog(MainFragment.SETTINGS.toString());
                     break;
-                case R.id.fragment_settings_tv_progress:
+                case R.id.fragment_settings_tv_progress: // TextView shows upload progress
                     performUploadTask();
                     break;
             }
@@ -163,10 +172,10 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
             switch (compoundButton.getId()) {
-                case R.id.fragment_settings_sw_event:
+                case R.id.fragment_settings_sw_event: // Switch of event channel
                     setChannelSubscription(isChecked, 0);
                     break;
-                case R.id.fragment_settings_sw_public:
+                case R.id.fragment_settings_sw_public: // Switch of message channel
                     setChannelSubscription(isChecked, 1);
                     break;
             }
@@ -193,6 +202,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
             strBuilder.append("\n");
             strBuilder.append(context.getResources().getString(R.string.upload_profilepic));
 
+            // Set text progress
             tvProgress.setText(strBuilder);
             tvProgress.setTextColor(context.getResources().getColor(R.color.green));
         }
@@ -234,6 +244,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         tvProgress.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
 
+        // Create Firebase upload task
         UploadTask uploadTask = firebaseMgr.uploadProfileImg(imageUtils.getFileFromBitmap(ivProfile.getDrawingCache()).getPath());
         uploadTask.addOnProgressListener(settingsFragmentListener).addOnFailureListener(settingsFragmentListener).addOnSuccessListener(settingsFragmentListener);
     }
@@ -252,6 +263,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
         else
             pubNubHelper.unsubscribeToChannels(IPowerSaving.getPubNub(), channels);
 
+        // Change share preference values
         myAccountInfo.setSubscriptionBools(index, isChecked);
     }
 
@@ -263,14 +275,24 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
      */
     @BindingAdapter({"bind:userImage"})
     public static void loadUserImage(final ImageView imageView, final String url) {
-        if (url.equalsIgnoreCase("")) {
-            imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+        imageView.setImageDrawable(IPowerSaving.getContext().getResources().getDrawable(R.mipmap.ic_preload_profile));
+
+        // Attempt to load from Firebase if local memory does not have image resource
+        String uid = SharedPrefsUtils.getInstance().getMyAccountInfo().getUid();
+        if (url.equalsIgnoreCase("") && null != uid && !"".equals(uid)) {
+            FirebaseManager.getInstance().downloadProfileImg(uid, new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    imageView.invalidate();
+                    ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(uri.toString(), imageView, ImageUtils.getInstance().IMG_CIRCULAR);
+                }
+            }, null);
+
             return;
         }
 
         imageView.invalidate();
-        final ImageUtils imageUtils = ImageUtils.getInstance();
-        imageUtils.setRoundedCornerImageViewFromUrl(url, imageView, imageUtils.IMG_CIRCULAR);
+        ImageUtils.getInstance().setRoundedCornerImageViewFromUrl(url, imageView, ImageUtils.getInstance().IMG_CIRCULAR);
     }
 
     @Override

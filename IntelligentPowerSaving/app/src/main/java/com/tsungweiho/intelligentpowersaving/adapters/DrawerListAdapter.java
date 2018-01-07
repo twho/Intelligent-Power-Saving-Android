@@ -13,7 +13,7 @@ import com.tsungweiho.intelligentpowersaving.R;
 
 /**
  * Class for setting side menu in InboxFragment
- *
+ * <p>
  * This class is the user interface of side menu in InboxFragment
  *
  * @author Tsung Wei Ho
@@ -27,6 +27,13 @@ public class DrawerListAdapter extends BaseAdapter {
     private int[] functions;
     private int[] drawables;
 
+    /**
+     * DrawerListAdapter constructor
+     *
+     * @param context   the context that uses this class
+     * @param functions the function description in String resources
+     * @param drawables the image of the functions in drawable resources
+     */
     public DrawerListAdapter(Context context, int[] functions, int[] drawables) {
         this.context = context;
         this.functions = functions;
@@ -55,11 +62,11 @@ public class DrawerListAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.obj_drawer_list_item, null);
+
             viewHolder = new ViewHolder();
-            viewHolder.tvFunction = (TextView) convertView
-                    .findViewById(R.id.obj_drawer_list_item_tv);
-            viewHolder.imageView = (ImageView) convertView
-                    .findViewById(R.id.obj_drawer_list_item_iv);
+            viewHolder.tvFunction = convertView.findViewById(R.id.obj_drawer_list_item_tv);
+            viewHolder.imageView = convertView.findViewById(R.id.obj_drawer_list_item_iv);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -70,6 +77,9 @@ public class DrawerListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * All UI widgets used in DrawerListAdapter
+     */
     private class ViewHolder {
         ImageView imageView;
         TextView tvFunction;

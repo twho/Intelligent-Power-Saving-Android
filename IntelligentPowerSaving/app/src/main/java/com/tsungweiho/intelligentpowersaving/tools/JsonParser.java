@@ -7,16 +7,21 @@ import android.util.Log;
 
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
 import com.tsungweiho.intelligentpowersaving.R;
+import com.tsungweiho.intelligentpowersaving.constants.BuildingConstants;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
+import com.tsungweiho.intelligentpowersaving.databases.BuildingDBHelper;
+import com.tsungweiho.intelligentpowersaving.objects.Building;
 import com.tsungweiho.intelligentpowersaving.objects.Event;
 import com.tsungweiho.intelligentpowersaving.objects.Message;
 import com.tsungweiho.intelligentpowersaving.utils.TimeUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,11 +34,16 @@ import java.util.Locale;
  * @version 1231.2017
  * @since 2.0.0
  */
-public class JsonParser implements PubNubAPIConstants, DBConstants {
+public class JsonParser implements PubNubAPIConstants, DBConstants, BuildingConstants {
     private String TAG = "JsonParser";
 
     private static final JsonParser instance = new JsonParser();
 
+    /**
+     * Get singleton class instance
+     *
+     * @return class instance
+     */
     public static JsonParser getInstance() {
         return instance;
     }
@@ -76,6 +86,12 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         return event;
     }
 
+    /**
+     * Get message object from input string
+     *
+     * @param strMessage the string of message that contains message object parameters
+     * @return the message object retrieved from strMessage
+     */
     public Message getMessageByString(String strMessage) {
         String uniqueId = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_UNID];
         String title = strMessage.split(FROM_WEB_MESSAGE_SEPARATOR)[FROM_WEB_MESSAGE_TITLE];
@@ -88,6 +104,12 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         return new Message(uniqueId, title, content, sender, senderImg, time, inboxLabel);
     }
 
+    /**
+     * Convert an event object to a message object
+     *
+     * @param jsonObject the JSON object represents information of an event object
+     * @return the message object retrieved from JSON object
+     */
     public Message convertEventToMessage(JSONObject jsonObject) {
         Message message = null;
 
@@ -108,6 +130,12 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         return message;
     }
 
+    /**
+     * Get address by latitude and longitude position
+     *
+     * @param position the position in the format of latitude,longitude
+     * @return the address as String
+     */
     private String getAddressByPosition(String position) {
         String address = "---";
         Geocoder geocoder;
@@ -122,5 +150,55 @@ public class JsonParser implements PubNubAPIConstants, DBConstants {
         }
 
         return address;
+    }
+
+    /**
+     * Load local building data to building database
+     */
+    public void loadLocalBuildingDataToDB() {
+        BuildingDBHelper buildingDBHelper = new BuildingDBHelper(getContext());
+
+        JSONObject jsonObj;
+        try {
+            jsonObj = new JSONObject(loadJSONFromAsset());
+            JSONArray jArr = jsonObj.getJSONArray(JSON_ARRAY_NAME);
+
+            for (int i = 0; i < jArr.length(); i++) {
+                JSONObject currentObj = jArr.getJSONObject(i);
+                String name = currentObj.getString(FDB_NAME);
+
+                // if already have in local, don't override the data
+                if (!buildingDBHelper.isExist(name)) {
+                    String detail = currentObj.getString(FDB_DETAIL);
+                    String efficiency = currentObj.getString(FDB_EFFICIENCY);
+                    String consumption = currentObj.getString(FDB_CONSUMPTION);
+                    String imgUrl = currentObj.getString(FDB_IMGURL);
+                    buildingDBHelper.insertDB(new Building(name, detail, efficiency, consumption, imgUrl, BUILDING_NOT_FOLLOW));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load JSON file from assets
+     *
+     * @return the JSON file as String
+     */
+    private String loadJSONFromAsset() {
+        String json = null;
+        InputStream is;
+        try {
+            is = getContext().getAssets().open(LOCAL_BUILDING_JSON);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
+        return json;
     }
 }

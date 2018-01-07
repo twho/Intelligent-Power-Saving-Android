@@ -13,9 +13,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
  * @since 1.0.0
  */
 public interface BuildingConstants {
+    LatLngBounds ntustBounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
+
+    // TODO Will be used when UM version is developed
     LatLngBounds umCentralBounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));
     LatLngBounds umNorthBounds = new LatLngBounds(new LatLng(42.269298, -83.745612), new LatLng(42.286554, -83.725708));
-    LatLngBounds ntustBounds = new LatLngBounds(new LatLng(25.011353, 121.540963), new LatLng(25.015593, 121.542648));
 
     String[] TIME_HOURS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "Noon", "1", "2", "3",
             "4", "5", "6", "7", "8", "9", "10", "11", "0"};

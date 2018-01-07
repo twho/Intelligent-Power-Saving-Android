@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.pubnub.api.PubNub;
 import com.tsungweiho.intelligentpowersaving.constants.DBConstants;
 import com.tsungweiho.intelligentpowersaving.constants.FragmentTags;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
@@ -48,7 +47,7 @@ import java.util.ArrayList;
 
 /**
  * Activity as main user interface
- *
+ * <p>
  * This activity is the user interface that provide most of the app functions.
  *
  * @author Tsung Wei Ho
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         return context;
     }
 
-    public static FragmentManager getFragmentMgr(){
+    public static FragmentManager getFragmentMgr() {
         return fragmentManager;
     }
 
@@ -194,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
      * Add action bar tab to main UI
      *
      * @param fragmentTag the fragment tag of action bar tab
-     * @param index the order of action bar tab to be shown
+     * @param index       the order of action bar tab to be shown
      */
     private void addTab(MainFragment fragmentTag, int index) {
         android.support.v7.app.ActionBar.Tab tab = actionBar.newTab().setTabListener(this);
@@ -285,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     /**
      * Set up MessageFragment
      *
-     * @param message the message object to be shown in MessageFragment
+     * @param message  the message object to be shown in MessageFragment
      * @param position the position of the message list item clicked by user
      */
     public void setMessageFragment(Message message, int position) {
@@ -304,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     /**
      * Set up ReportFragment
      */
-    public void setReportFragment(){
+    public void setReportFragment() {
         // TODO pass draft content as argument to the fragment
         ReportFragment reportFragment = new ReportFragment();
 
@@ -314,9 +313,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     /**
      * Start replacing current fragment
      *
-     * @param fragment the fragment to be set active
+     * @param fragment    the fragment to be set active
      * @param fragmentTag the fragment tag of active fragment
-     * @param animate show animation in fragment transition
+     * @param animate     show animation in fragment transition
      */
     private void startReplaceFragment(Fragment fragment, String fragmentTag, boolean animate) {
         try {
@@ -351,6 +350,12 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         FirebaseManager.getInstance().signOutSystemAccount();
     }
 
+    /**
+     * Close keyboard
+     *
+     * @param context     the context that calls this method
+     * @param windowToken the windowToken of the UI widget that is currently focused
+     */
     public static void closeKeyboard(Context context, IBinder windowToken) {
         InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 

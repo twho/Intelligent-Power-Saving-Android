@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Interface that stores all fragment tags
- *
+ * <p>
  * This interface is used to store all fragment tags, which is used by fragmentManager
  *
  * @author Tsung Wei Ho
