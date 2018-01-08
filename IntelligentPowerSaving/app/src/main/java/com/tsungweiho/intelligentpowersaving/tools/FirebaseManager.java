@@ -2,6 +2,7 @@ package com.tsungweiho.intelligentpowersaving.tools;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -135,7 +136,7 @@ public class FirebaseManager implements DBConstants, BuildingConstants {
      * @param successListener success event listener for UI callback
      * @param failureListener failure event listener for UI callback
      */
-    public void downloadProfileImg(String imgUrl, OnSuccessListener<Uri> successListener, OnFailureListener failureListener) {
+    public void downloadProfileImg(String imgUrl, OnSuccessListener<Uri> successListener, @Nullable OnFailureListener failureListener) {
         StorageReference load = FirebaseStorage.getInstance().getReference(FDB_STORAGE_PROFILEPIC).child(imgUrl);
 
         load.getDownloadUrl().addOnSuccessListener(successListener).addOnFailureListener(failureListener);

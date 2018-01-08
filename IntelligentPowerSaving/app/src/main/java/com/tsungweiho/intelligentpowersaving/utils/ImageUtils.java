@@ -123,7 +123,9 @@ public class ImageUtils {
         try {
             file.createNewFile();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            if (bitmap.getAllocationByteCount() > MAX_SIZE) {
+
+            // Check Android API version
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && bitmap.getAllocationByteCount() > MAX_SIZE) {
                 int rate = MAX_SIZE / (bitmap.getAllocationByteCount());
                 if (rate <= 25)
                     rate = 25;
@@ -131,6 +133,7 @@ public class ImageUtils {
             } else {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             }
+
 
             byte[] bitmapdata = bos.toByteArray();
 

@@ -200,17 +200,17 @@ public class MainService extends Service implements PubNubAPIConstants, Fragment
         if (null == fm && null != MainActivity.getContext())
             fm = MainActivity.getFragmentMgr();
 
-        Fragment existingFragment = fm.findFragmentByTag(fragmentTag.toString());
+        Fragment existingFragment = null;
+        if (null != fm)
+            existingFragment = fm.findFragmentByTag(fragmentTag.toString());
 
-        switch (fragmentTag) {
-            case INBOX:
-                if (null == existingFragment)
+        if (null == existingFragment) {
+            switch (fragmentTag) {
+                case INBOX:
                     return new InboxFragment();
-                break;
-            case EVENT:
-                if (null == existingFragment)
+                case EVENT:
                     return new EventFragment();
-                break;
+            }
         }
 
         return existingFragment;

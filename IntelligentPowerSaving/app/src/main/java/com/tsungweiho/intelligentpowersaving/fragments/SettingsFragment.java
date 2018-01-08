@@ -141,6 +141,8 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
                     e.printStackTrace();
                 }
             } else if (requestCode == alertDialogMgr.REQUEST_CODE_CAMERA) {
+                if (null != data.getExtras())
+
                 bmpBuffer = (Bitmap) data.getExtras().get("data");
             }
 
@@ -214,9 +216,7 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
          */
         @Override
         public void onFailure(@NonNull Exception exception) {
-            tvProgress.setClickable(true);
-            tvProgress.setText(context.getResources().getString(R.string.notification_fail));
-            tvProgress.setTextColor(context.getResources().getColor(R.color.light_red));
+            showUploadFail();
         }
 
         /**
@@ -226,15 +226,27 @@ public class SettingsFragment extends Fragment implements FragmentTags, DBConsta
          */
         @Override
         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-            Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+            if (null == taskSnapshot.getMetadata()) {
+                showUploadFail();
+                return;
+            }
 
             // Store to local user preference
-            myAccountInfo.setImageUrl(downloadUrl.toString());
+            myAccountInfo.setImageUrl(taskSnapshot.getMetadata().getDownloadUrl() + "");
             binding.setMyAccountInfo(myAccountInfo);
 
             tvProgress.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Show upload fail messages in UI
+     */
+    private void showUploadFail() {
+        tvProgress.setClickable(true);
+        tvProgress.setText(context.getResources().getString(R.string.notification_fail));
+        tvProgress.setTextColor(context.getResources().getColor(R.color.light_red));
     }
 
     /**

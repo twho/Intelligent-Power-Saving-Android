@@ -172,7 +172,7 @@ public class ChartUtils implements BuildingConstants {
      */
     private void setLineChartData(Context context, LineChart lineChart, ArrayList<String> stringArrayList) {
 
-        ArrayList<Entry> values = new ArrayList<Entry>();
+        ArrayList<Entry> values = new ArrayList<>();
 
         for (int i = 0; i < stringArrayList.size(); i++) {
             // Drawable icon is unused, can be set to anything
@@ -215,7 +215,7 @@ public class ChartUtils implements BuildingConstants {
                 set1.setFillColor(context.getResources().getColor(R.color.teal));
             }
 
-            ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the datasets
 
             // create a data object with the datasets
