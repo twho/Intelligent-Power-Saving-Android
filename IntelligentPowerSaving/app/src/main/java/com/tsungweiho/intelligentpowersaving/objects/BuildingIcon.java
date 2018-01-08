@@ -33,8 +33,9 @@ public class BuildingIcon extends View implements BuildingConstants {
     // Main view
     private View view;
 
-    // Functions
-    private ObjIconBuildingBinding binding;
+    public BuildingIcon(Context context) {
+        super(context);
+    }
 
     /**
      * BuildingIcon constructor
@@ -49,7 +50,7 @@ public class BuildingIcon extends View implements BuildingConstants {
 
         // Data binding
         LayoutInflater li = LayoutInflater.from(context);
-        binding = DataBindingUtil.inflate(li, R.layout.obj_icon_building, null, false);
+        ObjIconBuildingBinding binding = DataBindingUtil.inflate(li, R.layout.obj_icon_building, null, false);
         binding.setBuilding(building);
         view = binding.getRoot();
 

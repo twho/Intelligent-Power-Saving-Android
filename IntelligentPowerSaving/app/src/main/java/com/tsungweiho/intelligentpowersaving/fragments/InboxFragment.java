@@ -287,7 +287,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
                     // Change functions based on current mode
                     switch (msgListAdapter.getMode()) {
                         case VIEW:
-                            drawer.openDrawer(Gravity.LEFT);
+                            drawer.openDrawer(Gravity.START);
                             break;
                         case EDIT:
                             refreshViewingInbox(msgDBHelper.getMessageListByLabel(currentBox));
@@ -340,7 +340,7 @@ public class InboxFragment extends Fragment implements ListAdapterConstants, Pub
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int pos, long id) {
-            drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
                 @Override
                 public void onDrawerClosed(View drawerView) {
                     switch (pos) {

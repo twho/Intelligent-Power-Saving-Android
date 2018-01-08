@@ -64,7 +64,6 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     private String TAG = "ReportFragment";
 
     private View view;
-
     private Context context;
 
     // UI widgets
@@ -175,9 +174,7 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                     break;
                 case R.id.fragment_report_ib_delete: // Delete button
                     // Clean up message content in memory
-                    edTitle.setText("");
-                    edContent.setText("");
-                    prefUtils.savePreferenceString(prefUtils.PREF_REPORT_DRAFT, "");
+                    cleanupDraft();
 
                     // Go back to InboxFragment
                     ((MainActivity) getActivity()).setFragment(MainFragment.INBOX);
@@ -219,6 +216,16 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
     }
 
     /**
+     * Clean up draft in local memory
+     */
+    private void cleanupDraft() {
+        // Clean up message content in memory
+        edTitle.setText("");
+        edContent.setText("");
+        prefUtils.savePreferenceString(prefUtils.PREF_REPORT_DRAFT, "");
+    }
+
+    /**
      * Get the result from the intent
      *
      * @param requestCode the code that represents requested resource
@@ -240,7 +247,8 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                     e.printStackTrace();
                 }
             } else if (requestCode == alertDialogMgr.REQUEST_CODE_CAMERA) {
-                bmpBuffer = (Bitmap) data.getExtras().get("data");
+                if (null != data.getExtras())
+                    bmpBuffer = (Bitmap) data.getExtras().get("data");
             }
 
             if (null != bmpBuffer)
@@ -287,6 +295,9 @@ public class ReportFragment extends Fragment implements FragmentTags, PubNubAPIC
                             progressBar.setVisibility(View.GONE);
                         } else {
                             Toast.makeText(context, getString(R.string.message_sent), Toast.LENGTH_SHORT).show();
+
+                            // Clean up message content in memory
+                            cleanupDraft();
 
                             // Return to inbox fragment
                             ((MainActivity) MainActivity.getContext()).setFragment(MainFragment.INBOX);

@@ -255,6 +255,16 @@
                         android:scaleX="@dimen/activity_main_widget_scale"
                         android:scaleY="@dimen/activity_main_widget_scale" />
                 </FrameLayout>
+
+                <TextView
+                    style="@style/Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/activity_main_space"
+                    android:gravity="center"
+                    android:padding="@dimen/activity_main_space"
+                    android:text="@string/version"
+                    android:textColor="@color/colorTint" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

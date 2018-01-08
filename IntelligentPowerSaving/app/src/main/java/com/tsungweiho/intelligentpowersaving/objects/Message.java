@@ -103,22 +103,8 @@ public class Message {
      */
     public String toEncodedString() {
         // Separator in encoding
-        String SEPARATOR = "IPSFROMWEB";
+        String TAG = "IPSFROMWEB";
 
-        StringBuilder strBuilder = new StringBuilder(SEPARATOR);
-        strBuilder.append(time);
-        strBuilder.append(SEPARATOR);
-        strBuilder.append(title);
-        strBuilder.append(SEPARATOR);
-        strBuilder.append(content);
-        strBuilder.append(SEPARATOR);
-        strBuilder.append(sender);
-        strBuilder.append(SEPARATOR);
-        strBuilder.append(senderImg);
-        strBuilder.append(SEPARATOR);
-        strBuilder.append(inboxLabel);
-        strBuilder.append(SEPARATOR);
-
-        return strBuilder.toString();
+        return TAG + time + TAG + title + TAG + content + TAG + sender + TAG + senderImg + TAG + inboxLabel + TAG;
     }
 }

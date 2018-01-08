@@ -46,8 +46,8 @@ public class PermissionManager {
      */
     public static boolean hasAllPermissions(Context context) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (int i = 0; i < permissions.length; i++) {
-                if (ActivityCompat.checkSelfPermission(context, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }
@@ -59,10 +59,9 @@ public class PermissionManager {
      * Request camera permission from user
      */
     public void requestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale((MainActivity) context,
-                    android.Manifest.permission.CAMERA)) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((MainActivity) context, android.Manifest.permission.CAMERA)) {
+                // TODO add content
             } else {
                 ActivityCompat.requestPermissions((MainActivity) context,
                         new String[]{android.Manifest.permission.CAMERA},

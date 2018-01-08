@@ -9,7 +9,6 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.tsungweiho.intelligentpowersaving.IPowerSaving;
-import com.tsungweiho.intelligentpowersaving.R;
 import com.tsungweiho.intelligentpowersaving.constants.PubNubAPIConstants;
 import com.tsungweiho.intelligentpowersaving.databases.EventDBHelper;
 import com.tsungweiho.intelligentpowersaving.databases.MessageDBHelper;

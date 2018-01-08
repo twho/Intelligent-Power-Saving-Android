@@ -3,6 +3,7 @@ package com.tsungweiho.intelligentpowersaving.utils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Class to perform all time formatting tasks in the app
@@ -44,7 +45,7 @@ public class TimeUtils {
      * @return date as String
      */
     public String getDate() {
-        DateFormat df1 = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat df1 = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         return df1.format(Calendar.getInstance().getTime());
     }
 
@@ -54,7 +55,7 @@ public class TimeUtils {
      * @return current hour as String
      */
     public String getTimeHH() {
-        DateFormat df = new SimpleDateFormat("HH");
+        DateFormat df = new SimpleDateFormat("HH", Locale.US);
         return df.format(Calendar.getInstance().getTime());
     }
 
@@ -64,7 +65,7 @@ public class TimeUtils {
      * @return current time as String
      */
     public String getTimehhmm() {
-        DateFormat df = new SimpleDateFormat("hh:mm aaa");
+        DateFormat df = new SimpleDateFormat("hh:mm aaa", Locale.US);
         return df.format(Calendar.getInstance().getTime());
     }
 
@@ -87,7 +88,7 @@ public class TimeUtils {
      */
     private String getTimehhmmByMilliSec(long milliSeconds) {
         Calendar calendar = Calendar.getInstance();
-        DateFormat df = new SimpleDateFormat("hh:mm aaa");
+        DateFormat df = new SimpleDateFormat("hh:mm aaa", Locale.US);
         calendar.setTimeInMillis(milliSeconds);
         return df.format(calendar.getTime());
     }
@@ -100,7 +101,7 @@ public class TimeUtils {
      */
     private String getDateByMilliSec(long milliSeconds) {
         Calendar calendar = Calendar.getInstance();
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         calendar.setTimeInMillis(milliSeconds);
         return df.format(calendar.getTime());
     }

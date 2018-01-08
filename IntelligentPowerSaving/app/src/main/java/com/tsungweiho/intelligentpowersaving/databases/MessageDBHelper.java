@@ -97,9 +97,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         values.put(DB_MESSAGE_TIME, message.getTime());
         values.put(DB_MESSAGE_INBOX_LABEL, message.getInboxLabel());
 
-        long rowId = db.insert(TABLE_NAME, null, values);
-
-        return rowId;
+        return db.insert(TABLE_NAME, null, values);
     }
 
     /**
@@ -121,9 +119,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
         values.put(DB_MESSAGE_INBOX_LABEL, message.getInboxLabel());
         String whereClause = DB_MESSAGE_UNID + "='" + message.getUniqueId() + "'";
 
-        int count = db.update(TABLE_NAME, values, whereClause, null);
-
-        return count;
+        return db.update(TABLE_NAME, values, whereClause, null);
     }
 
     /**
@@ -185,6 +181,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
                 }
             }
         }
+
         cursor.close();
 
         return messageList;
@@ -279,6 +276,7 @@ public class MessageDBHelper extends SQLiteOpenHelper implements DBConstants, Pu
             String inboxLabel = cursor.getString(6);
             message = new Message(uniqueId, title, content, sender, senderImg, time, inboxLabel);
         }
+
         cursor.close();
         db.close();
 
