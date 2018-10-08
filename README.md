@@ -1,6 +1,6 @@
 # iPower Saving 
 <a href='https://play.google.com/store/apps/details?id=com.tsungweiho.intelligentpowersaving&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width = '200'></a>
-- Project website: http://www.tsungweiho.com/ipower-saving.html
+- Project website: https://twho.weebly.com/ipower-saving.html
 - Google Play download: https://play.google.com/store/apps/details?id=com.tsungweiho.intelligentpowersaving
 
 ## Project Information
